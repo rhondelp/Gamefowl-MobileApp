@@ -3,15 +3,18 @@
  *
  * Purpose:
  *   TypeScript definitions for every named route in the app. React
- *   Navigation uses these so `navigation.navigate("Register")` is fully
- *   typed — typos or missing params become compile errors instead of
- *   silent runtime bugs.
+ *   Navigation uses these so `navigation.navigate("GamefowlDetails", ...)`
+ *   is fully typed — typos or missing params become compile errors instead
+ *   of silent runtime bugs.
  *
- * Two stacks exist today:
+ * Three navigators exist today:
  *   - AuthStackParamList: pre-login flow (Login <-> Register)
- *   - MainTabParamList: post-login app (currently one Home tab; more tabs
- *     like Birds / History arrive in Milestones 10+).
+ *   - MainTabParamList:   post-login tabs (Dashboard + Profile; Health
+ *                         Assessment/History tabs arrive in later milestones)
+ *   - DashboardStackParamList: stack nested under the Dashboard tab holding
+ *                         the whole bird-management flow.
  */
+import type { NavigatorScreenParams } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 export type AuthStackParamList = {
@@ -19,10 +22,24 @@ export type AuthStackParamList = {
   Register: undefined;
 };
 
+/** Bird-management stack nested inside the Dashboard tab. */
+export type DashboardStackParamList = {
+  Dashboard: undefined;
+  MyGamefowl: undefined;
+  GamefowlDetails: { gamefowlId: number };
+  AddGamefowl: undefined;
+  EditGamefowl: { gamefowlId: number };
+};
+
 export type MainTabParamList = {
-  Home: undefined;
+  DashboardTab: NavigatorScreenParams<DashboardStackParamList>;
+  ProfileTab: undefined;
 };
 
 /** Handy alias for screens living in the auth stack. */
 export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
   NativeStackScreenProps<AuthStackParamList, T>;
+
+/** Handy alias for screens living in the dashboard stack. */
+export type DashboardStackScreenProps<T extends keyof DashboardStackParamList> =
+  NativeStackScreenProps<DashboardStackParamList, T>;

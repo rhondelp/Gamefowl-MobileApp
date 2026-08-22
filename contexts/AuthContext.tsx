@@ -35,18 +35,24 @@ export type AuthStatus = "loading" | "signedOut" | "signedIn";
 interface AuthState {
   status: AuthStatus;
   user: AuthUser | null;
+  /**
+   * Bearer token kept in memory alongside the user so data screens can
+   * authorize API calls without re-reading SecureStore per request.
+   * Null when signed out; never persisted anywhere but SecureStore itself.
+   */
+  token: string | null;
 }
 
 type AuthAction =
   | { type: "SIGNED_OUT" }
-  | { type: "SIGNED_IN"; user: AuthUser };
+  | { type: "SIGNED_IN"; user: AuthUser; token: string };
 
 function reducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case "SIGNED_IN":
-      return { status: "signedIn", user: action.user };
+      return { status: "signedIn", user: action.user, token: action.token };
     case "SIGNED_OUT":
-      return { status: "signedOut", user: null };
+      return { status: "signedOut", user: null, token: null };
     default:
       return state;
   }
@@ -79,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, {
     status: "loading",
     user: null,
+    token: null,
   });
 
   /**
@@ -95,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const data = await authService.me(token);
-        dispatch({ type: "SIGNED_IN", user: data.user });
+        dispatch({ type: "SIGNED_IN", user: data.user, token });
       } catch {
         // Token invalid or revoked server-side: discard it locally.
         await deleteToken();
@@ -114,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const data = await authService.login(email, password);
     await saveToken(data.token);
-    dispatch({ type: "SIGNED_IN", user: data.user });
+    dispatch({ type: "SIGNED_IN", user: data.user, token: data.token });
   };
 
   /**
@@ -134,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password_confirmation: input.passwordConfirmation,
     });
     await saveToken(data.token);
-    dispatch({ type: "SIGNED_IN", user: data.user });
+    dispatch({ type: "SIGNED_IN", user: data.user, token: data.token });
   };
 
   /**

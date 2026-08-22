@@ -39,6 +39,74 @@ export interface MeData {
 /** Per-field validation messages, e.g. { email: ["Invalid credentials."] }. */
 export type FieldErrors = Record<string, string[]>;
 
+/*
+ * ---------------------------------------------------------------------------
+ * Gamefowl domain (backend Milestone 3 — GamefowlResource)
+ * -------------------------------------------------------------------------
+ */
+
+/** Sex values exactly as the backend `gamefowls.sex` column stores them. */
+export type GamefowlSex = "male" | "female" | "unknown";
+
+/**
+ * Computed server-side from date_of_birth on every request (Gamefowl::age
+ * accessor) so it can never go stale. Null when the birth date is unknown.
+ */
+export interface GamefowlAge {
+  years: number;
+  months: number;
+}
+
+/**
+ * Shape returned by the backend's GamefowlResource on owner-facing
+ * endpoints. Dates are plain "YYYY-MM-DD" strings, timestamps ISO 8601.
+ * `user_id` is deliberately absent — ownership never crosses accounts.
+ */
+export interface Gamefowl {
+  id: number;
+  name: string;
+  breed: string | null;
+  date_of_birth: string | null;
+  age: GamefowlAge | null;
+  sex: GamefowlSex;
+  color: string | null;
+  weight: number | null;
+  date_acquired: string | null;
+  notes: string | null;
+  is_active: boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+/** Paginator meta block the backend embeds under `data.pagination`. */
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+/** `data` payload of GET /gamefowls. */
+export interface GamefowlListData {
+  items: Gamefowl[];
+  pagination: PaginationMeta;
+}
+
+/** `data` payload of single-gamefowl GET / POST / PUT endpoints. */
+export interface GamefowlShowData {
+  gamefowl: Gamefowl;
+}
+
+/**
+ * Writable profile fields sent to POST /gamefowls and PUT /gamefowls/{id}
+ * (snake_case on the wire). `is_active` is update-only; the backend forces
+ * it true on create and ignores `user_id` in payloads.
+ */
+export type GamefowlPayload = Omit<
+  Gamefowl,
+  "id" | "age" | "is_active" | "created_at" | "updated_at"
+>;
+
 /** Successful backend response. */
 export interface ApiSuccess<T> {
   success: true;

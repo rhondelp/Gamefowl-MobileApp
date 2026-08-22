@@ -2,61 +2,135 @@
  * File: screens/DashboardScreen.tsx
  *
  * Purpose:
- *   PLACEHOLDER main screen for Milestone 9. Its only jobs:
- *     1. Prove the auth flow end-to-end — it can only be reached when
- *        signed in, and it shows the real user's name from GET /auth/me.
- *     2. Provide a working Logout button (with confirmation dialog) that
- *        returns the user to Login via auth-state change.
+ *   The authenticated landing screen. Greets the owner by name, shows a
+ *   summary of their flock (active-bird count), and lists their birds via
+ *   the shared GamefowlCard — replacing the Milestone 9 placeholder.
  *
- *   Real dashboard content (bird list, health summaries) arrives in
- *   Milestone 10+; do not add feature screens here yet.
+ *   - Tap a bird  -> Gamefowl Details
+ *   - "See all"   -> My Gamefowl list
+ *   - Empty state -> clear call-to-action to add the first bird
+ *
+ *   Re-focus revalidation: when returning from Add/Edit/Details this screen
+ *   silently refreshes so counts and rows are never stale.
  */
-import React from "react";
-import { Alert, Text, View } from "react-native";
+import React, { useCallback, useRef } from "react";
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+
 import { Screen } from "../components/ui/Screen";
-import { Button } from "../components/ui/Button";
+import { EmptyState } from "../components/ui/EmptyState";
+import { ErrorState } from "../components/ui/ErrorState";
+import { GamefowlCard } from "../components/gamefowl/GamefowlCard";
 import { useAuth } from "../contexts/AuthContext";
+import { useGamefowls } from "../hooks/useGamefowls";
+import type { DashboardStackScreenProps } from "../navigation/types";
 
-export function DashboardScreen() {
-  const { user, logout } = useAuth();
+type Props = DashboardStackScreenProps<"Dashboard">;
 
-  /**
-   * Confirmation dialog first (project rule: confirm important actions),
-   * then logout. Auth state flips to signedOut, which swaps the navigator
-   * back to Login automatically.
-   */
-  const confirmLogout = () => {
-    Alert.alert("Log out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => void logout() },
-    ]);
-  };
+export function DashboardScreen({ navigation }: Props) {
+  const { user } = useAuth();
+  const { gamefowls, pagination, loading, refreshing, error, reload, refresh } =
+    useGamefowls();
+
+  // Skip the very first focus — the hook already fetches on mount; every
+  // LATER focus (back from Details/Add/Edit) triggers a silent revalidate.
+  const skipFirstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (skipFirstFocus.current) {
+        skipFirstFocus.current = false;
+        return;
+      }
+      refresh();
+    }, [refresh])
+  );
+
+  const activeTotal = pagination?.total ?? gamefowls.length;
 
   return (
     <Screen>
-      <View className="flex-1 justify-between">
-        <View className="mt-6">
-          <Text className="text-xs font-semibold uppercase tracking-widest text-brand-500">
-            Welcome back
-          </Text>
-          <Text className="mt-1 text-2xl font-bold text-gray-900">{user?.name}</Text>
-          {/* Role chip: proves /auth/me returned a real profile after boot. */}
-          <View className="mt-2 self-start rounded-full bg-brand-100 px-3 py-1">
-            <Text className="text-xs font-medium capitalize text-brand-700">{user?.role}</Text>
-          </View>
-
-          <View className="mt-8 rounded-2xl border border-dashed border-gray-300 p-5">
-            <Text className="text-sm text-gray-500">
-              Your gamefowl list and health summaries will appear here in an
-              upcoming milestone.
-            </Text>
-          </View>
-        </View>
-
-        <View className="mb-4">
-          <Button label="Log Out" variant="danger" onPress={confirmLogout} />
-        </View>
+      {/* Greeting */}
+      <View className="mt-2">
+        <Text className="text-xs font-semibold uppercase tracking-widest text-brand-500">
+          Welcome back
+        </Text>
+        <Text className="mt-1 text-2xl font-bold text-gray-900" numberOfLines={1}>
+          {user?.name}
+        </Text>
       </View>
+
+      {loading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#2e7d4f" />
+          <Text className="mt-3 text-sm text-gray-500">Loading your flock…</Text>
+        </View>
+      ) : error ? (
+        <ErrorState message={error} onRetry={reload} />
+      ) : (
+        <>
+          {/* Summary card */}
+          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4">
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className="text-sm text-brand-100">Your flock</Text>
+                <Text className="text-3xl font-bold text-white">
+                  {activeTotal} {activeTotal === 1 ? "bird" : "birds"}
+                </Text>
+              </View>
+              <Ionicons name="paw" size={40} color="#dcf0e3" />
+            </View>
+            <View className="mt-3 flex-row">
+              <TouchableOpacity
+                accessibilityRole="button"
+                className="mr-2 flex-1 items-center rounded-xl bg-white/15 py-2"
+                onPress={() => navigation.navigate("MyGamefowl")}
+              >
+                <Text className="text-sm font-semibold text-white">See all</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityRole="button"
+                className="ml-2 flex-1 items-center rounded-xl bg-white py-2"
+                onPress={() => navigation.navigate("AddGamefowl")}
+              >
+                <Text className="text-sm font-semibold text-brand-700">+ Add bird</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
+          <Text className="mb-1 mt-5 text-base font-semibold text-gray-900">
+            Recent birds
+          </Text>
+          {gamefowls.length === 0 ? (
+            <EmptyState
+              icon="paw-outline"
+              title="No gamefowl yet"
+              message="Add your first bird to start tracking its health."
+              actionLabel="+ Add Gamefowl"
+              onAction={() => navigation.navigate("AddGamefowl")}
+            />
+          ) : (
+            <FlatList
+              data={gamefowls}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item }) => (
+                <GamefowlCard
+                  gamefowl={item}
+                  onPress={() =>
+                    navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
+                  }
+                />
+              )}
+              refreshing={refreshing}
+              onRefresh={refresh}
+              style={{ flexGrow: 0 }}
+              contentContainerStyle={{ paddingBottom: 8 }}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </>
+      )}
     </Screen>
   );
 }

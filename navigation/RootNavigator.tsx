@@ -7,11 +7,16 @@
  *
  *     status === 'loading'    -> SplashScreen (bootstrap still running)
  *     status === 'signedOut'  -> AuthStack  (Login <-> Register)
- *     status === 'signedIn'   -> MainTabs   (app content; Dashboard today)
+ *     status === 'signedIn'   -> MainTabs   (Dashboard + Profile)
  *
- * This state-driven switch is the whole security model for routing: there
- * is no code path where a signed-out user can reach app content, and logout
- * automatically returns to Login because state flips underneath the tree.
+ * Structure since Milestone 10:
+ *   Each tab owns a native stack. The Dashboard tab's stack carries the
+ *   whole bird-management flow (list -> details -> add/edit) so push/pop
+ *   animations work inside the tab while later milestones can simply add
+ *   new tabs (Health Assessment, History) without touching auth logic.
+ *
+ * Headers: the tab navigator hides its own header and each stack screen
+ * shows one — except Dashboard itself, which renders its custom greeting.
  */
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
@@ -23,13 +28,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../contexts/AuthContext";
 import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
-import { SplashScreen } from "../screens/auth/SplashScreen";
 import { DashboardScreen } from "../screens/DashboardScreen";
-import type { AuthStackParamList, MainTabParamList } from "./types";
+import { MyGamefowlScreen } from "../screens/gamefowl/MyGamefowlScreen";
+import { GamefowlDetailsScreen } from "../screens/gamefowl/GamefowlDetailsScreen";
+import { AddGamefowlScreen } from "../screens/gamefowl/AddGamefowlScreen";
+import { EditGamefowlScreen } from "../screens/gamefowl/EditGamefowlScreen";
+import { ProfileScreen } from "../screens/profile/ProfileScreen";
+import type {
+  AuthStackParamList,
+  DashboardStackParamList,
+  MainTabParamList,
+} from "./types";
 
 // Typing the navigators with our param lists is what makes screen props
 // (navigation/route) fully typed on both sides.
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
 const MainTabs = createBottomTabNavigator<MainTabParamList>();
 
 /** Pre-login flow. Headers hidden: each screen carries its own branding. */
@@ -42,25 +56,75 @@ function AuthStackScreen() {
   );
 }
 
+/** Bird-management flow stacked under the Dashboard tab. */
+function DashboardStackScreen() {
+  return (
+    <DashboardStack.Navigator
+      screenOptions={{
+        headerTitleStyle: { fontWeight: "600" },
+        headerShadowVisible: false,
+        headerTintColor: "#111827",
+      }}
+    >
+      {/* Custom-greeting landing screen: no system header on top of it. */}
+      <DashboardStack.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{ headerShown: false }}
+      />
+      <DashboardStack.Screen
+        name="MyGamefowl"
+        component={MyGamefowlScreen}
+        options={{ title: "My Gamefowl" }}
+      />
+      <DashboardStack.Screen
+        name="GamefowlDetails"
+        component={GamefowlDetailsScreen}
+        options={{ title: "Bird Details" }}
+      />
+      <DashboardStack.Screen
+        name="AddGamefowl"
+        component={AddGamefowlScreen}
+        options={{ title: "Add Gamefowl" }}
+      />
+      <DashboardStack.Screen
+        name="EditGamefowl"
+        component={EditGamefowlScreen}
+        options={{ title: "Edit Profile" }}
+      />
+    </DashboardStack.Navigator>
+  );
+}
+
 /**
- * Post-login area. One tab today ("Home"); Milestones 10+ add Birds,
- * Assessments, and History tabs here without touching the auth logic.
+ * Post-login area. Two tabs today (bird management + account); Health
+ * Assessment/History tabs arrive in later milestones here.
  */
 function MainTabsScreen() {
   return (
     <MainTabs.Navigator
       screenOptions={{
-        headerTitleStyle: { fontWeight: "600" },
+        headerShown: false,
         tabBarActiveTintColor: "#2e7d4f",
       }}
     >
       <MainTabs.Screen
-        name="Home"
-        component={DashboardScreen}
+        name="DashboardTab"
+        component={DashboardStackScreen}
         options={{
-          title: "Gamefowl",
+          title: "Dashboard",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="paw" size={size} color={color} />
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <MainTabs.Screen
+        name="ProfileTab"
+        component={ProfileScreen}
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />
