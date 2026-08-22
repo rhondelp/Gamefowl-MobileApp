@@ -38,10 +38,21 @@ import { AssessmentResultScreen } from "../screens/assessment/AssessmentResultSc
 import { HealthHistoryScreen } from "../screens/history/HealthHistoryScreen";
 import { AddHealthRecordScreen } from "../screens/history/AddHealthRecordScreen";
 import { HealthRecordDetailScreen } from "../screens/history/HealthRecordDetailScreen";
+import { AdminDashboardScreen } from "../screens/admin/AdminDashboardScreen";
+import { AdminUsersScreen } from "../screens/admin/AdminUsersScreen";
+import { AdminUserDetailScreen } from "../screens/admin/AdminUserDetailScreen";
+import { AdminDiseasesScreen } from "../screens/admin/AdminDiseasesScreen";
+import { AdminDiseaseFormScreen } from "../screens/admin/AdminDiseaseFormScreen";
+import { AdminDiseaseDetailScreen } from "../screens/admin/AdminDiseaseDetailScreen";
+import { AdminSymptomsScreen } from "../screens/admin/AdminSymptomsScreen";
+import { AdminSymptomFormScreen } from "../screens/admin/AdminSymptomFormScreen";
+import { AdminRecommendationsScreen } from "../screens/admin/AdminRecommendationsScreen";
+import { AdminRecommendationFormScreen } from "../screens/admin/AdminRecommendationFormScreen";
 import { ProfileScreen } from "../screens/profile/ProfileScreen";
 import type {
   AuthStackParamList,
   DashboardStackParamList,
+  AdminStackParamList,
   MainTabParamList,
 } from "./types";
 
@@ -49,6 +60,7 @@ import type {
 // (navigation/route) fully typed on both sides.
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
+const AdminStack = createNativeStackNavigator<AdminStackParamList>();
 const MainTabs = createBottomTabNavigator<MainTabParamList>();
 
 /** Pre-login flow. Headers hidden: each screen carries its own branding. */
@@ -127,10 +139,81 @@ function DashboardStackScreen() {
 }
 
 /**
- * Post-login area. Two tabs today (bird management + account); Health
- * Assessment/History tabs arrive in later milestones here.
+ * Admin management stack (Milestone 14): dashboard stats, user management,
+ * and full knowledge-base CRUD. Mounted ONLY inside the role-conditional
+ * Admin tab below.
  */
-function MainTabsScreen() {
+function AdminStackScreen() {
+  return (
+    <AdminStack.Navigator
+      screenOptions={{
+        headerTitleStyle: { fontWeight: "600" },
+        headerShadowVisible: false,
+        headerTintColor: "#111827",
+      }}
+    >
+      <AdminStack.Screen
+        name="AdminDashboard"
+        component={AdminDashboardScreen}
+        options={{ title: "Admin" }}
+      />
+      <AdminStack.Screen
+        name="AdminUsers"
+        component={AdminUsersScreen}
+        options={{ title: "User Management" }}
+      />
+      <AdminStack.Screen
+        name="AdminUserDetail"
+        component={AdminUserDetailScreen}
+        options={{ title: "User Detail" }}
+      />
+      <AdminStack.Screen
+        name="AdminDiseases"
+        component={AdminDiseasesScreen}
+        options={{ title: "Diseases" }}
+      />
+      <AdminStack.Screen
+        name="AdminDiseaseDetail"
+        component={AdminDiseaseDetailScreen}
+        options={{ title: "Disease Detail" }}
+      />
+      <AdminStack.Screen
+        name="AdminDiseaseForm"
+        component={AdminDiseaseFormScreen}
+        options={{ title: "Disease" }}
+      />
+      <AdminStack.Screen
+        name="AdminSymptoms"
+        component={AdminSymptomsScreen}
+        options={{ title: "Symptoms" }}
+      />
+      <AdminStack.Screen
+        name="AdminSymptomForm"
+        component={AdminSymptomFormScreen}
+        options={{ title: "Symptom" }}
+      />
+      <AdminStack.Screen
+        name="AdminRecommendations"
+        component={AdminRecommendationsScreen}
+        options={{ title: "Recommendations" }}
+      />
+      <AdminStack.Screen
+        name="AdminRecommendationForm"
+        component={AdminRecommendationFormScreen}
+        options={{ title: "Recommendation" }}
+      />
+    </AdminStack.Navigator>
+  );
+}
+
+/**
+ * Post-login area. The Admin tab is registered ONLY when the signed-in user
+ * has role "admin" — a single central check at the navigation level. An
+ * owner's navigator literally contains no admin screens, so neither the tab
+ * bar nor any navigate() call can reach them (route-level guard, not just a
+ * hidden button).
+ */
+function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
   return (
     <MainTabs.Navigator
       screenOptions={{
@@ -148,6 +231,18 @@ function MainTabsScreen() {
           ),
         }}
       />
+      {isAdmin ? (
+        <MainTabs.Screen
+          name="AdminTab"
+          component={AdminStackScreen}
+          options={{
+            title: "Admin",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="shield-checkmark" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
       <MainTabs.Screen
         name="ProfileTab"
         component={ProfileScreen}
@@ -163,7 +258,7 @@ function MainTabsScreen() {
 }
 
 export function RootNavigator() {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
 
   // Bootstrap in progress: show a minimal splash and render nothing else,
   // so neither auth screens nor app content can flash before we know the
@@ -177,9 +272,15 @@ export function RootNavigator() {
     );
   }
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <NavigationContainer>
-      {status === "signedIn" ? <MainTabsScreen /> : <AuthStackScreen />}
+      {status === "signedIn" ? (
+        <MainTabsScreen isAdmin={isAdmin} />
+      ) : (
+        <AuthStackScreen />
+      )}
     </NavigationContainer>
   );
 }

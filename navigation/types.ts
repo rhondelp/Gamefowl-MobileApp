@@ -39,9 +39,31 @@ export type DashboardStackParamList = {
   HealthRecordDetail: { gamefowlId: number; recordId: number };
 };
 
+/**
+ * Admin management stack (Milestone 14) — registered ONLY when the signed-in
+ * user has role "admin". Because unregistered screens cannot be navigated to
+ * at all, this single registration point is also the route-level guard.
+ */
+export type AdminStackParamList = {
+  AdminDashboard: undefined;
+  AdminUsers: undefined;
+  AdminUserDetail: { userId: number };
+  AdminDiseases: undefined;
+  /** diseaseId omitted = create mode; present = edit mode. */
+  AdminDiseaseForm: { diseaseId?: number };
+  AdminDiseaseDetail: { diseaseId: number };
+  AdminSymptoms: undefined;
+  AdminSymptomForm: { symptomId?: number };
+  AdminRecommendations: undefined;
+  AdminRecommendationForm: { recommendationId?: number };
+};
+
 export type MainTabParamList = {
   DashboardTab: NavigatorScreenParams<DashboardStackParamList>;
   ProfileTab: undefined;
+  /** Present in the param list only so typing stays complete; the SCREEN is
+   *  conditionally registered per role (see RootNavigator). */
+  AdminTab?: NavigatorScreenParams<AdminStackParamList>;
 };
 
 /** Handy alias for screens living in the auth stack. */
@@ -51,3 +73,7 @@ export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
 /** Handy alias for screens living in the dashboard stack. */
 export type DashboardStackScreenProps<T extends keyof DashboardStackParamList> =
   NativeStackScreenProps<DashboardStackParamList, T>;
+
+/** Handy alias for screens living in the admin stack. */
+export type AdminStackScreenProps<T extends keyof AdminStackParamList> =
+  NativeStackScreenProps<AdminStackParamList, T>;

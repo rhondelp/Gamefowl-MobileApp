@@ -87,6 +87,99 @@ export function validateGamefowlForm(
 }
 
 /* ------------------------------------------------------------------------ */
+/* Admin knowledge-base forms (mirror M4 Store/Update requests)             */
+/* ------------------------------------------------------------------------ */
+
+export interface AdminDiseaseFormInput {
+  name: string;
+  description: string;
+  recommendedAction: string;
+  generalInfo: string;
+  preventionInfo: string;
+  vetWarning: string;
+}
+
+/** Backend: name unique<=255, description<=2000, recommended_action<=2000,
+ *  general_info<=5000, prevention_info<=2000, vet_warning<=1000. */
+export function validateAdminDiseaseForm(
+  values: AdminDiseaseFormInput
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.name.trim()) errors.name = "Name is required.";
+  else if (values.name.trim().length > 255)
+    errors.name = "Name is too long (max 255).";
+
+  if (!values.description.trim())
+    errors.description = "Description is required.";
+  else if (values.description.trim().length > 2000)
+    errors.description = "Description is too long (max 2000).";
+
+  if (!values.recommendedAction.trim())
+    errors.recommended_action = "Recommended action is required.";
+  else if (values.recommendedAction.trim().length > 2000)
+    errors.recommended_action =
+      "Recommended action is too long (max 2000).";
+
+  if (values.generalInfo.trim().length > 5000)
+    errors.general_info = "General info is too long (max 5000).";
+  if (values.preventionInfo.trim().length > 2000)
+    errors.prevention_info = "Prevention info is too long (max 2000).";
+  if (values.vetWarning.trim().length > 1000)
+    errors.vet_warning = "Vet warning is too long (max 1000).";
+
+  return errors;
+}
+
+export interface AdminSymptomFormInput {
+  name: string;
+  category: string;
+  description: string;
+}
+
+/** Backend: name unique<=255, category<=100 required, description<=2000. */
+export function validateAdminSymptomForm(
+  values: AdminSymptomFormInput
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.name.trim()) errors.name = "Name is required.";
+  else if (values.name.trim().length > 255)
+    errors.name = "Name is too long (max 255).";
+
+  if (!values.category.trim()) errors.category = "Category is required.";
+  else if (values.category.trim().length > 100)
+    errors.category = "Category is too long (max 100).";
+
+  if (values.description.trim().length > 2000)
+    errors.description = "Description is too long (max 2000).";
+
+  return errors;
+}
+
+export interface AdminRecommendationFormInput {
+  title: string;
+  content: string;
+}
+
+/** Backend: title<=255 required, content<=5000 required. */
+export function validateAdminRecommendationForm(
+  values: AdminRecommendationFormInput
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.title.trim()) errors.title = "Title is required.";
+  else if (values.title.trim().length > 255)
+    errors.title = "Title is too long (max 255).";
+
+  if (!values.content.trim()) errors.content = "Content is required.";
+  else if (values.content.trim().length > 5000)
+    errors.content = "Content is too long (max 5000).";
+
+  return errors;
+}
+
+/* ------------------------------------------------------------------------ */
 /* Health record form (mirrors StoreHealthRecordRequest)                    */
 /* ------------------------------------------------------------------------ */
 
