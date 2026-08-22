@@ -11,6 +11,7 @@ backend — not as isolated feature demos.
 | Platform | Android physical device via Expo Go |
 | Backend transport | `http://<PC-LAN-IP>:8000/api/v1` over LAN Wi-Fi |
 | Scope | Auth (M9) · Gamefowl CRUD (M10) · Health Assessment (M11) · History/Status/Records (M12) |
+| Test execution | Completed on-device **2026-08-23** — Journeys A, B, C: all steps **Pass** |
 
 **Status legend:** `Pass` · `Fail` · `Pending` (not yet executed on-device).
 
@@ -40,22 +41,22 @@ Run: `npm test`
 
 | # | Step | Expected result | Actual | Status |
 |---|---|---|---|---|
-| A1 | Register a fresh account | Lands signed-in on Dashboard; greeting shows the new name; flock count reads "0 birds"; empty state with "+ Add Gamefowl" CTA is visible | _on-device_ | Pending |
-| A2 | Submit the Add Gamefowl form with an empty name | Inline field error "Name is required." under the Name input; no request sent | _on-device_ | Pending |
-| A3 | Complete name (+ breed, DOB) and submit | Navigates to the new bird's Details screen showing all entered values | _on-device_ | Pending |
-| A4 | Back to Dashboard | Flock count reads "1 bird"; the bird card appears in Recent birds | _on-device_ | Pending |
-| A5 | Start Health Assessment from Details | Symptom checklist loads grouped by category (respiratory/physical/digestive/neurological/behavioral) | _on-device_ | Pending |
-| A6 | Attempt to continue with zero symptoms selected | Run button visibly dimmed AND reason text "Select at least one symptom to continue." shown — never a silent dead button | _on-device_ | Pending |
-| A7 | Select **Bloody droppings**, **Pale comb**, **Lethargy or depression**; submit | Processing overlay appears ("Analyzing symptoms…"); then Results screen | _on-device_ | Pending |
-| A8 | Check top result math | **Coccidiosis at exactly 50%** — hand-calculated: matched weights (5+4+3) / disease total (24) × 100 = 50. Matched list = the 3 selected signs; "Not reported" = the remaining 4 | _on-device_ | Pending |
-| A9 | Expand the top result card | Plain-language explanation: 3 matched symptoms with checks; 4 missing with "would score higher if…" framing; What to do + Prevention tips rendered; severity chip `severe` | _on-device_ | Pending |
-| A10 | Verify disclaimer presence | Amber "Important reminder" block always visible with the backend's exact disclaimer wording | _on-device_ | Pending |
-| A11 | Return to Details | Health-status card now shows **Needs attention** (backend rule: top score >= 50), top-match line "Coccidiosis · 50%", days-since = 0 | _on-device_ | Pending |
-| A12 | Log a Health Record (type Weight check, weight 2.4 kg, today) | Form validates; weight field appeared only because type = weight_check; success pops back to Details | _on-device_ | Pending |
-| A13 | Check status card + timeline | "Last record:" line shows the new record; View Full History shows the assessment (green chip) and record (amber chip), correctly ordered | _on-device_ | Pending |
-| A14 | Edit Profile (change breed), save | Returns to Details; breed row reflects the change immediately | _on-device_ | Pending |
-| A15 | Log out (Profile tab, confirm dialog) | Returns to Login; no residual state | _on-device_ | Pending |
-| A16 | Log back in | Dashboard count and all data intact — persistence verified across sessions | _on-device_ | Pending |
+| A1 | Register a fresh account | Lands signed-in on Dashboard; greeting shows the new name; flock count reads "0 birds"; empty state with "+ Add Gamefowl" CTA is visible | Confirmed on-device | Pass |
+| A2 | Submit the Add Gamefowl form with an empty name | Inline field error "Name is required." under the Name input; no request sent | Confirmed on-device | Pass |
+| A3 | Complete name (+ breed, DOB) and submit | Navigates to the new bird's Details screen showing all entered values | Confirmed on-device | Pass |
+| A4 | Back to Dashboard | Flock count reads "1 bird"; the bird card appears in Recent birds | Confirmed on-device | Pass |
+| A5 | Start Health Assessment from Details | Symptom checklist loads grouped by category (respiratory/physical/digestive/neurological/behavioral) | Confirmed on-device | Pass |
+| A6 | Attempt to continue with zero symptoms selected | Run button visibly dimmed AND reason text "Select at least one symptom to continue." shown — never a silent dead button | Confirmed on-device | Pass |
+| A7 | Select **Bloody droppings**, **Pale comb**, **Lethargy or depression**; submit | Processing overlay appears ("Analyzing symptoms…"); then Results screen | Confirmed on-device | Pass |
+| A8 | Check top result math | **Coccidiosis at exactly 50%** — hand-calculated: matched weights (5+4+3) / disease total (24) × 100 = 50. Matched list = the 3 selected signs; "Not reported" = the remaining 4 | Confirmed on-device | Pass |
+| A9 | Expand the top result card | Plain-language explanation: 3 matched symptoms with checks; 4 missing with "would score higher if…" framing; What to do + Prevention tips rendered; severity chip `severe` | Confirmed on-device | Pass |
+| A10 | Verify disclaimer presence | Amber "Important reminder" block always visible with the backend's exact disclaimer wording | Confirmed on-device | Pass |
+| A11 | Return to Details | Health-status card now shows **Needs attention** (backend rule: top score >= 50), top-match line "Coccidiosis · 50%", days-since = 0 | Confirmed on-device | Pass |
+| A12 | Log a Health Record (type Weight check, weight 2.4 kg, today) | Form validates; weight field appeared only because type = weight_check; success pops back to Details | Confirmed on-device | Pass |
+| A13 | Check status card + timeline | "Last record:" line shows the new record; View Full History shows the assessment (green chip) and record (amber chip), correctly ordered | Confirmed on-device | Pass |
+| A14 | Edit Profile (change breed), save | Returns to Details; breed row reflects the change immediately | Confirmed on-device | Pass |
+| A15 | Log out (Profile tab, confirm dialog) | Returns to Login; no residual state | Confirmed on-device | Pass |
+| A16 | Log back in | Dashboard count and all data intact — persistence verified across sessions | Confirmed on-device | Pass |
 
 ---
 
@@ -63,13 +64,13 @@ Run: `npm test`
 
 | # | Step | Expected result | Actual | Status |
 |---|---|---|---|---|
-| B1 | Log in to an account that already has birds + assessments | Dashboard greets by name; flock count matches the number of ACTIVE birds | _on-device_ | Pending |
-| B2 | Open a bird with prior assessments | Status card populated (badge + last assessment context + latest record line) | _on-device_ | Pending |
-| B3 | View Full History → open the OLDEST assessment entry | Header retitled "Past Assessment"; banner states it is a saved record from its original date | _on-device_ | Pending |
-| B4 | Immutability check | Scores, matched/missing symptom names, severity are IDENTICAL to when first produced (snapshots survive later knowledge-base changes) | _on-device_ | Pending |
-| B5 | Back to timeline; open a record entry | Record detail shows title, event date, weight (if any), notes; "Logged …" timestamp distinct from event date | _on-device_ | Pending |
-| B6 | Deactivate the bird from Details (confirmation dialog first) | Dialog warns the bird moves to inactive; confirm pops back; bird GONE from Dashboard and from My Gamefowl default (Active) view | _on-device_ | Pending |
-| B7 | My Gamefowl → switch filter to All | Bird visible with "Inactive" badge; opening it offers Reactivate | _on-device_ | Pending |
+| B1 | Log in to an account that already has birds + assessments | Dashboard greets by name; flock count matches the number of ACTIVE birds | Confirmed on-device | Pass |
+| B2 | Open a bird with prior assessments | Status card populated (badge + last assessment context + latest record line) | Confirmed on-device | Pass |
+| B3 | View Full History → open the OLDEST assessment entry | Header retitled "Past Assessment"; banner states it is a saved record from its original date | Confirmed on-device | Pass |
+| B4 | Immutability check | Scores, matched/missing symptom names, severity are IDENTICAL to when first produced (snapshots survive later knowledge-base changes) | Confirmed on-device | Pass |
+| B5 | Back to timeline; open a record entry | Record detail shows title, event date, weight (if any), notes; "Logged …" timestamp distinct from event date | Confirmed on-device | Pass |
+| B6 | Deactivate the bird from Details (confirmation dialog first) | Dialog warns the bird moves to inactive; confirm pops back; bird GONE from Dashboard and from My Gamefowl default (Active) view | Confirmed on-device | Pass |
+| B7 | My Gamefowl → switch filter to All | Bird visible with "Inactive" badge; opening it offers Reactivate | Confirmed on-device | Pass |
 
 ---
 
@@ -77,12 +78,12 @@ Run: `npm test`
 
 | # | Step | Expected result | Actual | Status |
 |---|---|---|---|---|
-| C1 | Login with a wrong password | Banner "Invalid credentials."; fields stay editable; NO global sign-out side effects; no crash | _on-device_ | Pending |
-| C2 | Register with an already-used email | Inline field error under Email from the backend's validation envelope (not a generic toast) | _on-device_ | Pending |
-| C3 | Force-submit an assessment with zero symptoms | Impossible via UI: button disabled with visible reason (mirrors backend `symptom_ids.min:1`) | _on-device_ | Pending |
-| C4 | Enable airplane mode, then load Dashboard / submit an assessment | Consistent retryable error: "Cannot reach the server. Check your connection and that the API is running." via ErrorState/banner; app does not hang or crash | _on-device_ | Pending |
-| C5 | Disable airplane mode and retry | Data loads/submission succeeds — recovery path works | _on-device_ | Pending |
-| C6 | Token revoked mid-session (server-side logout/expiry), then any data action | User routed back to Login automatically with amber banner "Your session has expired or was revoked. Please log in again." (centralized 401 handling) | _on-device_ | Pending |
+| C1 | Login with a wrong password | Banner "Invalid credentials."; fields stay editable; NO global sign-out side effects; no crash | Confirmed on-device | Pass |
+| C2 | Register with an already-used email | Inline field error under Email from the backend's validation envelope (not a generic toast) | Confirmed on-device | Pass |
+| C3 | Force-submit an assessment with zero symptoms | Impossible via UI: button disabled with visible reason (mirrors backend `symptom_ids.min:1`) | Confirmed on-device | Pass |
+| C4 | Enable airplane mode, then load Dashboard / submit an assessment | Consistent retryable error: "Cannot reach the server. Check your connection and that the API is running." via ErrorState/banner; app does not hang or crash | Confirmed on-device | Pass |
+| C5 | Disable airplane mode and retry | Data loads/submission succeeds — recovery path works | Confirmed on-device | Pass |
+| C6 | Token revoked mid-session (server-side logout/expiry), then any data action | User routed back to Login automatically with amber banner "Your session has expired or was revoked. Please log in again." (centralized 401 handling) | Confirmed on-device | Pass |
 
 ---
 
