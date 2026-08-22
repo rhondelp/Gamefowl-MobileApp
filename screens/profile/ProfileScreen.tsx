@@ -25,10 +25,9 @@ import { Button } from "../../components/ui/Button";
 import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 
-// Static app metadata lives in app.json; requiring it is dependency-free.
-const APP_VERSION =
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require("../../../app.json").expo.version as string;
+// Keep in sync with app.json "expo.version" (Metro cannot bundle app.json
+// itself — Expo CLI reserves it as build config).
+const APP_VERSION = "1.0.0";
 
 /** The exact wording the backend attaches to every assessment/status. */
 const DISCLAIMER_TEXT =
