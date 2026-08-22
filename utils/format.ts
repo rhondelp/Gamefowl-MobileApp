@@ -39,6 +39,31 @@ export function formatDate(isoDate: string | null | undefined): string {
   });
 }
 
+/**
+ * Full ISO timestamps (assessment created_at, timeline occurred_at) carry
+ * their own time component and parse safely as-is.
+ */
+export function formatDateTime(isoTimestamp: string | null | undefined): string {
+  if (!isoTimestamp) return "—";
+  const date = new Date(isoTimestamp);
+  if (Number.isNaN(date.getTime())) return isoTimestamp;
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Today's date as "YYYY-MM-DD" in LOCAL time (for form defaults). */
+export function todayDateString(): string {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
 /** Backend sends weight as a float in kg (or null when never recorded). */
 export function formatWeight(weightKg: number | null | undefined): string {
   return weightKg === null || weightKg === undefined ? "—" : `${weightKg} kg`;

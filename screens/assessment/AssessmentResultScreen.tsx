@@ -54,8 +54,16 @@ function formatTimestamp(iso: string | null | undefined): string {
 }
 
 export function AssessmentResultScreen({ route, navigation }: Props) {
-  const { assessmentId } = route.params;
+  const { assessmentId, historical = false } = route.params;
   const { token } = useAuth();
+
+  // Historical framing (opened from the M12 timeline): retitle and mark the
+  // record as frozen history instead of a fresh live result.
+  React.useEffect(() => {
+    if (historical) {
+      navigation.setOptions({ title: "Past Assessment" });
+    }
+  }, [historical, navigation]);
 
   const [assessment, setAssessment] = useState<HealthAssessmentDetail | null>(null);
   /** Educational content per disease id; absent entries render without tips. */
@@ -129,6 +137,20 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
   return (
     <Screen>
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
+        {/* Historical framing: this is a frozen record, not a fresh run. */}
+        {historical && assessment.created_at ? (
+          <View className="mt-2 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3">
+            <View className="flex-row items-start">
+              <Ionicons name="archive" size={16} color="#276a43" style={{ marginTop: 2 }} />
+              <Text className="ml-2 flex-1 text-xs leading-4 text-brand-700">
+                Saved assessment from {formatTimestamp(assessment.created_at)} —
+                shown exactly as reported at the time. Later knowledge-base
+                changes never alter past records.
+              </Text>
+            </View>
+          </View>
+        ) : null}
+
         {/* Escalation banner: shown BEFORE anything else when warranted. */}
         {hasVetWarning ? (
           <View className="mt-2 rounded-2xl border border-red-300 bg-red-50 px-4 py-3">

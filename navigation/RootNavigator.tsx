@@ -35,6 +35,9 @@ import { AddGamefowlScreen } from "../screens/gamefowl/AddGamefowlScreen";
 import { EditGamefowlScreen } from "../screens/gamefowl/EditGamefowlScreen";
 import { SymptomSelectScreen } from "../screens/assessment/SymptomSelectScreen";
 import { AssessmentResultScreen } from "../screens/assessment/AssessmentResultScreen";
+import { HealthHistoryScreen } from "../screens/history/HealthHistoryScreen";
+import { AddHealthRecordScreen } from "../screens/history/AddHealthRecordScreen";
+import { HealthRecordDetailScreen } from "../screens/history/HealthRecordDetailScreen";
 import { ProfileScreen } from "../screens/profile/ProfileScreen";
 import type {
   AuthStackParamList,
@@ -103,6 +106,21 @@ function DashboardStackScreen() {
         name="AssessmentResult"
         component={AssessmentResultScreen}
         options={{ title: "Results" }}
+      />
+      <DashboardStack.Screen
+        name="HealthHistory"
+        component={HealthHistoryScreen}
+        options={{ title: "Health History" }}
+      />
+      <DashboardStack.Screen
+        name="AddHealthRecord"
+        component={AddHealthRecordScreen}
+        options={{ title: "Log Health Record" }}
+      />
+      <DashboardStack.Screen
+        name="HealthRecordDetail"
+        component={HealthRecordDetailScreen}
+        options={{ title: "Record Detail" }}
       />
     </DashboardStack.Navigator>
   );

@@ -2,35 +2,38 @@
  * File: screens/gamefowl/GamefowlDetailsScreen.tsx
  *
  * Purpose:
- *   Full profile view for one bird, plus the actions available today:
- *   Edit (navigates to the shared form pre-filled) and Deactivate /
- *   Reactivate (confirmation dialog first — destructive-action rule).
+ *   Full profile view for one bird — the hub for everything health-related:
+ *     - Health Status card (M12): backend-derived label + last assessment /
+ *       latest record context, displayed verbatim (never recomputed here)
+ *     - Start Health Assessment (M11 flow) and Log Health Record actions
+ *     - View Full History -> merged timeline screen
+ *     - Edit Profile and the reversible Deactivate / Reactivate action
  *
  *   Deactivation uses `PUT { is_active: false }` — the backend's documented
  *   owner-facing retirement mechanism (reversible; history is kept). On
  *   success we pop back to the list/dashboard, which revalidates on focus,
  *   so the bird disappears from active lists immediately.
- *
- *   This screen is also the future entry point for health assessment and
- *   history flows (Milestone 11+); those actions will hang off the action
- *   area at the bottom.
  */
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { HealthStatusBadge } from "../../components/history/HealthStatusBadge";
 import { useAuth } from "../../contexts/AuthContext";
 import { useGamefowl } from "../../hooks/useGamefowl";
 import * as gamefowlsApi from "../../services/api/gamefowls";
+import * as healthHistoryApi from "../../services/api/healthHistory";
 import { ApiError } from "../../services/api/client";
 import {
   formatAge,
   formatDate,
   formatWeight,
 } from "../../utils/format";
+import type { HealthStatusSummary } from "../../types/api";
 import type { DashboardStackScreenProps } from "../../navigation/types";
 
 type Props = DashboardStackScreenProps<"GamefowlDetails">;
@@ -41,14 +44,31 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
   const { gamefowl, loading, error, load } = useGamefowl(gamefowlId);
   // Spinner on the action buttons while a deactivate/reactivate is running.
   const [actionBusy, setActionBusy] = useState(false);
+  // Derived status summary (display-only; failures hide just the card).
+  const [statusSummary, setStatusSummary] = useState<HealthStatusSummary | null>(null);
 
-  // Revalidate on every focus. `load(true)` is silent once content is on
-  // screen; the very first call still spins because nothing is loaded yet
-  // (handled inside the hook).
+  /** Status fetch: silent once present, non-blocking on failure. */
+  const loadStatus = useCallback(
+    async (silent = false) => {
+      if (!token) return;
+      try {
+        if (!silent) setStatusSummary(null);
+        setStatusSummary(await healthHistoryApi.status(token, gamefowlId));
+      } catch {
+        // The bird profile stays usable even if status can't load right now;
+        // next focus retries automatically.
+      }
+    },
+    [token, gamefowlId]
+  );
+
+  // Revalidate both profile and status on every focus. `load(true)` is
+  // silent once content is on screen; first calls still spin.
   useFocusEffect(
     useCallback(() => {
       void load(true);
-    }, [load])
+      void loadStatus(true);
+    }, [load, loadStatus])
   );
 
   /** Confirmation dialog, then the reversible retirement call. */
@@ -141,6 +161,60 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
           </View>
         </View>
 
+        {/* Health Status card — displays the backend's derived summary. */}
+        {statusSummary ? (
+          <View className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-3.5">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm font-semibold text-gray-900">Health status</Text>
+              <HealthStatusBadge status={statusSummary.status} />
+            </View>
+
+            {statusSummary.based_on ? (
+              <Text className="mt-2 text-xs leading-5 text-gray-600">
+                Top match:{" "}
+                <Text className="font-semibold text-gray-800">
+                  {statusSummary.based_on.top_possible_disease.name} ·{" "}
+                  {statusSummary.based_on.match_score}%
+                </Text>
+                {statusSummary.days_since_last_assessment !== null
+                  ? ` · assessed ${statusSummary.days_since_last_assessment} ${
+                      statusSummary.days_since_last_assessment === 1 ? "day" : "days"
+                    } ago`
+                  : null}
+              </Text>
+            ) : statusSummary.status === "no_data" ? (
+              <Text className="mt-2 text-xs leading-5 text-gray-500">
+                No symptom assessments yet — start one below to establish a baseline.
+              </Text>
+            ) : null}
+
+            {statusSummary.latest_health_record ? (
+              <Text className="mt-1 text-xs leading-5 text-gray-600">
+                Last record: {statusSummary.latest_health_record.title} ·{" "}
+                {formatDate(statusSummary.latest_health_record.recorded_at)}
+              </Text>
+            ) : null}
+
+            {/* Timeline entry point. */}
+            <TouchableOpacity
+              accessibilityRole="button"
+              className="mt-3 flex-row items-center border-t border-gray-100 pt-3"
+              onPress={() =>
+                navigation.navigate("HealthHistory", {
+                  gamefowlId: gamefowl.id,
+                  birdName: gamefowl.name,
+                })
+              }
+            >
+              <Ionicons name="time-outline" size={16} color="#276a43" />
+              <Text className="ml-1.5 flex-1 text-sm font-semibold text-brand-700">
+                View full history
+              </Text>
+              <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+            </TouchableOpacity>
+          </View>
+        ) : null}
+
         {/* Profile card */}
         <View className="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-2">
           <InfoRow label="Sex" value={gamefowl.sex} />
@@ -167,6 +241,18 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
               })
             }
           />
+          <View className="mt-3">
+            <Button
+              label="Log Health Record"
+              variant="outline"
+              onPress={() =>
+                navigation.navigate("AddHealthRecord", {
+                  gamefowlId: gamefowl.id,
+                  birdName: gamefowl.name,
+                })
+              }
+            />
+          </View>
           <View className="mt-3">
             <Button
               label="Edit Profile"

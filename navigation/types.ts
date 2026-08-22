@@ -31,7 +31,12 @@ export type DashboardStackParamList = {
   EditGamefowl: { gamefowlId: number };
   /** Milestone 11 diagnostic flow. */
   SymptomSelect: { gamefowlId: number; birdName?: string };
-  AssessmentResult: { assessmentId: number };
+  /** historical=true frames results as a saved past record (M12 timeline). */
+  AssessmentResult: { assessmentId: number; historical?: boolean };
+  /** Milestone 12 history + manual records. */
+  HealthHistory: { gamefowlId: number; birdName?: string };
+  AddHealthRecord: { gamefowlId: number; birdName?: string };
+  HealthRecordDetail: { gamefowlId: number; recordId: number };
 };
 
 export type MainTabParamList = {

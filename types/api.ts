@@ -218,6 +218,113 @@ export interface HealthAssessmentDetail {
   created_at?: string | null;
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * Health history & manual records (backend Milestone 7)
+ * -------------------------------------------------------------------------
+ */
+
+/** Manual logbook entry types (HealthRecord::TYPES). */
+export type HealthRecordType =
+  | "vet_visit"
+  | "weight_check"
+  | "general_note"
+  | "vaccination";
+
+/** One human-entered logbook entry (HealthRecordResource). */
+export interface HealthRecord {
+  id: number;
+  type: HealthRecordType;
+  title: string;
+  notes: string | null;
+  /** Event date chosen by the owner ("YYYY-MM-DD"); may be backdated. */
+  recorded_at: string;
+  weight: number | null;
+  created_at?: string | null;
+}
+
+export interface HealthRecordsListData {
+  items: HealthRecord[];
+  pagination: PaginationMeta;
+}
+
+/** `data` payload of POST /gamefowls/{id}/health-records (201). */
+export interface HealthRecordShowData {
+  record: HealthRecord;
+}
+
+/** Body of POST /gamefowls/{id}/health-records. */
+export interface HealthRecordPayload {
+  type: HealthRecordType;
+  title: string;
+  notes: string | null;
+  /** "YYYY-MM-DD" or null — the backend defaults to today when omitted. */
+  recorded_at: string | null;
+  weight: number | null;
+}
+
+/** Derived labels from the backend's documented rule chain — display only. */
+export type HealthStatusLabel =
+  | "healthy"
+  | "needs_attention"
+  | "stale"
+  | "no_data";
+
+/**
+ * `data` payload of GET /gamefowls/{id}/health-status. The client renders
+ * these values verbatim; derivation never happens app-side.
+ */
+export interface HealthStatusSummary {
+  status: HealthStatusLabel;
+  recent_window_days: number;
+  based_on: {
+    assessment_id: number;
+    assessed_at: string | null;
+    top_possible_disease: { id: number; name: string };
+    match_score: number;
+  } | null;
+  days_since_last_assessment: number | null;
+  latest_health_record: HealthRecord | null;
+  disclaimer: string;
+}
+
+/**
+ * One merged-timeline row. NOTE the backend uses TYPE-SPECIFIC id keys
+ * (`assessment_id` vs `record_id`) and different occurred_at precision
+ * (ISO timestamp vs plain date) — mirrored exactly here.
+ */
+export type HealthHistoryEntry =
+  | {
+      type: "assessment";
+      assessment_id: number;
+      occurred_at: string;
+      top_possible_disease: { id: number; name: string } | null;
+      match_score: number | null;
+      severity_at_assessment: DiseaseSeverity | null;
+    }
+  | {
+      type: "health_record";
+      record_id: number;
+      occurred_at: string;
+      record_type: HealthRecordType;
+      title: string;
+      weight: number | null;
+    };
+
+/**
+ * `data` payload of GET /gamefowls/{id}/health-history. Unlike other lists,
+ * the backend's merged-feed pagination carries NO last_page — clients infer
+ * more pages from items.length < total.
+ */
+export interface HealthHistoryData {
+  items: HealthHistoryEntry[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
 /** Successful backend response. */
 export interface ApiSuccess<T> {
   success: true;
