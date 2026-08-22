@@ -19,6 +19,7 @@ import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { TextField } from "../../components/ui/TextField";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
 import { ApiError } from "../../services/api/client";
@@ -116,8 +117,10 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
           ...payload,
           is_active: isActive,
         });
+        showToast("Symptom saved.");
       } else {
         await adminApi.createSymptom(token!, payload);
+        showToast("Symptom added to the checklist.");
       }
       navigation.goBack();
     } catch (error) {

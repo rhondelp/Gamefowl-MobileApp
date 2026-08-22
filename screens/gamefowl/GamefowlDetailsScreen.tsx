@@ -23,6 +23,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { HealthStatusBadge } from "../../components/history/HealthStatusBadge";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useGamefowl } from "../../hooks/useGamefowl";
 import * as gamefowlsApi from "../../services/api/gamefowls";
@@ -93,15 +94,20 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
     try {
       setActionBusy(true);
       await gamefowlsApi.update(token, gamefowl.id, { is_active: isActive });
+      showToast(
+        isActive
+          ? `${gamefowl.name} reactivated.`
+          : `${gamefowl.name} moved to inactive birds.`
+      );
       // Pop back so the list/dashboard can refresh on focus — per spec the
       // deactivated bird should no longer be in the active list.
       navigation.goBack();
     } catch (err) {
-      Alert.alert(
-        "Update failed",
+      showToast(
         err instanceof ApiError
           ? err.message
-          : "Something went wrong. Please try again."
+          : "Something went wrong. Please try again.",
+        "error"
       );
     } finally {
       setActionBusy(false);

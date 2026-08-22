@@ -22,6 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 
 // Static app metadata lives in app.json; requiring it is dependency-free.
@@ -42,7 +43,14 @@ export function ProfileScreen() {
   const confirmLogout = () => {
     Alert.alert("Log out", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => void logout() },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: () => {
+          showToast("Logged out.");
+          void logout();
+        },
+      },
     ]);
   };
 

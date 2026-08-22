@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
 import { ApiError } from "../../services/api/client";
@@ -64,9 +65,14 @@ export function AdminUserDetailScreen({ route }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  /** Shared runner for the three mutations with confirm-then-apply flow. */
+  /** Shared runner for the three mutations: confirm -> apply -> toast. */
   const runAction = useCallback(
-    (confirmTitle: string, confirmMessage: string, apply: () => Promise<void>) => {
+    (
+      confirmTitle: string,
+      confirmMessage: string,
+      successToast: string,
+      apply: () => Promise<void>
+    ) => {
       Alert.alert(confirmTitle, confirmMessage, [
         { text: "Cancel", style: "cancel" },
         {
@@ -77,13 +83,14 @@ export function AdminUserDetailScreen({ route }: Props) {
               try {
                 setBusy(true);
                 await apply();
+                showToast(successToast);
                 await load(true);
               } catch (err) {
-                Alert.alert(
-                  "Action failed",
+                showToast(
                   err instanceof ApiError
                     ? err.message
-                    : "Something went wrong. Please try again."
+                    : "Something went wrong. Please try again.",
+                  "error"
                 );
               } finally {
                 setBusy(false);
@@ -182,10 +189,15 @@ export function AdminUserDetailScreen({ route }: Props) {
                   user.role === "owner"
                     ? `${user.name} will gain full admin access to the knowledge base and all users.`
                     : `${user.name} will lose admin access and become a regular owner.`,
+                  user.role === "owner"
+                    ? `${user.name} promoted to admin.`
+                    : `${user.name} demoted to owner.`,
                   () =>
-                    adminApi.updateUser(token!, user.id, {
-                      role: user.role === "owner" ? "admin" : "owner",
-                    }).then(() => undefined)
+                    adminApi
+                      .updateUser(token!, user.id, {
+                        role: user.role === "owner" ? "admin" : "owner",
+                      })
+                      .then(() => undefined)
                 )
               }
             />
@@ -201,6 +213,7 @@ export function AdminUserDetailScreen({ route }: Props) {
                     runAction(
                       "Deactivate account?",
                       `${user.name} will be signed out and their account hidden. Their birds and assessment history are kept, and the account can be restored later.`,
+                      `${user.name} deactivated.`,
                       () => adminApi.deactivateUser(token!, user.id)
                     )
                   }
@@ -213,6 +226,7 @@ export function AdminUserDetailScreen({ route }: Props) {
                     runAction(
                       "Restore account?",
                       `${user.name} will regain access with their previous data intact.`,
+                      `${user.name} restored.`,
                       async () => {
                         await adminApi.updateUser(token!, user.id, {
                           status: "active",

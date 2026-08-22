@@ -29,6 +29,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
 import { ApiError } from "../../services/api/client";
@@ -94,10 +95,11 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
     }, [load])
   );
 
-  /** Confirm-dialog wrapper for destructive actions. */
+  /** Confirm-dialog wrapper for destructive actions (toasts report outcome). */
   const confirmAction = (
     title: string,
     message: string,
+    successToast: string,
     action: () => Promise<void>
   ) => {
     Alert.alert(title, message, [
@@ -110,13 +112,14 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
             try {
               setBusy(true);
               await action();
+              showToast(successToast);
               await load();
             } catch (err) {
-              Alert.alert(
-                "Action failed",
+              showToast(
                 err instanceof ApiError
                   ? err.message
-                  : "Something went wrong. Please try again."
+                  : "Something went wrong. Please try again.",
+                "error"
               );
             } finally {
               setBusy(false);
@@ -265,11 +268,12 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                     try {
                       setBusy(true);
                       await adminApi.updateRuleWeight(token!, rule.rule_id, weight);
+                      showToast("Rule weight updated.");
                       await load();
                     } catch (err) {
-                      Alert.alert(
-                        "Update failed",
-                        err instanceof ApiError ? err.message : "Please try again."
+                      showToast(
+                        err instanceof ApiError ? err.message : "Please try again.",
+                        "error"
                       );
                     } finally {
                       setBusy(false);
@@ -280,6 +284,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                   confirmAction(
                     "Remove rule?",
                     `“${rule.symptom_name}” will no longer contribute to ${disease.name}'s score.`,
+                    "Rule removed.",
                     () => adminApi.detachRule(token!, rule.rule_id)
                   )
                 }
@@ -356,14 +361,15 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                             symptom_id: selectedSymptomId,
                             weight: newWeight,
                           });
+                          showToast("Symptom attached to knowledge base.");
                           setSelectedSymptomId(null);
                           setShowSymptomPicker(false);
                           setNewWeight(3);
                           await load();
                         } catch (err) {
-                          Alert.alert(
-                            "Could not attach",
-                            err instanceof ApiError ? err.message : "Please try again."
+                          showToast(
+                            err instanceof ApiError ? err.message : "Please try again.",
+                            "error"
                           );
                         } finally {
                           setBusy(false);
@@ -402,13 +408,14 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                   accessibilityRole="button"
                   accessibilityLabel={`Detach ${rec.title}`}
                   disabled={busy}
-                  onPress={() =>
-                    confirmAction(
-                      "Detach recommendation?",
-                      `“${rec.title}” will no longer be linked to ${disease.name}.`,
-                      () => adminApi.detachRecommendation(token!, disease.id, rec.id)
-                    )
-                  }
+                onPress={() =>
+                  confirmAction(
+                    "Detach recommendation?",
+                    `“${rec.title}” will no longer be linked to ${disease.name}.`,
+                    "Recommendation detached.",
+                    () => adminApi.detachRecommendation(token!, disease.id, rec.id)
+                  )
+                }
                 >
                   <Ionicons name="trash-outline" size={18} color="#b3401f" />
                 </Pressable>
@@ -444,6 +451,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                     confirmAction(
                       "Link recommendation?",
                       `“${rec.title}” (${rec.category}) will appear with ${disease.name}.`,
+                      "Recommendation linked.",
                       async () => {
                         await adminApi.attachRecommendation(token!, disease.id, rec.id);
                         setShowRecPicker(false);
@@ -471,6 +479,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                 confirmAction(
                   "Deactivate disease?",
                   `${disease.name} will disappear from owner-facing screens and future assessments. History keeps its snapshots; you can reactivate anytime.`,
+                  `${disease.name} deactivated.`,
                   () => adminApi.deactivateDisease(token!, disease.id)
                 )
               }
@@ -483,6 +492,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                 confirmAction(
                   "Reactivate disease?",
                   `${disease.name} will become selectable again for owners.`,
+                  `${disease.name} reactivated.`,
                   async () => {
                     await adminApi.updateDisease(token!, disease.id, {
                       is_active: true,

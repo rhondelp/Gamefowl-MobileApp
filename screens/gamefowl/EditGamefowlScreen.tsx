@@ -12,6 +12,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { GamefowlForm, type GamefowlFormValues } from "../../components/gamefowl/GamefowlForm";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import { useGamefowl } from "../../hooks/useGamefowl";
 import * as gamefowlsApi from "../../services/api/gamefowls";
@@ -49,6 +50,7 @@ export function EditGamefowlScreen({ route, navigation }: Props) {
   const handleSubmit = async (payload: GamefowlPayload) => {
     if (!token) return;
     await gamefowlsApi.update(token, gamefowlId, payload);
+    showToast("Profile changes saved.");
     navigation.goBack();
   };
 

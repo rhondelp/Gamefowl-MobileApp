@@ -20,6 +20,7 @@ import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { TextField } from "../../components/ui/TextField";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
 import { ApiError } from "../../services/api/client";
@@ -131,8 +132,10 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
       setSubmitting(true);
       if (isEdit) {
         await adminApi.updateDisease(token!, diseaseId!, payload);
+        showToast("Disease saved.");
       } else {
         await adminApi.createDisease(token!, payload);
+        showToast("Disease added to the knowledge base.");
       }
       navigation.goBack();
     } catch (error) {

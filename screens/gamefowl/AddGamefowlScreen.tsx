@@ -15,6 +15,7 @@ import { Text, View } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
 import { GamefowlForm } from "../../components/gamefowl/GamefowlForm";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as gamefowlsApi from "../../services/api/gamefowls";
 import type { GamefowlPayload } from "../../types/api";
@@ -28,6 +29,7 @@ export function AddGamefowlScreen({ navigation }: Props) {
   const handleSubmit = async (payload: GamefowlPayload) => {
     if (!token) return;
     const data = await gamefowlsApi.create(token, payload);
+    showToast(`${data.gamefowl.name} added to your flock.`);
     // Replace so Back skips the finished Add form.
     navigation.replace("GamefowlDetails", { gamefowlId: data.gamefowl.id });
   };

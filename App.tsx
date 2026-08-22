@@ -17,12 +17,15 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RootNavigator } from "./navigation/RootNavigator";
+import { ToastHost } from "./components/ui/Toast";
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <RootNavigator />
+        {/* Global transient feedback (Milestone 15): sits above navigation. */}
+        <ToastHost />
       </AuthProvider>
       <StatusBar style="dark" />
     </SafeAreaProvider>

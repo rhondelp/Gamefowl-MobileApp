@@ -18,6 +18,7 @@ import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { TextField } from "../../components/ui/TextField";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
 import { ApiError } from "../../services/api/client";
@@ -95,12 +96,14 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
           category,
           is_active: isActive,
         });
+        showToast("Recommendation saved.");
       } else {
         await adminApi.createRecommendation(token!, {
           title: title.trim(),
           content: content.trim(),
           category,
         });
+        showToast("Recommendation added.");
       }
       navigation.goBack();
     } catch (error) {

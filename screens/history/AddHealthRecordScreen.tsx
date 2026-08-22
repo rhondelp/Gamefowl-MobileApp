@@ -12,6 +12,7 @@ import { Text, View } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
 import { HealthRecordForm } from "../../components/history/HealthRecordForm";
+import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
 import * as healthHistoryApi from "../../services/api/healthHistory";
 import type { HealthRecordPayload } from "../../types/api";
@@ -26,6 +27,7 @@ export function AddHealthRecordScreen({ route, navigation }: Props) {
   const handleSubmit = async (payload: HealthRecordPayload) => {
     if (!token) return;
     await healthHistoryApi.addRecord(token, gamefowlId, payload);
+    showToast("Health record logged.");
     // Back to Details: its focus refetch shows the new latest record, and
     // the timeline picks the entry up on its own next focus.
     navigation.goBack();
