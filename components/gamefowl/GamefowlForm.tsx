@@ -23,6 +23,7 @@ import { Pressable, Text, View } from "react-native";
 import { TextField } from "../ui/TextField";
 import { Button } from "../ui/Button";
 import { FormError } from "../ui/FormError";
+import { DatePickerField } from "../ui/DatePickerField";
 import { ApiError } from "../../services/api/client";
 import { validateGamefowlForm } from "../../utils/validation";
 import type { GamefowlPayload, GamefowlSex } from "../../types/api";
@@ -205,19 +206,19 @@ export function GamefowlForm({
         error={fieldErrors.weight ?? null}
       />
 
-      <TextField
+      <DatePickerField
         label="Date of birth"
         value={values.date_of_birth}
-        onChangeText={(text) => setField("date_of_birth", text)}
-        placeholder="YYYY-MM-DD"
+        onChange={(iso) => setField("date_of_birth", iso)}
+        placeholder="Not recorded"
         error={fieldErrors.date_of_birth ?? null}
       />
 
-      <TextField
+      <DatePickerField
         label="Date acquired"
         value={values.date_acquired}
-        onChangeText={(text) => setField("date_acquired", text)}
-        placeholder="YYYY-MM-DD"
+        onChange={(iso) => setField("date_acquired", iso)}
+        placeholder="Not recorded"
         error={fieldErrors.date_acquired ?? null}
       />
 

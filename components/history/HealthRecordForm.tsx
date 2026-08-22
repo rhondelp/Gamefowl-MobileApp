@@ -20,6 +20,7 @@ import { Pressable, Text, View } from "react-native";
 import { TextField } from "../ui/TextField";
 import { Button } from "../ui/Button";
 import { FormError } from "../ui/FormError";
+import { DatePickerField } from "../ui/DatePickerField";
 import { ApiError } from "../../services/api/client";
 import { todayDateString } from "../../utils/format";
 import { validateHealthRecordForm } from "../../utils/validation";
@@ -174,14 +175,14 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
         />
       ) : null}
 
-      <TextField
+      <DatePickerField
         label="Date of event"
         value={recordedAt}
-        onChangeText={(text) => {
-          setRecordedAt(text);
+        onChange={(iso) => {
+          setRecordedAt(iso);
           clearFieldError("recorded_at");
         }}
-        placeholder="YYYY-MM-DD"
+        placeholder="Today"
         error={fieldErrors.recorded_at ?? null}
       />
 
