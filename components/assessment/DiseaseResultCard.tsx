@@ -16,11 +16,8 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { AssessmentResultItem, DiseaseInfo } from "../../types/api";
-import {
-  MatchScoreBadge,
-  scoreTier,
-  tierBarColor,
-} from "./MatchScoreBadge";
+import { MatchScoreBadge } from "./MatchScoreBadge";
+import { scoreTier, tierBarColor } from "./scoreTiers";
 
 const SEVERITY_CHIP: Record<string, string> = {
   mild: "bg-green-100 text-green-700",

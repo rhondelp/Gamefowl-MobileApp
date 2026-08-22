@@ -24,6 +24,7 @@ import { TextField } from "../ui/TextField";
 import { Button } from "../ui/Button";
 import { FormError } from "../ui/FormError";
 import { ApiError } from "../../services/api/client";
+import { validateGamefowlForm } from "../../utils/validation";
 import type { GamefowlPayload, GamefowlSex } from "../../types/api";
 
 /** Editable string state of the form (numbers/dates kept as strings). */
@@ -66,28 +67,6 @@ const SEX_OPTIONS: { value: GamefowlSex; label: string }[] = [
   { value: "female", label: "Female" },
 ];
 
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-/** True when the parsed local midnight of `iso` is after today's midnight. */
-function isFutureDate(iso: string): boolean {
-  const input = new Date(`${iso}T00:00:00`);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return input.getTime() > today.getTime();
-}
-
-/** Validate one optional date exactly like the backend would. */
-function validateDate(value: string): string | null {
-  const trimmed = value.trim();
-  if (!trimmed) return null; // optional field
-  if (!DATE_PATTERN.test(trimmed)) return "Use the YYYY-MM-DD format.";
-  if (Number.isNaN(new Date(`${trimmed}T00:00:00`).getTime())) {
-    return "Enter a real calendar date.";
-  }
-  if (isFutureDate(trimmed)) return "Date cannot be in the future.";
-  return null;
-}
-
 export function GamefowlForm({
   initialValues = EMPTY_GAMEFOWL_FORM,
   submitLabel,
@@ -109,31 +88,9 @@ export function GamefowlForm({
     });
   };
 
-  /** Client-side mirror of Store/UpdateGamefowlRequest rules. */
+  /** Client-side rules live in utils/validation.ts (unit-tested there). */
   const validate = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    if (!values.name.trim()) errors.name = "Name is required.";
-    else if (values.name.trim().length > 255) errors.name = "Name is too long (max 255).";
-
-    if (values.breed.trim().length > 100) errors.breed = "Breed is too long (max 100).";
-    if (values.color.trim().length > 100) errors.color = "Color is too long (max 100).";
-
-    const dobError = validateDate(values.date_of_birth);
-    if (dobError) errors.date_of_birth = dobError;
-
-    const acquiredError = validateDate(values.date_acquired);
-    if (acquiredError) errors.date_acquired = acquiredError;
-
-    const weight = values.weight.trim();
-    if (weight !== "") {
-      const parsed = Number(weight);
-      if (Number.isNaN(parsed)) errors.weight = "Weight must be a number.";
-      else if (parsed < 0 || parsed > 20) errors.weight = "Weight must be between 0 and 20 kg.";
-    }
-
-    if (values.notes.trim().length > 2000) errors.notes = "Notes are too long (max 2000).";
-
+    const errors = validateGamefowlForm(values);
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };

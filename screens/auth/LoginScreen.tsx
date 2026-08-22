@@ -26,7 +26,7 @@ import type { AuthStackScreenProps } from "../../navigation/types";
 type Props = AuthStackScreenProps<"Login">;
 
 export function LoginScreen({ navigation }: Props) {
-  const { login } = useAuth();
+  const { login, sessionExpired } = useAuth();
 
   // Local form state — kept in the screen because only this screen cares.
   const [email, setEmail] = useState("");
@@ -79,6 +79,15 @@ export function LoginScreen({ navigation }: Props) {
         <Text className="text-3xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
         <Text className="mt-1 text-sm text-gray-500">Early Bird Disease Monitoring</Text>
       </View>
+
+      {/* Forced sign-out explanation (token revoked/expired mid-session). */}
+      {sessionExpired ? (
+        <View className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <Text className="text-sm text-amber-800">
+            Your session has expired or was revoked. Please log in again.
+          </Text>
+        </View>
+      ) : null}
 
       <FormError message={formError} />
 

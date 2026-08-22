@@ -22,6 +22,7 @@ import { Button } from "../ui/Button";
 import { FormError } from "../ui/FormError";
 import { ApiError } from "../../services/api/client";
 import { todayDateString } from "../../utils/format";
+import { validateHealthRecordForm } from "../../utils/validation";
 import type {
   HealthRecordPayload,
   HealthRecordType,
@@ -33,8 +34,6 @@ const TYPE_OPTIONS: { value: HealthRecordType; label: string }[] = [
   { value: "vaccination", label: "Vaccination" },
   { value: "general_note", label: "General note" },
 ];
-
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 interface HealthRecordFormProps {
   onSubmit: (payload: HealthRecordPayload) => Promise<void>;
@@ -61,39 +60,15 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
     });
   };
 
-  /** Client-side mirror of StoreHealthRecordRequest rules. */
+  /** Client-side rules live in utils/validation.ts (unit-tested there). */
   const validate = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    if (!title.trim()) errors.title = "Title is required.";
-    else if (title.trim().length > 255) errors.title = "Title is too long (max 255).";
-
-    if (notes.trim().length > 5000) errors.notes = "Notes are too long (max 5000).";
-
-    const dateValue = recordedAt.trim();
-    if (!DATE_PATTERN.test(dateValue)) {
-      errors.recorded_at = "Use the YYYY-MM-DD format.";
-    } else if (Number.isNaN(new Date(`${dateValue}T00:00:00`).getTime())) {
-      errors.recorded_at = "Enter a real calendar date.";
-    } else {
-      const input = new Date(`${dateValue}T00:00:00`);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      if (input.getTime() > today.getTime()) {
-        errors.recorded_at = "Date cannot be in the future.";
-      }
-    }
-
-    // Weight only applies to weight checks in this form's UX.
-    const weightValue = weight.trim();
-    if (type === "weight_check" && weightValue !== "") {
-      const parsed = Number(weightValue);
-      if (Number.isNaN(parsed)) errors.weight = "Weight must be a number.";
-      else if (parsed < 0 || parsed > 20) {
-        errors.weight = "Weight must be between 0 and 20 kg.";
-      }
-    }
-
+    const errors = validateHealthRecordForm({
+      type,
+      title,
+      notes,
+      weight,
+      recordedAt,
+    });
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };

@@ -24,39 +24,14 @@ import React, {
   useMemo,
   useReducer,
 } from "react";
-import type { AuthUser } from "../types/api";
 import * as authService from "../services/api/auth";
 import { deleteToken, getToken, saveToken } from "../services/storage";
-import { ApiError } from "../services/api/client";
-
-/** The three phases of auth state; drives which navigation stack renders. */
-export type AuthStatus = "loading" | "signedOut" | "signedIn";
-
-interface AuthState {
-  status: AuthStatus;
-  user: AuthUser | null;
-  /**
-   * Bearer token kept in memory alongside the user so data screens can
-   * authorize API calls without re-reading SecureStore per request.
-   * Null when signed out; never persisted anywhere but SecureStore itself.
-   */
-  token: string | null;
-}
-
-type AuthAction =
-  | { type: "SIGNED_OUT" }
-  | { type: "SIGNED_IN"; user: AuthUser; token: string };
-
-function reducer(state: AuthState, action: AuthAction): AuthState {
-  switch (action.type) {
-    case "SIGNED_IN":
-      return { status: "signedIn", user: action.user, token: action.token };
-    case "SIGNED_OUT":
-      return { status: "signedOut", user: null, token: null };
-    default:
-      return state;
-  }
-}
+import { setUnauthorizedHandler } from "../services/api/client";
+import {
+  authReducer,
+  INITIAL_AUTH_STATE,
+  type AuthState,
+} from "./authState";
 
 interface AuthContextValue extends AuthState {
   /** Validate a possibly-stored token against /auth/me on app launch. */
@@ -82,11 +57,23 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // status starts at 'loading': RootNavigator shows the Splash screen until
   // the bootstrap effect below decides signedIn vs signedOut.
-  const [state, dispatch] = useReducer(reducer, {
-    status: "loading",
-    user: null,
-    token: null,
-  });
+  const [state, dispatch] = useReducer(authReducer, INITIAL_AUTH_STATE);
+
+  /**
+   * Central session-expiry wiring (Milestone 13): ANY authenticated request
+   * that comes back 401 means the stored token died server-side. The API
+   * client calls this handler exactly once per failure; we clear the token
+   * and flip to signedOut — RootNavigator swaps to Login everywhere, and
+   * LoginScreen explains why via `sessionExpired`.
+   */
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      void deleteToken().finally(() => {
+        dispatch({ type: "SESSION_EXPIRED" });
+      });
+    });
+    return () => setUnauthorizedHandler(null);
+  }, []);
 
   /**
    * App-launch check: if SecureStore has a token, ask the backend who we are.

@@ -57,6 +57,36 @@ interface RequestOptions {
   token?: string | null;
 }
 
+/*
+ * Central session-expiry hook.
+ *
+ * When an AUTHENTICATED request fails with 401, the stored token is dead
+ * (expired or revoked server-side). Rather than every screen improvising,
+ * the client notifies one registered handler — AuthProvider subscribes and
+ * signs the user out, which swaps RootNavigator back to Login everywhere.
+ *
+ * Deliberate exclusion: /auth/login and /auth/register can legitimately
+ * answer 401 for WRONG CREDENTIALS — those requests carry no token, so the
+ * `token` guard below already keeps them from firing the handler. The path
+ * check is defense-in-depth for that same rule.
+ */
+type UnauthorizedHandler = () => void;
+
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+
+/** Register the single global handler (AuthContext does this once). */
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
+}
+
+/** Endpoints whose 401 means "bad credentials", never "session expired". */
+const AUTH_CREDENTIAL_PATHS = ["/auth/login", "/auth/register"];
+
+function isSessionExpiry(path: string, hadToken: boolean, status: number): boolean {
+  if (status !== 401 || !hadToken) return false;
+  return !AUTH_CREDENTIAL_PATHS.some((p) => path.startsWith(p));
+}
+
 /**
  * Perform one API call and return the parsed `data` payload on success,
  * or throw ApiError on any failure.
@@ -101,6 +131,10 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   if (!response.ok || !payload || payload.success === false) {
+    // Dead token mid-session -> central sign-out before surfacing anything.
+    if (isSessionExpiry(path, Boolean(token), response.status)) {
+      unauthorizedHandler?.();
+    }
     throw new ApiError(
       response.status,
       payload?.success === false ? payload.message : fallbackMessage(response.status),

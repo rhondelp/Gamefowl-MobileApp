@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import type { HealthHistoryEntry, HealthRecordType } from "../../types/api";
 import { formatDateTime, formatDate, formatWeight } from "../../utils/format";
-import { scoreTier } from "../assessment/MatchScoreBadge";
+import { scoreTier } from "../assessment/scoreTiers";
 
 /** Icon + label per manual record type (all standard Ionicons glyphs). */
 const RECORD_TYPE_META: Record<
