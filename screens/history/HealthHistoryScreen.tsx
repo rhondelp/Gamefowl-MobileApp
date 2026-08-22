@@ -20,6 +20,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { EntranceView } from "../../components/ui/EntranceView";
 import { TimelineEntryCard } from "../../components/history/TimelineEntryCard";
 import { useHealthHistory } from "../../hooks/useHealthHistory";
 import type { HealthHistoryEntry } from "../../types/api";
@@ -89,8 +90,10 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
               ? `a-${entry.assessment_id}`
               : `r-${entry.record_id}`
           }
-          renderItem={({ item }) => (
-            <TimelineEntryCard entry={item} onPress={() => handlePress(item)} />
+          renderItem={({ item, index }) => (
+            <EntranceView index={Math.min(index, 10)}>
+              <TimelineEntryCard entry={item} onPress={() => handlePress(item)} />
+            </EntranceView>
           )}
           ListHeaderComponent={
             <View className="mb-2">

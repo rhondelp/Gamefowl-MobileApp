@@ -17,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { EntranceView } from "../../components/ui/EntranceView";
 import { GamefowlCard } from "../../components/gamefowl/GamefowlCard";
 import { useGamefowls } from "../../hooks/useGamefowls";
 import type { DashboardStackScreenProps } from "../../navigation/types";
@@ -80,13 +81,15 @@ export function MyGamefowlScreen({ navigation }: Props) {
         <FlatList
           data={gamefowls}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <GamefowlCard
-              gamefowl={item}
-              onPress={() =>
-                navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
-              }
-            />
+          renderItem={({ item, index }) => (
+            <EntranceView index={Math.min(index, 10)}>
+              <GamefowlCard
+                gamefowl={item}
+                onPress={() =>
+                  navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
+                }
+              />
+            </EntranceView>
           )}
           ListEmptyComponent={
             showInactive ? (

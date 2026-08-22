@@ -17,7 +17,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import type { AssessmentResultItem, DiseaseInfo } from "../../types/api";
 import { MatchScoreBadge } from "./MatchScoreBadge";
-import { scoreTier, tierBarColor } from "./scoreTiers";
+import { scoreTier } from "./scoreTiers";
+import { AnimatedScoreBar } from "./AnimatedScoreBar";
 
 const SEVERITY_CHIP: Record<string, string> = {
   mild: "bg-green-100 text-green-700",
@@ -69,15 +70,9 @@ export function DiseaseResultCard({ result, detail = null }: DiseaseResultCardPr
           />
         </View>
 
-        {/* Score as a bar, not just a number (UX spec). */}
-        <View className="mt-3 h-2 flex-row overflow-hidden rounded-full bg-gray-200">
-          <View
-            className="h-full rounded-full"
-            style={{
-              width: `${result.match_score}%`,
-              backgroundColor: tierBarColor(tier),
-            }}
-          />
+        {/* Score as an animated bar, not just a number (UX spec). */}
+        <View className="mt-3">
+          <AnimatedScoreBar score={result.match_score} tier={tier} delayMs={(result.rank - 1) * 120} />
         </View>
 
         <View className="mt-2.5 flex-row items-center">

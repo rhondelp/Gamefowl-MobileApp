@@ -81,6 +81,8 @@ function DashboardStackScreen() {
         headerTitleStyle: { fontWeight: "600" },
         headerShadowVisible: false,
         headerTintColor: "#111827",
+        // Consistent push feel on both platforms (Milestone 15 motion pass).
+        animation: "slide_from_right",
       }}
     >
       {/* Custom-greeting landing screen: no system header on top of it. */}
@@ -150,6 +152,7 @@ function AdminStackScreen() {
         headerTitleStyle: { fontWeight: "600" },
         headerShadowVisible: false,
         headerTintColor: "#111827",
+        animation: "slide_from_right",
       }}
     >
       <AdminStack.Screen

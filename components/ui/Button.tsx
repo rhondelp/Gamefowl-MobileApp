@@ -43,6 +43,11 @@ export function Button({ label, onPress, variant = "primary", loading = false }:
       }`}
       disabled={loading}
       onPress={onPress}
+      // Subtle press feedback app-wide: slight scale + dim (150ms feel via
+      // the platform's default press animation timing).
+      style={({ pressed }) => [
+        pressed && !loading ? { transform: [{ scale: 0.98 }], opacity: 0.9 } : null,
+      ]}
     >
       {loading ? (
         // White spinner reads well on both the filled and danger variants;

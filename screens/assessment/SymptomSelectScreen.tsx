@@ -31,6 +31,7 @@ import { Screen } from "../../components/ui/Screen";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { ChipGroup } from "../../components/ui/ChipGroup";
 import { Button } from "../../components/ui/Button";
+import { EntranceView } from "../../components/ui/EntranceView";
 import { SymptomSelectItem } from "../../components/assessment/SymptomSelectItem";
 import {
   ACTIVITY_OPTIONS,
@@ -231,13 +232,14 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
               <Text className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-600">
                 {category}
               </Text>
-              {items.map((symptom) => (
-                <SymptomSelectItem
-                  key={symptom.id}
-                  symptom={symptom}
-                  selected={selected.has(symptom.id)}
-                  onToggle={toggleSymptom}
-                />
+              {items.map((symptom, index) => (
+                <EntranceView key={symptom.id} index={index}>
+                  <SymptomSelectItem
+                    symptom={symptom}
+                    selected={selected.has(symptom.id)}
+                    onToggle={toggleSymptom}
+                  />
+                </EntranceView>
               ))}
             </View>
           ))

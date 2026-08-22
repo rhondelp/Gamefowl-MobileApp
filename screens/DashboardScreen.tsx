@@ -21,6 +21,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../components/ui/Screen";
 import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
+import { EntranceView } from "../components/ui/EntranceView";
 import { GamefowlCard } from "../components/gamefowl/GamefowlCard";
 import { useAuth } from "../contexts/AuthContext";
 import { useGamefowls } from "../hooks/useGamefowls";
@@ -114,13 +115,15 @@ export function DashboardScreen({ navigation }: Props) {
             <FlatList
               data={gamefowls}
               keyExtractor={(item) => String(item.id)}
-              renderItem={({ item }) => (
-                <GamefowlCard
-                  gamefowl={item}
-                  onPress={() =>
-                    navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
-                  }
-                />
+              renderItem={({ item, index }) => (
+                <EntranceView index={index}>
+                  <GamefowlCard
+                    gamefowl={item}
+                    onPress={() =>
+                      navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
+                    }
+                  />
+                </EntranceView>
               )}
               refreshing={refreshing}
               onRefresh={refresh}
