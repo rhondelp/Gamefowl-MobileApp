@@ -49,11 +49,14 @@ import { AdminSymptomFormScreen } from "../screens/admin/AdminSymptomFormScreen"
 import { AdminRecommendationsScreen } from "../screens/admin/AdminRecommendationsScreen";
 import { AdminRecommendationFormScreen } from "../screens/admin/AdminRecommendationFormScreen";
 import { ProfileScreen } from "../screens/profile/ProfileScreen";
+import { EditProfileScreen } from "../screens/profile/EditProfileScreen";
+import { ChangePasswordScreen } from "../screens/profile/ChangePasswordScreen";
 import type {
   AuthStackParamList,
   DashboardStackParamList,
   AdminStackParamList,
   MainTabParamList,
+  ProfileStackParamList,
 } from "./types";
 
 // Typing the navigators with our param lists is what makes screen props
@@ -61,7 +64,41 @@ import type {
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
 const AdminStack = createNativeStackNavigator<AdminStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const MainTabs = createBottomTabNavigator<MainTabParamList>();
+
+/**
+ * Self-service account stack (Milestone 16): settings main + edit profile +
+ * change password. Headers shown — the forms rely on the back button.
+ */
+function ProfileStackScreen() {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerTitleStyle: { fontWeight: "600" },
+        headerShadowVisible: false,
+        headerTintColor: "#111827",
+        animation: "slide_from_right",
+      }}
+    >
+      <ProfileStack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: "Edit Profile" }}
+      />
+      <ProfileStack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ title: "Change Password" }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
 
 /** Pre-login flow. Headers hidden: each screen carries its own branding. */
 function AuthStackScreen() {
@@ -248,7 +285,7 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
       ) : null}
       <MainTabs.Screen
         name="ProfileTab"
-        component={ProfileScreen}
+        component={ProfileStackScreen}
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (

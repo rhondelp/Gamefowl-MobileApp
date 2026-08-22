@@ -14,7 +14,13 @@
  *   POST /auth/logout    Bearer required                  -> revokes token
  */
 
-import type { AuthSuccessData, MeData } from "../../types/api";
+import type {
+  AuthSuccessData,
+  MeData,
+  PasswordChangePayload,
+  ProfileUpdateData,
+  ProfileUpdatePayload,
+} from "../../types/api";
 import { request } from "./client";
 
 /** Exchange email/password for a Sanctum token + user profile. */
@@ -49,4 +55,30 @@ export async function me(token: string): Promise<MeData> {
 /** Revoke the current token server-side. Fire-and-forget friendly. */
 export async function logout(token: string): Promise<void> {
   await request<null>("/auth/logout", { method: "POST", token });
+}
+
+/**
+ * Update the signed-in user's own name/email (Backend Milestone 9).
+ * Returns the fresh profile so callers can update local auth state.
+ */
+export async function updateProfile(
+  token: string,
+  payload: ProfileUpdatePayload
+): Promise<ProfileUpdateData> {
+  return request<ProfileUpdateData>("/auth/me", {
+    method: "PATCH",
+    body: payload,
+    token,
+  });
+}
+
+/**
+ * Change the signed-in user's password. Current session stays valid; the
+ * backend revokes all OTHER tokens. Message-only response (no data).
+ */
+export async function changePassword(
+  token: string,
+  payload: PasswordChangePayload
+): Promise<void> {
+  await request<null>("/auth/me/password", { method: "PUT", body: payload, token });
 }

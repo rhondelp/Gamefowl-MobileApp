@@ -33,7 +33,9 @@ export interface AuthState {
 export type AuthAction =
   | { type: "SIGNED_OUT" }
   | { type: "SIGNED_IN"; user: AuthUser; token: string }
-  | { type: "SESSION_EXPIRED" };
+  | { type: "SESSION_EXPIRED" }
+  /** Self-service profile update (Backend M9): same session, fresh profile. */
+  | { type: "PROFILE_UPDATED"; user: AuthUser };
 
 export const INITIAL_AUTH_STATE: AuthState = {
   status: "loading",
@@ -55,6 +57,10 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
       return { status: "signedOut", user: null, token: null, sessionExpired: false };
     case "SESSION_EXPIRED":
       return { status: "signedOut", user: null, token: null, sessionExpired: true };
+    case "PROFILE_UPDATED":
+      // Session and token are untouched — only the cached profile refreshes,
+      // so the Dashboard greeting etc. update without a re-login.
+      return { ...state, user: action.user };
     default:
       return state;
   }

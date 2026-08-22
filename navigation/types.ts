@@ -58,9 +58,16 @@ export type AdminStackParamList = {
   AdminRecommendationForm: { recommendationId?: number };
 };
 
+/** Self-service profile flows (Milestone 16) nested under the Profile tab. */
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  EditProfile: undefined;
+  ChangePassword: undefined;
+};
+
 export type MainTabParamList = {
   DashboardTab: NavigatorScreenParams<DashboardStackParamList>;
-  ProfileTab: undefined;
+  ProfileTab: NavigatorScreenParams<ProfileStackParamList>;
   /** Present in the param list only so typing stays complete; the SCREEN is
    *  conditionally registered per role (see RootNavigator). */
   AdminTab?: NavigatorScreenParams<AdminStackParamList>;
@@ -77,3 +84,7 @@ export type DashboardStackScreenProps<T extends keyof DashboardStackParamList> =
 /** Handy alias for screens living in the admin stack. */
 export type AdminStackScreenProps<T extends keyof AdminStackParamList> =
   NativeStackScreenProps<AdminStackParamList, T>;
+
+/** Handy alias for screens living in the profile stack. */
+export type ProfileStackScreenProps<T extends keyof ProfileStackParamList> =
+  NativeStackScreenProps<ProfileStackParamList, T>;

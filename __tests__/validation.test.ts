@@ -6,6 +6,8 @@ import {
   isFutureDateString,
   validateGamefowlForm,
   validateHealthRecordForm,
+  validatePasswordChangeForm,
+  validateProfileForm,
 } from "../utils/validation";
 import { todayDateString } from "../utils/format";
 
@@ -117,5 +119,68 @@ describe("validateHealthRecordForm", () => {
 describe("isFutureDateString", () => {
   it("is false for today (before_or_equal semantics)", () => {
     expect(isFutureDateString(todayDateString())).toBe(false);
+  });
+});
+
+describe("validateProfileForm", () => {
+  const valid = { name: "Rhondel", email: "rhondel@example.com" };
+
+  it("accepts a valid name and email", () => {
+    expect(validateProfileForm(valid)).toEqual({});
+  });
+
+  it("requires name and email", () => {
+    const errors = validateProfileForm({ name: "", email: "" });
+    expect(errors.name).toBe("Name is required.");
+    expect(errors.email).toBe("Email is required.");
+  });
+
+  it("rejects malformed emails", () => {
+    expect(validateProfileForm({ ...valid, email: "not-an-email" }).email).toBe(
+      "Enter a valid email address."
+    );
+    // Re-submitting the current address stays VALID (backend unique rule
+    // ignores the user's own row) � the client only checks shape.
+    expect(validateProfileForm(valid).email).toBeUndefined();
+  });
+});
+
+describe("validatePasswordChangeForm", () => {
+  const base = { current: "oldSecret1", next: "newSecret1", confirmation: "newSecret1" };
+
+  it("accepts a matching, sufficiently long change", () => {
+    expect(validatePasswordChangeForm(base)).toEqual({});
+  });
+
+  it("requires all three fields", () => {
+    const errors = validatePasswordChangeForm({ current: "", next: "", confirmation: "" });
+    expect(errors.current_password).toBe("Current password is required.");
+    expect(errors.new_password).toBe("New password is required.");
+    expect(errors.new_password_confirmation).toBe("Please confirm the new password.");
+  });
+
+  it("enforces the registration strength rule (min 8)", () => {
+    const errors = validatePasswordChangeForm({
+      current: base.current,
+      next: "short",
+      confirmation: "short",
+    });
+    expect(errors.new_password).toBe("New password must be at least 8 characters.");
+  });
+
+  it("rejects mismatched confirmation", () => {
+    const errors = validatePasswordChangeForm({ ...base, confirmation: "different" });
+    expect(errors.new_password_confirmation).toBe("The passwords do not match.");
+  });
+
+  it("rejects reusing the current password", () => {
+    const errors = validatePasswordChangeForm({
+      current: "samePass123",
+      next: "samePass123",
+      confirmation: "samePass123",
+    });
+    expect(errors.new_password).toBe(
+      "New password must be different from the current password."
+    );
   });
 });

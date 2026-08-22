@@ -13,6 +13,9 @@ import type { GamefowlSex, HealthRecordType } from "../types/api";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Pragmatic email shape check; the backend re-validates with email:rfc. */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /** True when the string parses as a real local calendar date. */
 export function isValidDateString(value: string): boolean {
   if (!DATE_PATTERN.test(value)) return false;
@@ -82,6 +85,63 @@ export function validateGamefowlForm(
 
   if (values.notes.trim().length > 2000)
     errors.notes = "Notes are too long (max 2000).";
+
+  return errors;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Profile self-service forms (mirror Backend M9 UpdateProfile/UpdatePassword) */
+/* ------------------------------------------------------------------------ */
+
+export interface ProfileFormInput {
+  name: string;
+  email: string;
+}
+
+/** Backend: name required<=255, email required email:rfc<=255 unique-except-self. */
+export function validateProfileForm(values: ProfileFormInput): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.name.trim()) errors.name = "Name is required.";
+  else if (values.name.trim().length > 255)
+    errors.name = "Name is too long (max 255).";
+
+  const email = values.email.trim();
+  if (!email) errors.email = "Email is required.";
+  else if (email.length > 255) errors.email = "Email is too long (max 255).";
+  else if (!EMAIL_PATTERN.test(email)) errors.email = "Enter a valid email address.";
+
+  return errors;
+}
+
+export interface PasswordChangeFormInput {
+  current: string;
+  next: string;
+  confirmation: string;
+}
+
+/**
+ * Backend: current_password required (verified against the stored hash
+ * server-side), new_password Password::min(8) + confirmed — the exact
+ * strength rule registration uses.
+ */
+export function validatePasswordChangeForm(
+  values: PasswordChangeFormInput
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (!values.current) errors.current_password = "Current password is required.";
+
+  if (!values.next) errors.new_password = "New password is required.";
+  else if (values.next.length < 8)
+    errors.new_password = "New password must be at least 8 characters.";
+
+  if (!values.confirmation)
+    errors.new_password_confirmation = "Please confirm the new password.";
+  else if (values.confirmation !== values.next)
+    errors.new_password_confirmation = "The passwords do not match.";
+  else if (values.current && values.confirmation === values.current)
+    errors.new_password = "New password must be different from the current password.";
 
   return errors;
 }

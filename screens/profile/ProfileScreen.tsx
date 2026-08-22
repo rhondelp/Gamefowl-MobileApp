@@ -24,6 +24,9 @@ import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
+import type { ProfileStackScreenProps } from "../../navigation/types";
+
+type Props = ProfileStackScreenProps<"ProfileMain">;
 
 // Keep in sync with app.json "expo.version" (Metro cannot bundle app.json
 // itself — Expo CLI reserves it as build config).
@@ -35,7 +38,7 @@ const DISCLAIMER_TEXT =
   "veterinary diagnosis. Always consult a licensed veterinarian for confirmation " +
   "and treatment, especially for severe or critical findings.";
 
-export function ProfileScreen() {
+export function ProfileScreen({ navigation }: Props) {
   const { user, logout } = useAuth();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
 
@@ -70,6 +73,23 @@ export function ProfileScreen() {
               {user?.role}
             </Text>
           </View>
+        </View>
+
+        {/* Account self-service (Milestone 16 — Backend M9 endpoints). */}
+        <View className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white">
+          <MenuRow
+            icon="person-outline"
+            label="Edit profile"
+            sub="Update your name and email"
+            onPress={() => navigation.navigate("EditProfile")}
+          />
+          <MenuRow
+            icon="lock-closed-outline"
+            label="Change password"
+            sub="Signs out your other devices"
+            onPress={() => navigation.navigate("ChangePassword")}
+            last
+          />
         </View>
 
         {/* About */}
@@ -130,5 +150,40 @@ export function ProfileScreen() {
         </Text>
       </ScrollView>
     </Screen>
+  );
+}
+
+/** Tappable settings row: icon + label + chevron (matches Admin dashboard). */
+function MenuRow({
+  icon,
+  label,
+  sub,
+  onPress,
+  last = false,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  sub: string;
+  onPress: () => void;
+  last?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      className={`flex-row items-center px-4 py-3.5 active:bg-brand-50 ${
+        last ? "" : "border-b border-gray-100"
+      }`}
+    >
+      <View className="h-9 w-9 items-center justify-center rounded-full bg-brand-100">
+        <Ionicons name={icon} size={17} color="#276a43" />
+      </View>
+      <View className="ml-3 flex-1">
+        <Text className="text-sm font-semibold text-gray-900">{label}</Text>
+        <Text className="text-xs text-gray-500">{sub}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+    </Pressable>
   );
 }

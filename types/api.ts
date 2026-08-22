@@ -325,6 +325,28 @@ export interface HealthHistoryData {
   };
 }
 
+/** Body of PATCH /auth/me (Backend Milestone 9 — self-service profile). */
+export interface ProfileUpdatePayload {
+  name: string;
+  email: string;
+}
+
+/** `data` payload of PATCH /auth/me. */
+export interface ProfileUpdateData {
+  user: AuthUser;
+}
+
+/**
+ * Body of PUT /auth/me/password. Server verifies current_password against
+ * the stored hash and revokes all OTHER tokens on success — this device's
+ * session stays signed in.
+ */
+export interface PasswordChangePayload {
+  current_password: string;
+  new_password: string;
+  new_password_confirmation: string;
+}
+
 /** Successful backend response. */
 export interface ApiSuccess<T> {
   success: true;

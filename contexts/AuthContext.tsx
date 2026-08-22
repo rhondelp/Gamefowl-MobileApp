@@ -30,6 +30,7 @@ import { setUnauthorizedHandler } from "../services/api/client";
 import {
   authReducer,
   INITIAL_AUTH_STATE,
+  type AuthAction,
   type AuthState,
 } from "./authState";
 
@@ -47,6 +48,11 @@ interface AuthContextValue extends AuthState {
   }) => Promise<void>;
   /** Revoke the server-side token and clear local storage. */
   logout: () => Promise<void>;
+  /**
+   * Self-service profile update (Backend M9): PATCH /auth/me then refresh
+   * the cached user so the whole app reflects the new name/email instantly.
+   */
+  updateProfile: (name: string, email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -147,13 +153,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  /**
+   * Profile self-service (Milestone 16): PATCH /auth/me with the current
+   * in-memory token, then swap the cached user. No re-login required —
+   * the session token is unchanged.
+   */
+  const updateProfile = async (name: string, email: string) => {
+    if (!state.token) throw new Error("Not signed in.");
+    const data = await authService.updateProfile(state.token, { name, email });
+    dispatch({ type: "PROFILE_UPDATED", user: data.user });
+  };
+
   // Kick off bootstrap exactly once when the provider mounts.
   useEffect(() => {
     void bootstrap();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const value = useMemo(() => ({ ...state, bootstrap, login, register, logout }), [state]);
+  const value = useMemo(
+    () => ({ ...state, bootstrap, login, register, logout, updateProfile }),
+    [state]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
