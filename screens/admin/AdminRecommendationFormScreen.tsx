@@ -148,9 +148,6 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-1 text-center text-xl font-bold text-gray-900">
-          {isEdit ? "Edit Recommendation" : "Add Recommendation"}
-        </Text>
         <Text className="mb-6 text-center text-sm text-gray-500">
           Care guidance linked to diseases and shown on results.
         </Text>

@@ -180,9 +180,6 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-1 text-center text-xl font-bold text-gray-900">
-          {isEdit ? "Edit Disease" : "Add Disease"}
-        </Text>
         <Text className="mb-6 text-center text-sm text-gray-500">
           This is what the expert system reasons over — keep it accurate.
         </Text>

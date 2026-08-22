@@ -100,7 +100,7 @@ export function AdminSymptomsScreen({ navigation }: Props) {
               onPress={() =>
                 navigation.navigate("AdminSymptomForm", { symptomId: item.id })
               }
-              className="mb-2.5 rounded-2xl border border-gray-200 bg-white px-4 py-3 active:bg-brand-50"
+              className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 active:bg-brand-50"
             >
               <View className="flex-row items-center">
                 {/* Severity cue matches the owner-facing checklist dot. */}

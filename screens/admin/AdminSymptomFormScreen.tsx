@@ -165,9 +165,6 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-1 text-center text-xl font-bold text-gray-900">
-          {isEdit ? "Edit Symptom" : "Add Symptom"}
-        </Text>
         <Text className="mb-6 text-center text-sm text-gray-500">
           Owners tick these when reporting a sick bird.
         </Text>

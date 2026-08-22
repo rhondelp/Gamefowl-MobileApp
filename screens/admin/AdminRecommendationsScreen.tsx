@@ -95,7 +95,7 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
                   recommendationId: item.id,
                 })
               }
-              className="mb-2.5 rounded-2xl border border-gray-200 bg-white px-4 py-3 active:bg-brand-50"
+              className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 active:bg-brand-50"
             >
               <View className="flex-row items-center">
                 <Text className="flex-shrink flex-1 text-sm font-semibold text-gray-900" numberOfLines={1}>

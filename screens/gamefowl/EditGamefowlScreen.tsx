@@ -76,9 +76,6 @@ export function EditGamefowlScreen({ route, navigation }: Props) {
   return (
     <Screen scroll key={gamefowl?.id}>
       <View>
-        <Text className="mb-1 text-center text-2xl font-bold text-gray-900">
-          Edit Profile
-        </Text>
         <Text className="mb-6 text-center text-sm text-gray-500">
           Update {gamefowl?.name}&apos;s details below.
         </Text>
