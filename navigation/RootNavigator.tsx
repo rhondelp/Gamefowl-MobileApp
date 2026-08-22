@@ -33,6 +33,8 @@ import { MyGamefowlScreen } from "../screens/gamefowl/MyGamefowlScreen";
 import { GamefowlDetailsScreen } from "../screens/gamefowl/GamefowlDetailsScreen";
 import { AddGamefowlScreen } from "../screens/gamefowl/AddGamefowlScreen";
 import { EditGamefowlScreen } from "../screens/gamefowl/EditGamefowlScreen";
+import { SymptomSelectScreen } from "../screens/assessment/SymptomSelectScreen";
+import { AssessmentResultScreen } from "../screens/assessment/AssessmentResultScreen";
 import { ProfileScreen } from "../screens/profile/ProfileScreen";
 import type {
   AuthStackParamList,
@@ -91,6 +93,16 @@ function DashboardStackScreen() {
         name="EditGamefowl"
         component={EditGamefowlScreen}
         options={{ title: "Edit Profile" }}
+      />
+      <DashboardStack.Screen
+        name="SymptomSelect"
+        component={SymptomSelectScreen}
+        options={{ title: "Health Assessment" }}
+      />
+      <DashboardStack.Screen
+        name="AssessmentResult"
+        component={AssessmentResultScreen}
+        options={{ title: "Results" }}
       />
     </DashboardStack.Navigator>
   );

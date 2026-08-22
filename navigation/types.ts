@@ -29,6 +29,9 @@ export type DashboardStackParamList = {
   GamefowlDetails: { gamefowlId: number };
   AddGamefowl: undefined;
   EditGamefowl: { gamefowlId: number };
+  /** Milestone 11 diagnostic flow. */
+  SymptomSelect: { gamefowlId: number; birdName?: string };
+  AssessmentResult: { assessmentId: number };
 };
 
 export type MainTabParamList = {

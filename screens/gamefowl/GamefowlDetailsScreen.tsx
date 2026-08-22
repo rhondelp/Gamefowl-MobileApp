@@ -157,13 +157,25 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
 
         {/* Actions */}
         <View className="mt-6">
+          {/* Primary health action: the diagnostic flow (Milestone 11). */}
           <Button
-            label="Edit Profile"
-            variant="outline"
+            label="Start Health Assessment"
             onPress={() =>
-              navigation.navigate("EditGamefowl", { gamefowlId: gamefowl.id })
+              navigation.navigate("SymptomSelect", {
+                gamefowlId: gamefowl.id,
+                birdName: gamefowl.name,
+              })
             }
           />
+          <View className="mt-3">
+            <Button
+              label="Edit Profile"
+              variant="outline"
+              onPress={() =>
+                navigation.navigate("EditGamefowl", { gamefowlId: gamefowl.id })
+              }
+            />
+          </View>
           {gamefowl.is_active ? (
             <View className="mt-3">
               <Button
