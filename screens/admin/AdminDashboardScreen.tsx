@@ -13,6 +13,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -28,6 +29,9 @@ import { ApiError } from "../../services/api/client";
 import { scoreTier, tierBarColor } from "../../components/assessment/scoreTiers";
 import { formatDateTime } from "../../utils/format";
 import type { DashboardStats } from "../../types/admin";
+import type { AdminStackScreenProps } from "../../navigation/types";
+
+type Props = AdminStackScreenProps<"AdminDashboard">;
 
 /** Big-number card used for the three headline counts. */
 function StatCard({
@@ -84,7 +88,7 @@ function CountRow({
   );
 }
 
-export function AdminDashboardScreen() {
+export function AdminDashboardScreen({ navigation }: Props) {
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -174,6 +178,36 @@ export function AdminDashboardScreen() {
         <StatCard icon="people" value={stats.total_users} label="Users" />
         <StatCard icon="paw" value={stats.total_gamefowls} label="Gamefowls" />
         <StatCard icon="pulse" value={stats.total_assessments} label="Assessments" />
+      </View>
+
+      {/* Management shortcuts — entry points to every admin surface. */}
+      <SectionTitle>Manage</SectionTitle>
+      <View className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <MenuRow
+          icon="people"
+          label="User management"
+          sub="Roles, status, deactivation"
+          onPress={() => navigation.navigate("AdminUsers")}
+        />
+        <MenuRow
+          icon="book"
+          label="Diseases"
+          sub="Conditions, rules, linked guidance"
+          onPress={() => navigation.navigate("AdminDiseases")}
+        />
+        <MenuRow
+          icon="medkit"
+          label="Symptoms"
+          sub="Signs owners can report"
+          onPress={() => navigation.navigate("AdminSymptoms")}
+        />
+        <MenuRow
+          icon="list"
+          label="Recommendations"
+          sub="Care guidance library"
+          onPress={() => navigation.navigate("AdminRecommendations")}
+          last
+        />
       </View>
 
       {/* Breakdowns */}
@@ -293,5 +327,40 @@ function SectionTitle({ children }: { children: string }) {
     <Text className="mb-2 mt-5 text-xs font-semibold uppercase tracking-widest text-brand-600">
       {children}
     </Text>
+  );
+}
+
+/** Tappable management shortcut row: icon + label + chevron. */
+function MenuRow({
+  icon,
+  label,
+  sub,
+  onPress,
+  last = false,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  sub: string;
+  onPress: () => void;
+  last?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      className={`flex-row items-center px-4 py-3.5 active:bg-brand-50 ${
+        last ? "" : "border-b border-gray-100"
+      }`}
+    >
+      <View className="h-9 w-9 items-center justify-center rounded-full bg-brand-100">
+        <Ionicons name={icon} size={17} color="#276a43" />
+      </View>
+      <View className="ml-3 flex-1">
+        <Text className="text-sm font-semibold text-gray-900">{label}</Text>
+        <Text className="text-xs text-gray-500">{sub}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+    </Pressable>
   );
 }
