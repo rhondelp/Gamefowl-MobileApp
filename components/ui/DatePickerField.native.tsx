@@ -24,7 +24,7 @@ import DateTimePicker, {
 
 import { formatDate } from "../../utils/format";
 
-interface DatePickerFieldProps {
+export interface DatePickerFieldProps {
   label: string;
   /** "YYYY-MM-DD" or "" / null for no selection. */
   value: string;
