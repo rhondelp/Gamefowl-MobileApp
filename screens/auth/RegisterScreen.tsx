@@ -14,7 +14,7 @@
  *      backend envelope (duplicate email, weak password...).
  */
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
@@ -84,8 +84,12 @@ export function RegisterScreen({ navigation }: Props) {
   return (
     <Screen scroll>
       <View className="mb-8">
-        <Text className="text-2xl font-bold text-gray-900">Create your account</Text>
-        <Text className="mt-1 text-sm text-gray-500">
+        <Image
+          source={require("../../assets/images/main_logo.png")}
+          style={{ width: 72, height: 72, resizeMode: "contain", alignSelf: "center" }}
+        />
+        <Text className="mt-2 text-center text-2xl font-bold text-gray-900">Create your account</Text>
+        <Text className="mt-1 text-center text-sm text-gray-500">
           Start monitoring your gamefowl's health today.
         </Text>
       </View>

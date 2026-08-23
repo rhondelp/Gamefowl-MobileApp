@@ -17,7 +17,7 @@
  *     - Notification preferences — no notification system exists.
  */
 import React, { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
@@ -97,7 +97,13 @@ export function ProfileScreen({ navigation }: Props) {
           About
         </Text>
         <View className="rounded-2xl border border-gray-200 bg-white px-4 py-1">
-          <View className="flex-row items-center py-3">
+          <View className="items-center py-3">
+            <Image
+              source={require("../../assets/images/main_logo.png")}
+              style={{ width: 88, height: 88, resizeMode: "contain" }}
+            />
+          </View>
+          <View className="flex-row items-center border-t border-gray-100 py-3">
             <Ionicons name="information-circle-outline" size={18} color="#276a43" />
             <Text className="ml-3 flex-1 text-sm text-gray-700">App version</Text>
             <Text className="text-sm font-medium text-gray-900">{APP_VERSION}</Text>

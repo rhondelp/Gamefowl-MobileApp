@@ -105,7 +105,7 @@ export function DashboardScreen({ navigation }: Props) {
           </Text>
           {gamefowls.length === 0 ? (
             <EmptyState
-              icon="paw-outline"
+              image={require("../assets/images/badge_green.png")}
               title="No gamefowl yet"
               message="Add your first bird to start tracking its health."
               actionLabel="+ Add Gamefowl"

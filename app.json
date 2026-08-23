@@ -4,28 +4,31 @@
     "slug": "Gamefowl-MobileApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/app_icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/app_icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#123122"
+    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#123122",
+        "foregroundImage": "./assets/images/app_icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/app_icon.png"
     },
     "plugins": [
       "expo-secure-store",
       "expo-font",
-      "@react-native-community/datetimepicker",
-      "expo-video"
+      "@react-native-community/datetimepicker"
     ]
   }
+}
 }

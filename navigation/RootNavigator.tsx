@@ -19,7 +19,7 @@
  * shows one — except Dashboard itself, which renders its custom greeting.
  */
 import React from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -300,13 +300,17 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
 export function RootNavigator() {
   const { status, user } = useAuth();
 
-  // Bootstrap in progress: show a minimal splash and render nothing else,
+  // Bootstrap in progress: show a branded splash and render nothing else,
   // so neither auth screens nor app content can flash before we know the
   // real auth state.
   if (status === "loading") {
     return (
       <View className="flex-1 items-center justify-center bg-brand-600">
-        <ActivityIndicator color="#ffffff" />
+        <Image
+          source={require("../assets/images/app_icon_white.png")}
+          style={{ width: 110, height: 110, resizeMode: "contain" }}
+        />
+        <ActivityIndicator color="#ffffff" style={{ marginTop: 16 }} />
         <Text className="mt-3 text-sm text-brand-100">Checking session…</Text>
       </View>
     );

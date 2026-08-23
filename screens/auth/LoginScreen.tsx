@@ -13,7 +13,7 @@
  *   - 429 rate limiting surfaces friendly copy in the banner.
  */
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
@@ -76,7 +76,11 @@ export function LoginScreen({ navigation }: Props) {
   return (
     <Screen scroll>
       <View className="mb-10 items-center">
-        <Text className="text-3xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
+        <Image
+          source={require("../../assets/images/main_logo.png")}
+          style={{ width: 130, height: 130, resizeMode: "contain" }}
+        />
+        <Text className="mt-2 text-3xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
         <Text className="mt-1 text-sm text-gray-500">Early Bird Disease Monitoring</Text>
       </View>
 
