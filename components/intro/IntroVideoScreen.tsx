@@ -70,7 +70,8 @@ export function IntroVideoScreen({ videoSource, onFinish }: IntroVideoScreenProp
         player={player}
         contentFit="cover"
         style={StyleSheet.absoluteFill}
-        allowsFullscreen={false}
+        // Controls are hidden anyway; this just keeps fullscreen impossible.
+        fullscreenOptions={{ enable: false }}
         allowsPictureInPicture={false}
         nativeControls={false}
       />
