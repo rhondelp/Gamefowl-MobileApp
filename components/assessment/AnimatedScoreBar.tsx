@@ -29,6 +29,10 @@ interface AnimatedScoreBarProps {
 
 export function AnimatedScoreBar({ score, tier, delayMs = 0 }: AnimatedScoreBarProps) {
   const progress = useSharedValue(0);
+  // Computed on the JS thread: Reanimated worklets cannot reliably capture
+  // cross-module function references (they arrive as namespace objects on
+  // the UI thread), but primitive strings are copied safely.
+  const color = tierBarColor(tier);
 
   useEffect(() => {
     progress.value = withDelay(delayMs, withTiming(score, { duration: 300 }));
@@ -36,7 +40,7 @@ export function AnimatedScoreBar({ score, tier, delayMs = 0 }: AnimatedScoreBarP
 
   const barStyle = useAnimatedStyle(() => ({
     width: `${progress.value}%`,
-    backgroundColor: tierBarColor(tier),
+    backgroundColor: color,
   }));
 
   return (
