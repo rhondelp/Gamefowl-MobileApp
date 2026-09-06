@@ -20,6 +20,12 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
+  /**
+   * Pre-login password-reset request screen (Milestone 17). The optional
+   * `prefillEmail` is supplied by Login when the user has already typed
+   * their address — purely a UX nicety, no flow depends on it.
+   */
+  ForgotPassword: { prefillEmail?: string } | undefined;
 };
 
 /** Bird-management stack nested inside the Dashboard tab. */

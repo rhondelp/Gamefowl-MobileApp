@@ -28,6 +28,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../contexts/AuthContext";
 import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
+import { ForgotPasswordScreen } from "../screens/auth/ForgotPasswordScreen";
 import { DashboardScreen } from "../screens/DashboardScreen";
 import { MyGamefowlScreen } from "../screens/gamefowl/MyGamefowlScreen";
 import { GamefowlDetailsScreen } from "../screens/gamefowl/GamefowlDetailsScreen";
@@ -100,12 +101,25 @@ function ProfileStackScreen() {
   );
 }
 
-/** Pre-login flow. Headers hidden: each screen carries its own branding. */
+/** Pre-login flow. Headers hidden on the branded landings; the Forgot
+ *  Password form opts back into a header so users get a back affordance. */
 function AuthStackScreen() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Register" component={RegisterScreen} />
+      <AuthStack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+        options={{
+          // Per-screen override: form screens get a header for a back button.
+          title: "Forgot Password",
+          headerShown: true,
+          headerTintColor: "#111827",
+          headerShadowVisible: false,
+          headerTitleStyle: { fontWeight: "600" },
+        }}
+      />
     </AuthStack.Navigator>
   );
 }

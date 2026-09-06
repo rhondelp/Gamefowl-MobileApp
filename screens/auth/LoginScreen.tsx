@@ -112,6 +112,23 @@ export function LoginScreen({ navigation }: Props) {
         error={fieldErrors.password ?? null}
       />
 
+      {/* Inline link under the password field — only carries a prefill when
+          the user has actually typed an email, so an untouched Login lands
+          on an empty Forgot Password field. */}
+      <TouchableOpacity
+        className="mb-4 self-end"
+        onPress={() =>
+          navigation.navigate("ForgotPassword", {
+            prefillEmail: email.trim() || undefined,
+          })
+        }
+        accessibilityRole="link"
+      >
+        <Text className="text-sm font-semibold text-brand-600">
+          Forgot Password?
+        </Text>
+      </TouchableOpacity>
+
       <Button label="Log In" onPress={handleSubmit} loading={submitting} />
 
       <TouchableOpacity

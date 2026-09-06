@@ -12,6 +12,11 @@
  *                          password_confirmation }        -> { user, token }
  *   GET  /auth/me        Bearer required                  -> { user }
  *   POST /auth/logout    Bearer required                  -> revokes token
+ *
+ * Backend Milestone 10 added a public forgot-password flow used by the
+ * Milestone 17 mobile entry point. The actual reset happens outside the
+ * app on a backend-hosted web page reached from the email's link.
+ *   POST /auth/forgot-password  { email }                 -> 2xx always
  */
 
 import type {
@@ -55,6 +60,26 @@ export async function me(token: string): Promise<MeData> {
 /** Revoke the current token server-side. Fire-and-forget friendly. */
 export async function logout(token: string): Promise<void> {
   await request<null>("/auth/logout", { method: "POST", token });
+}
+
+/**
+ * Ask the backend to email a password-reset link to `email` (Backend M10).
+ *
+ * Deliberately does NOT inspect the response body beyond "did it succeed":
+ * the backend returns the same 2xx envelope whether or not the email is
+ * registered, and the mobile UI must mirror that — any client-side
+ * differentiation would leak account presence. A 2xx flips the screen to
+ * a neutral confirmation; a real failure (network down / 5xx) surfaces as
+ * a retryable error and leaves the form mounted.
+ *
+ * Public endpoint, no token; the central 401-expiry hook in client.ts is
+ * guarded by `!hadToken` so it won't fire here.
+ */
+export async function requestPasswordReset(email: string): Promise<void> {
+  await request<null>("/auth/forgot-password", {
+    method: "POST",
+    body: { email },
+  });
 }
 
 /**
