@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/images/app_icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/images/app_icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#123122"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -27,7 +22,17 @@
     "plugins": [
       "expo-secure-store",
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-status-bar",
+      "expo-video",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/app_icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#123122"
+        }
+      ]
     ]
   }
 }
