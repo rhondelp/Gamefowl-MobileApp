@@ -18,7 +18,7 @@
  *      explanation lists never depend on it.
  */
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
@@ -26,6 +26,7 @@ import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { elevation } from "../../components/ui/elevation";
+import { Skeleton } from "../../components/ui/Skeleton";
 import { DiseaseResultCard } from "../../components/assessment/DiseaseResultCard";
 import {
   activityLabel,
@@ -111,17 +112,47 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
   if (loading && !assessment) {
     return (
       <Screen>
-        <View className="flex-1 items-center justify-center">
+        {/* Shaped like the real results: summary card, then ranked cards. */}
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel="Scoring your results"
+          accessibilityState={{ busy: true }}
+        >
           <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
             style={elevation.card}
           >
-            <ActivityIndicator size="large" color="#2e7d4f" />
+            <Skeleton width="60%" height={13} />
+            <View className="mt-3 flex-row">
+              <Skeleton width={72} height={22} radius={11} style={{ marginRight: 6 }} />
+              <Skeleton width={88} height={22} radius={11} style={{ marginRight: 6 }} />
+              <Skeleton width={64} height={22} radius={11} />
+            </View>
           </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">
-            Scoring your results…
+
+          {[0, 1, 2].map((i) => (
+            <View
+              key={i}
+              className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+              style={elevation.card}
+            >
+              <View className="flex-row items-center">
+                <Skeleton width={28} height={28} radius={14} />
+                <View className="ml-2.5 flex-1">
+                  <Skeleton width="65%" height={14} />
+                </View>
+                <Skeleton width={52} height={26} radius={13} />
+              </View>
+              {/* Matches the AnimatedScoreBar track. */}
+              <Skeleton height={8} radius={4} style={{ marginTop: 14 }} />
+              <Skeleton width={110} height={20} radius={10} style={{ marginTop: 12 }} />
+            </View>
+          ))}
+
+          <Text className="mt-5 text-center text-sm font-medium text-gray-500">
+            Scoring possible conditions…
           </Text>
-          <Text className="mt-1 text-xs text-gray-500">This takes just a moment.</Text>
         </View>
       </Screen>
     );

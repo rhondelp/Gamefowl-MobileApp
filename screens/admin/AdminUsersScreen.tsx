@@ -15,6 +15,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
 import { elevation } from "../../components/ui/elevation";
+import { SkeletonList } from "../../components/ui/Skeleton";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { useAdminUsers, type AdminUserFilters } from "../../hooks/useAdminUsers";
@@ -88,15 +89,7 @@ export function AdminUsersScreen({ navigation }: Props) {
       </View>
 
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
-            style={elevation.card}
-          >
-            <ActivityIndicator size="large" color="#2e7d4f" />
-          </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">Loading users…</Text>
-        </View>
+        <SkeletonList count={5} label="Loading users" />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (

@@ -21,6 +21,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
+  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -229,6 +230,17 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
             onChangeText={setSearch}
             autoCapitalize="none"
           />
+          {search.length > 0 ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
+              hitSlop={12}
+              onPress={() => setSearch("")}
+              style={({ pressed }) => (pressed ? { opacity: 0.6 } : null)}
+            >
+              <Ionicons name="close-circle" size={19} color="#9ca3af" />
+            </Pressable>
+          ) : null}
         </View>
 
         {filteredGroups.length === 0 ? (

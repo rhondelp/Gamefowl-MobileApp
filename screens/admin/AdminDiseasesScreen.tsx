@@ -8,11 +8,12 @@
  *   recommendations are managed.
  */
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
 import { elevation } from "../../components/ui/elevation";
+import { SkeletonList } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -74,15 +75,7 @@ export function AdminDiseasesScreen({ navigation }: Props) {
   if (loading) {
     return (
       <Screen>
-        <View className="flex-1 items-center justify-center">
-          <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
-            style={elevation.card}
-          >
-            <ActivityIndicator size="large" color="#2e7d4f" />
-          </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">Loading diseases…</Text>
-        </View>
+        <SkeletonList count={5} label="Loading diseases" />
       </Screen>
     );
   }

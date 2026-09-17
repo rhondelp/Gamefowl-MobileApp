@@ -16,7 +16,6 @@
  */
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -28,6 +27,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
 import { elevation } from "../../components/ui/elevation";
+import { SkeletonLines } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { showToast } from "../../components/ui/Toast";
@@ -134,14 +134,8 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
   if (loading && !disease) {
     return (
       <Screen>
-        <View className="flex-1 items-center justify-center">
-          <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
-            style={elevation.card}
-          >
-            <ActivityIndicator size="large" color="#2e7d4f" />
-          </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">Loading disease…</Text>
+        <View className="mt-4">
+          <SkeletonLines lines={6} label="Loading disease" />
         </View>
       </Screen>
     );

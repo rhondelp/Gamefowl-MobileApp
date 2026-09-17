@@ -15,7 +15,7 @@
  *   so the bird disappears from active lists immediately.
  */
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -23,6 +23,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { elevation } from "../../components/ui/elevation";
+import { SkeletonLines } from "../../components/ui/Skeleton";
 import { HealthStatusBadge } from "../../components/history/HealthStatusBadge";
 import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
@@ -118,14 +119,8 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
   if (loading && !gamefowl) {
     return (
       <Screen>
-        <View className="flex-1 items-center justify-center">
-          <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
-            style={elevation.card}
-          >
-            <ActivityIndicator size="large" color="#2e7d4f" />
-          </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">Loading profile…</Text>
+        <View className="mt-4">
+          <SkeletonLines lines={5} label="Loading profile" />
         </View>
       </Screen>
     );

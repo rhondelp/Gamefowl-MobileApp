@@ -14,12 +14,13 @@
  *   silently refreshes so counts and rows are never stale.
  */
 import React, { useCallback, useRef } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../components/ui/Screen";
 import { elevation } from "../components/ui/elevation";
+import { Skeleton, SkeletonList } from "../components/ui/Skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
 import { EntranceView } from "../components/ui/EntranceView";
@@ -63,16 +64,33 @@ export function DashboardScreen({ navigation }: Props) {
       </View>
 
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <View
-            className="h-16 w-16 items-center justify-center rounded-full bg-white"
-            style={elevation.card}
-          >
-            <ActivityIndicator size="large" color="#2e7d4f" />
+        // Mirrors the loaded layout (summary card, section heading, rows) so
+        // nothing shifts when the data arrives.
+        <View accessibilityLabel="Loading your flock" accessibilityState={{ busy: true }}>
+          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4" style={elevation.raised}>
+            <Skeleton width="35%" height={10} style={{ backgroundColor: "#ffffff55" }} />
+            <Skeleton
+              width="55%"
+              height={26}
+              style={{ marginTop: 10, backgroundColor: "#ffffff55" }}
+            />
+            <View className="mt-4 flex-row">
+              <Skeleton
+                height={44}
+                radius={12}
+                style={{ flex: 1, marginRight: 8, backgroundColor: "#ffffff33" }}
+              />
+              <Skeleton
+                height={44}
+                radius={12}
+                style={{ flex: 1, marginLeft: 8, backgroundColor: "#ffffff33" }}
+              />
+            </View>
           </View>
-          <Text className="mt-4 text-sm font-medium text-gray-500">
-            Loading your flock…
-          </Text>
+          <View className="mb-2 mt-6">
+            <Skeleton width="40%" height={14} />
+          </View>
+          <SkeletonList count={3} label="Loading your birds" />
         </View>
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />

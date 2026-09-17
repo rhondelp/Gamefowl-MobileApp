@@ -17,12 +17,14 @@
  */
 import React, { useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerAndroid,
   type AndroidNativeProps,
 } from "@react-native-community/datetimepicker";
 
 import { formatDate } from "../../utils/format";
+import { elevation } from "./elevation";
 
 export interface DatePickerFieldProps {
   label: string;
@@ -57,56 +59,68 @@ export function DatePickerField({
   maximumDate = new Date(),
 }: DatePickerFieldProps) {
   const [iosOpen, setIosOpen] = useState(false);
-  const borderColor = error ? "border-alert" : "border-gray-300";
+  // Mirrors TextField: error outranks the open/focused state.
+  const borderColor = error
+    ? "border-alert bg-red-50"
+    : iosOpen
+      ? "border-brand-600 bg-white"
+      : "border-gray-300 bg-white";
 
   const openAndroid = () => {
-    // Android fires onChange once per selection in default mode — a dialog,
+    // Android fires this once per selection in default mode — a dialog,
     // matching platform convention. No visible component to mount.
-    const open: AndroidNativeProps["onChange"] = (_event, selected) => {
-      if (selected) onChange(toIso(selected));
+    // onValueChange only fires on an actual pick, so dismissing leaves the
+    // current value alone without needing an onDismiss handler.
+    const open: AndroidNativeProps["onValueChange"] = (_event, selected) => {
+      onChange(toIso(selected));
     };
     DateTimePickerAndroid.open({
       value: value ? toDate(value) : new Date(),
       mode: "date",
       display: "default",
-      onChange: open,
+      onValueChange: open,
       maximumDate,
     });
   };
 
   return (
     <View className="mb-4">
-      <Text className="mb-1 text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${value ? formatDate(value) : placeholder}`}
         onPress={() => (Platform.OS === "android" ? openAndroid() : setIosOpen((p) => !p))}
-        className={`flex-row items-center rounded-xl border ${borderColor} bg-white px-4 py-3`}
+        className={`flex-row items-center rounded-xl border-2 ${borderColor} px-4 py-3`}
+        style={({ pressed }) => [{ minHeight: 48 }, pressed ? { opacity: 0.9 } : null]}
       >
         <Text
           className={`flex-1 text-base ${value ? "text-gray-900" : "text-gray-400"}`}
         >
           {value ? formatDate(value) : placeholder}
         </Text>
-        <Text className="text-brand-600">📅</Text>
+        <Ionicons name="calendar-outline" size={18} color="#215838" />
       </Pressable>
-      {error ? <Text className="mt-1 text-sm text-alert">{error}</Text> : null}
+      {error ? (
+        <View className="mt-1.5 flex-row items-center">
+          <Ionicons name="alert-circle" size={14} color="#b3401f" />
+          <Text className="ml-1 flex-1 text-sm text-alert">{error}</Text>
+        </View>
+      ) : null}
 
       {Platform.OS === "ios" && iosOpen ? (
-        <View className="mt-2 rounded-xl border border-gray-200 bg-white p-3">
+        <View className="mt-2 rounded-xl border border-gray-200 bg-white p-3" style={elevation.card}>
           <DateTimePicker
             value={value ? toDate(value) : new Date()}
             mode="date"
             display="spinner"
             maximumDate={maximumDate}
-            onChange={(_event, selected) => {
-              if (selected) onChange(toIso(selected));
-            }}
+            onValueChange={(_event, selected) => onChange(toIso(selected))}
           />
           <Pressable
             accessibilityRole="button"
             onPress={() => setIosOpen(false)}
-            className="items-center rounded-xl bg-brand-600 py-2.5"
+            style={({ pressed }) => [{ minHeight: 44 }, pressed ? { opacity: 0.9 } : null]}
+            className="items-center justify-center rounded-xl bg-brand-600 active:bg-brand-700"
           >
             <Text className="text-sm font-semibold text-white">Done</Text>
           </Pressable>

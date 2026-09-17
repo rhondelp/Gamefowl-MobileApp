@@ -12,8 +12,9 @@
  * Metro resolves this file only for web bundles; native builds use
  * DatePickerField.native.tsx. No other file changes.
  */
-import React from "react";
+import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface DatePickerFieldProps {
   label: string;
@@ -36,7 +37,14 @@ export function DatePickerField({
   error = null,
   maximumDate = new Date(),
 }: DatePickerFieldProps) {
-  const borderColor = error ? "border-alert" : "border-gray-300";
+  // Focus is local presentation state only — it never leaves this component.
+  const [focused, setFocused] = useState(false);
+  // Mirrors TextField: error outranks focus.
+  const borderColor = error
+    ? "border-alert bg-red-50"
+    : focused
+      ? "border-brand-600 bg-white"
+      : "border-gray-300 bg-white";
 
   const handleChange = (text: string) => {
     onChange(text);
@@ -55,18 +63,35 @@ export function DatePickerField({
 
   return (
     <View className="mb-4">
-      <Text className="mb-1 text-sm font-medium text-gray-700">{label}</Text>
-      <TextInput
-        accessibilityLabel={`${label} date, formatted as year, month, day`}
-        className={`h-12 rounded-xl border ${borderColor} bg-white px-4 text-base text-gray-900`}
-        value={value}
-        onChangeText={handleChange}
-        placeholder={placeholder}
-        placeholderTextColor="#9ca3af"
-        maxLength={10}
-      />
-      {hint ? <Text className="mt-1 text-xs text-gray-500">{hint}</Text> : null}
-      {error ? <Text className="mt-1 text-sm text-alert">{error}</Text> : null}
+      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
+      <View
+        className={`h-12 flex-row items-center rounded-xl border-2 ${borderColor} px-4`}
+      >
+        <TextInput
+          accessibilityLabel={`${label} date, formatted as year, month, day`}
+          className="flex-1 text-base text-gray-900"
+          value={value}
+          onChangeText={handleChange}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          placeholder={placeholder}
+          placeholderTextColor="#9ca3af"
+          maxLength={10}
+        />
+        <Ionicons name="calendar-outline" size={18} color="#215838" />
+      </View>
+      {hint ? (
+        <View className="mt-1.5 flex-row items-center">
+          <Ionicons name="information-circle-outline" size={14} color="#6b7280" />
+          <Text className="ml-1 flex-1 text-xs text-gray-500">{hint}</Text>
+        </View>
+      ) : null}
+      {error ? (
+        <View className="mt-1.5 flex-row items-center">
+          <Ionicons name="alert-circle" size={14} color="#b3401f" />
+          <Text className="ml-1 flex-1 text-sm text-alert">{error}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }

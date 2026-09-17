@@ -11,7 +11,7 @@
  *   - server-side field errors mapped from the backend envelope
  */
 import React, { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface TextFieldProps {
@@ -41,8 +41,10 @@ export function TextField({
   maxLength,
   error = null,
 }: TextFieldProps) {
-  // Focus is local presentation state only — it never leaves this component.
+  // Focus and reveal are local presentation state only — neither leaves this
+  // component, and neither changes what the field submits.
   const [focused, setFocused] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   // Error outranks focus so a field never looks "fine" while it's invalid.
   const borderColor = error
@@ -54,23 +56,52 @@ export function TextField({
   return (
     <View className="mb-4">
       <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
-      <TextInput
-        className={`rounded-xl border-2 ${borderColor} px-4 py-3 text-base text-gray-900`}
-        style={multiline ? { minHeight: 96, textAlignVertical: "top" } : { minHeight: 48 }}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        accessibilityLabel={label}
-        placeholder={placeholder}
-        placeholderTextColor="#9ca3af"
-        secureTextEntry={secure}
-        autoCapitalize={autoCapitalize}
-        autoComplete="off"
-        keyboardType={keyboardType}
-        multiline={multiline}
-        maxLength={maxLength}
-      />
+      {/* The border lives on the wrapper so the reveal toggle can sit inside
+          it; multiline grows the wrapper and top-aligns both children. */}
+      <View
+        className={`flex-row rounded-xl border-2 ${borderColor} px-4 ${
+          multiline ? "items-start py-3" : "items-center"
+        }`}
+        style={multiline ? { minHeight: 96 } : { minHeight: 48 }}
+      >
+        <TextInput
+          className="flex-1 text-base text-gray-900"
+          style={
+            multiline
+              ? { textAlignVertical: "top", minHeight: 72 }
+              : { paddingVertical: 12 }
+          }
+          value={value}
+          onChangeText={onChangeText}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          accessibilityLabel={label}
+          placeholder={placeholder}
+          placeholderTextColor="#9ca3af"
+          secureTextEntry={secure && !revealed}
+          autoCapitalize={autoCapitalize}
+          autoComplete="off"
+          keyboardType={keyboardType}
+          multiline={multiline}
+          maxLength={maxLength}
+        />
+        {secure ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={revealed ? "Hide password" : "Show password"}
+            accessibilityState={{ selected: revealed }}
+            hitSlop={12}
+            onPress={() => setRevealed((prev) => !prev)}
+            style={({ pressed }) => (pressed ? { opacity: 0.6 } : null)}
+          >
+            <Ionicons
+              name={revealed ? "eye-off-outline" : "eye-outline"}
+              size={19}
+              color="#6b7280"
+            />
+          </Pressable>
+        ) : null}
+      </View>
       {error ? (
         <View className="mt-1.5 flex-row items-center">
           <Ionicons name="alert-circle" size={14} color="#b3401f" />
