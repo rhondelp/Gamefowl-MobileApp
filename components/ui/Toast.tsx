@@ -19,6 +19,8 @@ import { Animated, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { elevation } from "./elevation";
+
 export type ToastType = "success" | "error" | "info";
 
 type ToastListener = (message: string, type: ToastType) => void;
@@ -81,6 +83,7 @@ export function ToastHost() {
       accessibilityLiveRegion="polite"
       accessibilityRole="alert"
       style={[
+        elevation.overlay,
         {
           position: "absolute",
           left: 16,
@@ -90,15 +93,16 @@ export function ToastHost() {
           transform: [{ translateY }],
         },
       ]}
-      className="z-50 flex-row items-center rounded-2xl px-4 py-3 shadow-lg"
+      className="z-50 flex-row items-center rounded-2xl px-4 py-3.5"
     >
-      <Ionicons name={tone.icon} size={18} color="#ffffff" />
-      <Text className="mx-2 flex-1 text-sm font-medium leading-4 text-white">
+      <Ionicons name={tone.icon} size={20} color="#ffffff" />
+      <Text className="mx-2.5 flex-1 text-sm font-medium leading-5 text-white">
         {toast.message}
       </Text>
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityLabel="Dismiss notification"
+        hitSlop={12}
         onPress={() => {
           if (hideTimer.current) clearTimeout(hideTimer.current);
           Animated.timing(translateY, {

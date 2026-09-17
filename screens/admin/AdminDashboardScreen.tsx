@@ -22,6 +22,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { useAuth } from "../../contexts/AuthContext";
 import * as adminApi from "../../services/api/admin";
@@ -44,7 +45,10 @@ function StatCard({
   label: string;
 }) {
   return (
-    <View className="flex-1 items-center rounded-2xl border border-gray-200 bg-white px-2 py-4">
+    <View
+      className="flex-1 items-center rounded-2xl border border-gray-100 bg-white px-2 py-4"
+      style={elevation.card}
+    >
       <View className="h-9 w-9 items-center justify-center rounded-full bg-brand-100">
         <Ionicons name={icon} size={18} color="#276a43" />
       </View>
@@ -72,7 +76,7 @@ function CountRow({
   return (
     <View className="mb-2">
       <View className="flex-row items-center">
-        <Text className="w-5 text-xs font-semibold text-gray-400">{rank}.</Text>
+        <Text className="w-5 text-xs font-semibold text-gray-500">{rank}.</Text>
         <Text className="flex-1 text-sm font-medium text-gray-800" numberOfLines={1}>
           {name}
         </Text>
@@ -130,8 +134,13 @@ export function AdminDashboardScreen({ navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading statistics…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading statistics…</Text>
         </View>
       </Screen>
     );
@@ -182,7 +191,10 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
       {/* Management shortcuts — entry points to every admin surface. */}
       <SectionTitle>Manage</SectionTitle>
-      <View className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+      <View
+        className="overflow-hidden rounded-2xl border border-gray-100 bg-white"
+        style={elevation.card}
+      >
         <MenuRow
           icon="people"
           label="User management"
@@ -212,10 +224,13 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
       {/* Breakdowns */}
       <SectionTitle>Accounts</SectionTitle>
-      <View className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
+      <View
+        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        style={elevation.card}
+      >
         <View className="flex-row">
           <View className="flex-1">
-            <Text className="text-xs uppercase tracking-wide text-gray-400">By role</Text>
+            <Text className="text-xs uppercase tracking-wide text-gray-500">By role</Text>
             <View className="mt-1.5 flex-row">
               {(["owner", "admin"] as const).map((role) => (
                 <View key={role} className="mr-2 rounded-full bg-brand-50 px-2.5 py-1">
@@ -227,7 +242,7 @@ export function AdminDashboardScreen({ navigation }: Props) {
             </View>
           </View>
           <View className="items-end">
-            <Text className="text-xs uppercase tracking-wide text-gray-400">Status</Text>
+            <Text className="text-xs uppercase tracking-wide text-gray-500">Status</Text>
             <Text className="mt-1.5 text-xs text-gray-600">
               {stats.users_by_active_status.active} active ·{" "}
               {stats.users_by_active_status.inactive} inactive
@@ -238,7 +253,10 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
       {/* Most reported symptoms */}
       <SectionTitle>Most reported symptoms</SectionTitle>
-      <View className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
+      <View
+        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        style={elevation.card}
+      >
         {stats.most_frequently_reported_symptoms.length === 0 ? (
           <Text className="py-2 text-sm text-gray-500">No assessments yet.</Text>
         ) : (
@@ -256,7 +274,10 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
       {/* Most suggested diseases */}
       <SectionTitle>Most suggested diseases</SectionTitle>
-      <View className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
+      <View
+        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        style={elevation.card}
+      >
         {stats.most_frequently_suggested_diseases.length === 0 ? (
           <Text className="py-2 text-sm text-gray-500">No results recorded yet.</Text>
         ) : (
@@ -274,7 +295,10 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
       {/* Recent assessments across all owners */}
       <SectionTitle>Recent assessments</SectionTitle>
-      <View className="rounded-2xl border border-gray-200 bg-white px-4 py-1">
+      <View
+        className="rounded-2xl border border-gray-100 bg-white px-4 py-1"
+        style={elevation.card}
+      >
         {stats.recent_assessments.length === 0 ? (
           <Text className="py-3 text-sm text-gray-500">Nothing submitted yet.</Text>
         ) : (

@@ -13,12 +13,13 @@
  *   Dates use each type's own precision (timestamp vs plain date).
  */
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { HealthHistoryEntry, HealthRecordType } from "../../types/api";
 import { formatDateTime, formatDate, formatWeight } from "../../utils/format";
 import { scoreTier } from "../assessment/scoreTiers";
+import { elevation } from "../ui/elevation";
 
 /** Icon + label per manual record type (all standard Ionicons glyphs). */
 const RECORD_TYPE_META: Record<
@@ -40,16 +41,20 @@ export function TimelineEntryCard({ entry, onPress }: TimelineEntryCardProps) {
   if (entry.type === "assessment") {
     const tier = entry.match_score === null ? null : scoreTier(entry.match_score);
     return (
-      <TouchableOpacity
+      <Pressable
         accessibilityRole="button"
         accessibilityLabel={`Assessment on ${formatDateTime(entry.occurred_at)}`}
-        className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 active:bg-brand-50"
+        className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
         onPress={onPress}
+        style={({ pressed }) => [
+          elevation.card,
+          pressed ? { transform: [{ scale: 0.99 }] } : null,
+        ]}
       >
         <View className="flex-row items-center">
           {/* Assessment accent: brand green. */}
-          <View className="h-10 w-10 items-center justify-center rounded-full bg-brand-100">
-            <Ionicons name="pulse" size={20} color="#276a43" />
+          <View className="h-11 w-11 items-center justify-center rounded-full bg-brand-100">
+            <Ionicons name="pulse" size={20} color="#215838" />
           </View>
           <View className="ml-3 flex-1">
             <View className="flex-row items-center">
@@ -69,26 +74,32 @@ export function TimelineEntryCard({ entry, onPress }: TimelineEntryCardProps) {
                 ? `${entry.top_possible_disease.name} · ${entry.match_score}%`
                 : "No strong match found"}
             </Text>
-            <Text className="text-xs text-gray-400">{formatDateTime(entry.occurred_at)}</Text>
+            <Text className="mt-0.5 text-xs text-gray-500">
+              {formatDateTime(entry.occurred_at)}
+            </Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   // Manual health record branch.
   const meta = RECORD_TYPE_META[entry.record_type] ?? RECORD_TYPE_META.general_note;
   return (
-    <TouchableOpacity
+    <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${meta.label}: ${entry.title}`}
-      className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 active:bg-amber-50"
+      className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-amber-50"
       onPress={onPress}
+      style={({ pressed }) => [
+        elevation.card,
+        pressed ? { transform: [{ scale: 0.99 }] } : null,
+      ]}
     >
       <View className="flex-row items-center">
         {/* Record accent: warm amber family to contrast assessments. */}
-        <View className="h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+        <View className="h-11 w-11 items-center justify-center rounded-full bg-amber-100">
           <Ionicons name={meta.icon} size={20} color="#b45309" />
         </View>
         <View className="ml-3 flex-1">
@@ -108,10 +119,10 @@ export function TimelineEntryCard({ entry, onPress }: TimelineEntryCardProps) {
             {entry.title}
           </Text>
           {/* Records carry their event date only (possibly backdated). */}
-          <Text className="text-xs text-gray-400">{formatDate(entry.occurred_at)}</Text>
+          <Text className="mt-0.5 text-xs text-gray-500">{formatDate(entry.occurred_at)}</Text>
         </View>
         <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

@@ -132,13 +132,14 @@ export function RegisterScreen({ navigation }: Props) {
       <Button label="Create Account" onPress={handleSubmit} loading={submitting} />
 
       <TouchableOpacity
-        className="mt-6 self-center"
+        className="mt-5 self-center justify-center px-2"
+        style={{ minHeight: 44 }}
         onPress={() => navigation.navigate("Login")}
         accessibilityRole="button"
       >
         <Text className="text-sm text-gray-500">
           Already have an account?{" "}
-          <Text className="font-semibold text-brand-600">Log in</Text>
+          <Text className="font-semibold text-brand-700">Log in</Text>
         </Text>
       </TouchableOpacity>
     </Screen>

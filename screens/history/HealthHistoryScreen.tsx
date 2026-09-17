@@ -20,6 +20,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { elevation } from "../../components/ui/elevation";
 import { EntranceView } from "../../components/ui/EntranceView";
 import { TimelineEntryCard } from "../../components/history/TimelineEntryCard";
 import { useHealthHistory } from "../../hooks/useHealthHistory";
@@ -77,8 +78,13 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
     <Screen>
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading history…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading history…</Text>
         </View>
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
@@ -96,7 +102,7 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
             </EntranceView>
           )}
           ListHeaderComponent={
-            <View className="mb-2">
+            <View className="mb-3">
               {birdName ? (
                 <Text className="text-sm text-gray-500">
                   Health timeline for{" "}

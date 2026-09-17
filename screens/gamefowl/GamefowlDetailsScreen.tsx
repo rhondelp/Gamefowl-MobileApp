@@ -22,6 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { elevation } from "../../components/ui/elevation";
 import { HealthStatusBadge } from "../../components/history/HealthStatusBadge";
 import { showToast } from "../../components/ui/Toast";
 import { useAuth } from "../../contexts/AuthContext";
@@ -118,8 +119,13 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading profile…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading profile…</Text>
         </View>
       </Screen>
     );
@@ -140,7 +146,10 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 16 }}>
         {/* Identity header */}
         <View className="mt-2 flex-row items-center">
-          <View className="h-14 w-14 items-center justify-center rounded-full bg-brand-100">
+          <View
+            className="h-14 w-14 items-center justify-center rounded-full bg-brand-100"
+            style={elevation.card}
+          >
             <Text className="text-xl font-bold text-brand-700">
               {gamefowl.name.charAt(0).toUpperCase()}
             </Text>
@@ -159,7 +168,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
           >
             <Text
               className={`text-xs font-semibold ${
-                gamefowl.is_active ? "text-brand-700" : "text-gray-500"
+                gamefowl.is_active ? "text-brand-700" : "text-gray-600"
               }`}
             >
               {gamefowl.is_active ? "Active" : "Inactive"}
@@ -169,7 +178,10 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
 
         {/* Health Status card — displays the backend's derived summary. */}
         {statusSummary ? (
-          <View className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-3.5">
+          <View
+            className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+            style={elevation.raised}
+          >
             <View className="flex-row items-center justify-between">
               <Text className="text-sm font-semibold text-gray-900">Health status</Text>
               <HealthStatusBadge status={statusSummary.status} />
@@ -204,6 +216,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
             {/* Timeline entry point. */}
             <TouchableOpacity
               accessibilityRole="button"
+              style={{ minHeight: 44 }}
               className="mt-3 flex-row items-center border-t border-gray-100 pt-3"
               onPress={() =>
                 navigation.navigate("HealthHistory", {
@@ -212,7 +225,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
                 })
               }
             >
-              <Ionicons name="time-outline" size={16} color="#276a43" />
+              <Ionicons name="time-outline" size={16} color="#215838" />
               <Text className="ml-1.5 flex-1 text-sm font-semibold text-brand-700">
                 View full history
               </Text>
@@ -222,7 +235,10 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
         ) : null}
 
         {/* Profile card */}
-        <View className="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-2">
+        <View
+          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          style={elevation.card}
+        >
           <InfoRow label="Sex" value={gamefowl.sex} />
           <InfoRow label="Color" value={gamefowl.color} />
           <InfoRow label="Weight" value={formatWeight(gamefowl.weight)} />
@@ -230,7 +246,10 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
           <InfoRow label="Date of birth" value={formatDate(gamefowl.date_of_birth)} last />
         </View>
 
-        <View className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-2">
+        <View
+          className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          style={elevation.card}
+        >
           <InfoRow label="Date acquired" value={formatDate(gamefowl.date_acquired)} />
           <InfoRow label="Notes" value={gamefowl.notes?.trim() || "—"} multiline last />
         </View>

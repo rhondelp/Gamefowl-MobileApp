@@ -27,6 +27,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { showToast } from "../../components/ui/Toast";
@@ -134,8 +135,13 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading disease…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading disease…</Text>
         </View>
       </Screen>
     );
@@ -218,14 +224,20 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         </View>
 
         {/* Profile card */}
-        <View className="mt-4 rounded-2xl border border-gray-200 bg-white px-4 py-2">
+        <View
+          className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          style={elevation.card}
+        >
           <InfoBlock label="Description" text={disease.description} />
           <InfoBlock label="Recommended action" text={disease.recommended_action} />
           <InfoBlock label="General info" text={disease.general_info} last />
         </View>
 
         {(disease.prevention_info || disease.vet_warning) ? (
-          <View className="mt-3 rounded-2xl border border-gray-200 bg-white px-4 py-2">
+          <View
+            className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+            style={elevation.card}
+          >
             {disease.vet_warning ? (
               <InfoBlock
                 label="Vet warning"
@@ -250,7 +262,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
           removing a rule affects future assessments only — past records keep
           their snapshots.
         </Text>
-        <View className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <View
+          className="overflow-hidden rounded-2xl border border-gray-100 bg-white"
+          style={elevation.card}
+        >
           {disease.rules.length === 0 ? (
             <Text className="px-4 py-3 text-sm text-gray-500">
               No rules yet — this disease can never match an assessment until it
@@ -305,7 +320,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
           </Text>
         </Pressable>
         {showSymptomPicker ? (
-          <View className="mt-2 rounded-2xl border border-gray-200 bg-white p-3">
+          <View
+            className="mt-2 rounded-2xl border border-gray-100 bg-white p-3"
+            style={elevation.card}
+          >
             {availableSymptoms.length === 0 ? (
               <Text className="py-1 text-sm text-gray-500">
                 {symptoms.length === 0
@@ -387,7 +405,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         <Text className="mb-2 mt-6 text-xs font-semibold uppercase tracking-widest text-brand-600">
           Linked care recommendations ({disease.recommendations.length})
         </Text>
-        <View className="rounded-2xl border border-gray-200 bg-white">
+        <View
+          className="rounded-2xl border border-gray-100 bg-white"
+          style={elevation.card}
+        >
           {disease.recommendations.length === 0 ? (
             <Text className="px-4 py-3 text-sm text-gray-500">
               None linked yet — results will show guidance only from the disease itself.
@@ -435,7 +456,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
           </Text>
         </Pressable>
         {showRecPicker ? (
-          <View className="mt-2 rounded-2xl border border-gray-200 bg-white p-3">
+          <View
+            className="mt-2 rounded-2xl border border-gray-100 bg-white p-3"
+            style={elevation.card}
+          >
             {availableRecs.length === 0 ? (
               <Text className="py-1 text-sm text-gray-500">
                 {recommendations.length === 0
@@ -616,7 +640,7 @@ function InfoBlock({
     <View className={`py-3 ${last ? "" : "border-b border-gray-100"}`}>
       <Text
         className={`text-xs font-semibold uppercase tracking-wide ${
-          tone === "alert" ? "text-alert" : "text-gray-400"
+          tone === "alert" ? "text-alert" : "text-gray-500"
         }`}
       >
         {label}

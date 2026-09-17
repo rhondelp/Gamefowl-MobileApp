@@ -17,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../../components/ui/Screen";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
+import { elevation } from "../../components/ui/elevation";
 import { EntranceView } from "../../components/ui/EntranceView";
 import { GamefowlCard } from "../../components/gamefowl/GamefowlCard";
 import { useGamefowls } from "../../hooks/useGamefowls";
@@ -72,8 +73,13 @@ export function MyGamefowlScreen({ navigation }: Props) {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading your flock…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading your flock…</Text>
         </View>
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
@@ -141,8 +147,14 @@ function FilterChip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      className={`mr-2 rounded-full border px-4 py-1.5 ${
-        selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+      style={({ pressed }) => [
+        { minHeight: 40 },
+        pressed ? { transform: [{ scale: 0.97 }], opacity: 0.9 } : null,
+      ]}
+      className={`mr-2 items-center justify-center rounded-full border-2 px-4 ${
+        selected
+          ? "border-brand-600 bg-brand-600"
+          : "border-gray-300 bg-white active:bg-brand-50"
       }`}
     >
       <Text className={`text-sm font-medium ${selected ? "text-white" : "text-gray-700"}`}>

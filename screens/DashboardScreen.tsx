@@ -14,11 +14,12 @@
  *   silently refreshes so counts and rows are never stale.
  */
 import React, { useCallback, useRef } from "react";
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../components/ui/Screen";
+import { elevation } from "../components/ui/elevation";
 import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
 import { EntranceView } from "../components/ui/EntranceView";
@@ -63,44 +64,65 @@ export function DashboardScreen({ navigation }: Props) {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading your flock…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">
+            Loading your flock…
+          </Text>
         </View>
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
         <>
-          {/* Summary card */}
-          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4">
+          {/* Summary card — the one raised surface on this screen. */}
+          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4" style={elevation.raised}>
             <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-sm text-brand-100">Your flock</Text>
-                <Text className="text-3xl font-bold text-white">
+              <View className="flex-1">
+                <Text className="text-xs font-semibold uppercase tracking-wider text-brand-100">
+                  Your flock
+                </Text>
+                <Text className="mt-0.5 text-3xl font-bold text-white">
                   {activeTotal} {activeTotal === 1 ? "bird" : "birds"}
                 </Text>
               </View>
-              <Ionicons name="paw" size={40} color="#dcf0e3" />
+              {/* Decorative — the count beside it already conveys this. */}
+              <View
+                className="h-14 w-14 items-center justify-center rounded-full bg-white/15"
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Ionicons name="paw" size={30} color="#dcf0e3" />
+              </View>
             </View>
-            <View className="mt-3 flex-row">
-              <TouchableOpacity
+            <View className="mt-4 flex-row">
+              <Pressable
                 accessibilityRole="button"
-                className="mr-2 flex-1 items-center rounded-xl bg-white/15 py-2"
+                accessibilityLabel="See all birds"
+                className="mr-2 h-11 flex-1 items-center justify-center rounded-xl bg-white/15 active:bg-white/25"
+                style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
                 onPress={() => navigation.navigate("MyGamefowl")}
               >
                 <Text className="text-sm font-semibold text-white">See all</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 accessibilityRole="button"
-                className="ml-2 flex-1 items-center rounded-xl bg-white py-2"
+                accessibilityLabel="Add bird"
+                className="ml-2 h-11 flex-1 flex-row items-center justify-center rounded-xl bg-white active:bg-brand-50"
+                style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
                 onPress={() => navigation.navigate("AddGamefowl")}
               >
-                <Text className="text-sm font-semibold text-brand-700">+ Add bird</Text>
-              </TouchableOpacity>
+                <Ionicons name="add" size={16} color="#215838" />
+                <Text className="ml-0.5 text-sm font-semibold text-brand-700">Add bird</Text>
+              </Pressable>
             </View>
           </View>
 
           {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
-          <Text className="mb-1 mt-5 text-base font-semibold text-gray-900">
+          <Text className="mb-2 mt-6 text-base font-semibold text-gray-900">
             Recent birds
           </Text>
           {gamefowls.length === 0 ? (

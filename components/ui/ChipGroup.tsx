@@ -29,9 +29,9 @@ export function ChipGroup<T extends string>({
 }: ChipGroupProps<T>) {
   return (
     <View className="mb-4">
-      <View className="mb-1 flex-row items-baseline">
+      <View className="mb-2 flex-row items-baseline">
         <Text className="text-sm font-medium text-gray-700">{label}</Text>
-        {hint ? <Text className="ml-1 text-xs text-gray-400">{hint}</Text> : null}
+        {hint ? <Text className="ml-1 text-xs text-gray-500">{hint}</Text> : null}
       </View>
       <View className="flex-row flex-wrap">
         {options.map((option) => {
@@ -40,10 +40,19 @@ export function ChipGroup<T extends string>({
             <Pressable
               key={option.value}
               accessibilityRole="button"
+              accessibilityLabel={option.label}
               accessibilityState={{ selected }}
               onPress={() => onChange(option.value)}
-              className={`mr-2 mb-2 rounded-full border px-3.5 py-2 ${
-                selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+              // minHeight keeps every chip at the 44pt touch minimum even
+              // though the label is only ~20pt tall.
+              style={({ pressed }) => [
+                { minHeight: 44 },
+                pressed ? { transform: [{ scale: 0.97 }], opacity: 0.9 } : null,
+              ]}
+              className={`mr-2 mb-2 items-center justify-center rounded-full border-2 px-4 ${
+                selected
+                  ? "border-brand-600 bg-brand-600"
+                  : "border-gray-300 bg-white active:bg-brand-50"
               }`}
             >
               <Text

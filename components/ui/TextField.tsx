@@ -10,8 +10,9 @@
  *   - client-side checks (e.g. "Password must be at least 8 characters")
  *   - server-side field errors mapped from the backend envelope
  */
-import React from "react";
+import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface TextFieldProps {
   label: string;
@@ -40,16 +41,27 @@ export function TextField({
   maxLength,
   error = null,
 }: TextFieldProps) {
-  const borderColor = error ? "border-alert" : "border-gray-300";
+  // Focus is local presentation state only — it never leaves this component.
+  const [focused, setFocused] = useState(false);
+
+  // Error outranks focus so a field never looks "fine" while it's invalid.
+  const borderColor = error
+    ? "border-alert bg-red-50"
+    : focused
+      ? "border-brand-600 bg-white"
+      : "border-gray-300 bg-white";
 
   return (
     <View className="mb-4">
-      <Text className="mb-1 text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
       <TextInput
-        className={`rounded-xl border ${borderColor} bg-white px-4 py-3 text-base text-gray-900`}
-        style={multiline ? { minHeight: 96, textAlignVertical: "top" } : undefined}
+        className={`rounded-xl border-2 ${borderColor} px-4 py-3 text-base text-gray-900`}
+        style={multiline ? { minHeight: 96, textAlignVertical: "top" } : { minHeight: 48 }}
         value={value}
         onChangeText={onChangeText}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        accessibilityLabel={label}
         placeholder={placeholder}
         placeholderTextColor="#9ca3af"
         secureTextEntry={secure}
@@ -59,7 +71,12 @@ export function TextField({
         multiline={multiline}
         maxLength={maxLength}
       />
-      {error ? <Text className="mt-1 text-sm text-alert">{error}</Text> : null}
+      {error ? (
+        <View className="mt-1.5 flex-row items-center">
+          <Ionicons name="alert-circle" size={14} color="#b3401f" />
+          <Text className="ml-1 flex-1 text-sm text-alert">{error}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }

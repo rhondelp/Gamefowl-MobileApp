@@ -16,6 +16,7 @@ import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -160,8 +161,13 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading…</Text>
         </View>
       </Screen>
     );
@@ -289,12 +295,13 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
             accessibilityRole="switch"
             accessibilityState={{ checked: isActive }}
             onPress={() => setIsActive((prev) => !prev)}
-            className="mb-5 flex-row items-center rounded-xl border border-gray-200 bg-white px-4 py-3"
+            style={({ pressed }) => [{ minHeight: 56 }, pressed ? { opacity: 0.9 } : null]}
+            className="mb-5 flex-row items-center rounded-xl border-2 border-gray-200 bg-white px-4 py-3 active:bg-gray-50"
           >
             <Ionicons
               name={isActive ? "toggle" : "toggle-outline"}
               size={26}
-              color={isActive ? "#276a43" : "#9ca3af"}
+              color={isActive ? "#215838" : "#9ca3af"}
               style={{ transform: [{ rotate: isActive ? "180deg" : "0deg" }] }}
             />
             <View className="ml-3 flex-1">

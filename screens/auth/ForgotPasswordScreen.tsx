@@ -156,13 +156,14 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
           />
 
           <TouchableOpacity
-            className="mt-6 self-center"
+            className="mt-5 self-center justify-center px-2"
+        style={{ minHeight: 44 }}
             onPress={goBackToLogin}
             accessibilityRole="link"
           >
             <Text className="text-sm text-gray-500">
               Remembered it?{" "}
-              <Text className="font-semibold text-brand-600">Back to Login</Text>
+              <Text className="font-semibold text-brand-700">Back to Login</Text>
             </Text>
           </TouchableOpacity>
         </View>

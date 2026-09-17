@@ -7,7 +7,7 @@
  *   Pure controlled component — selection state lives in the screen.
  */
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Symptom, SymptomSeverity } from "../../types/api";
@@ -27,17 +27,25 @@ interface SymptomSelectItemProps {
 
 export function SymptomSelectItem({ symptom, selected, onToggle }: SymptomSelectItemProps) {
   return (
-    <TouchableOpacity
+    <Pressable
       accessibilityRole="checkbox"
       accessibilityState={{ checked: selected }}
       accessibilityLabel={symptom.name}
       onPress={() => onToggle(symptom.id)}
-      className={`mb-2 flex-row items-start rounded-xl border px-3 py-3 ${
-        selected ? "border-brand-600 bg-brand-50" : "border-gray-200 bg-white"
+      // Border width stays constant and only its color changes, so toggling a
+      // row never reflows the checklist.
+      className={`mb-2 flex-row items-start rounded-xl border-2 px-3 py-3 ${
+        selected
+          ? "border-brand-600 bg-brand-50"
+          : "border-gray-200 bg-white active:bg-gray-50"
       }`}
+      style={({ pressed }) => [
+        { minHeight: 56 },
+        pressed ? { opacity: 0.85 } : null,
+      ]}
     >
       <View
-        className={`mr-3 mt-0.5 h-6 w-6 items-center justify-center rounded-full border ${
+        className={`mr-3 mt-0.5 h-7 w-7 items-center justify-center rounded-full border-2 ${
           selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
         }`}
       >
@@ -61,11 +69,11 @@ export function SymptomSelectItem({ symptom, selected, onToggle }: SymptomSelect
           </Text>
         </View>
         {symptom.description ? (
-          <Text className="mt-0.5 text-xs leading-4 text-gray-500" numberOfLines={2}>
+          <Text className="mt-1 text-xs leading-4 text-gray-500" numberOfLines={2}>
             {symptom.description}
           </Text>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

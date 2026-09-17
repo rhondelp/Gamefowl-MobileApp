@@ -8,11 +8,12 @@
  *   retired badge. Tap target = whole card.
  */
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Gamefowl } from "../../types/api";
 import { formatAge } from "../../utils/format";
+import { elevation } from "../ui/elevation";
 
 interface GamefowlCardProps {
   gamefowl: Gamefowl;
@@ -21,16 +22,28 @@ interface GamefowlCardProps {
 
 export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
   return (
-    <TouchableOpacity
+    <Pressable
       accessibilityRole="button"
       accessibilityLabel={`View details for ${gamefowl.name}`}
-      className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-4 active:bg-brand-50"
+      className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-4 active:bg-brand-50"
       onPress={onPress}
+      style={({ pressed }) => [
+        elevation.card,
+        pressed ? { transform: [{ scale: 0.99 }] } : null,
+      ]}
     >
       <View className="flex-row items-center">
         {/* Monogram avatar keeps the list light — no image upload exists yet. */}
-        <View className="h-11 w-11 items-center justify-center rounded-full bg-brand-100">
-          <Text className="text-base font-bold text-brand-700">
+        <View
+          className={`h-12 w-12 items-center justify-center rounded-full ${
+            gamefowl.is_active ? "bg-brand-100" : "bg-gray-100"
+          }`}
+        >
+          <Text
+            className={`text-lg font-bold ${
+              gamefowl.is_active ? "text-brand-700" : "text-gray-500"
+            }`}
+          >
             {gamefowl.name.charAt(0).toUpperCase()}
           </Text>
         </View>
@@ -43,13 +56,13 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
             {/* Retired birds stay visible in "show inactive" lists but read as such. */}
             {!gamefowl.is_active ? (
               <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">
                   Inactive
                 </Text>
               </View>
             ) : null}
           </View>
-          <Text className="mt-0.5 text-sm text-gray-500" numberOfLines={1}>
+          <Text className="mt-1 text-sm text-gray-500" numberOfLines={1}>
             {gamefowl.breed?.trim() || "Breed not set"} · {formatAge(gamefowl.age)} ·{" "}
             {gamefowl.sex}
           </Text>
@@ -57,6 +70,6 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
 
         <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

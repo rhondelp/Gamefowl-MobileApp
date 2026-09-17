@@ -25,6 +25,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { EmptyState } from "../../components/ui/EmptyState";
+import { elevation } from "../../components/ui/elevation";
 import { DiseaseResultCard } from "../../components/assessment/DiseaseResultCard";
 import {
   activityLabel,
@@ -111,8 +112,16 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading results…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">
+            Scoring your results…
+          </Text>
+          <Text className="mt-1 text-xs text-gray-500">This takes just a moment.</Text>
         </View>
       </Screen>
     );
@@ -141,8 +150,8 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
         {historical && assessment.created_at ? (
           <View className="mt-2 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3">
             <View className="flex-row items-start">
-              <Ionicons name="archive" size={16} color="#276a43" style={{ marginTop: 2 }} />
-              <Text className="ml-2 flex-1 text-xs leading-4 text-brand-700">
+              <Ionicons name="archive" size={16} color="#215838" style={{ marginTop: 2 }} />
+              <Text className="ml-2 flex-1 text-xs leading-5 text-brand-700">
                 Saved assessment from {formatTimestamp(assessment.created_at)} —
                 shown exactly as reported at the time. Later knowledge-base
                 changes never alter past records.
@@ -153,14 +162,22 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
 
         {/* Escalation banner: shown BEFORE anything else when warranted. */}
         {hasVetWarning ? (
-          <View className="mt-2 rounded-2xl border border-red-300 bg-red-50 px-4 py-3">
+          // Escalation outranks everything else on the screen, so it is the
+          // only element here carrying a solid fill and raised depth.
+          <View
+            className="mt-2 rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-3.5"
+            style={elevation.raised}
+            accessibilityRole="alert"
+          >
             <View className="flex-row items-center">
-              <Ionicons name="medkit" size={18} color="#b3401f" />
-              <Text className="ml-2 text-sm font-bold text-alert">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-red-100">
+                <Ionicons name="medkit" size={19} color="#b3401f" />
+              </View>
+              <Text className="ml-2.5 flex-1 text-base font-bold text-alert">
                 Veterinary attention advised
               </Text>
             </View>
-            <Text className="mt-1 text-xs leading-4 text-alert">
+            <Text className="mt-2 text-xs leading-5 text-alert">
               One or more findings below carry an official warning. Consult a
               licensed veterinarian promptly.
             </Text>
@@ -168,12 +185,15 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
         ) : null}
 
         {/* Submission summary */}
-        <View className="mt-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5">
+        <View
+          className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+          style={elevation.card}
+        >
           <View className="flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-gray-900">
+            <Text className="flex-1 text-sm font-semibold text-gray-900">
               Symptoms you reported ({assessment.submitted_symptoms.length})
             </Text>
-            <Text className="text-xs text-gray-400">
+            <Text className="ml-2 text-xs text-gray-500">
               {formatTimestamp(assessment.created_at)}
             </Text>
           </View>
@@ -252,7 +272,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             <Ionicons name="information-circle" size={18} color="#b45309" style={{ marginTop: 1 }} />
             <View className="ml-2 flex-1">
               <Text className="text-sm font-bold text-amber-800">Important reminder</Text>
-              <Text className="mt-1 text-xs leading-4 text-amber-800">
+              <Text className="mt-1 text-xs leading-5 text-amber-800">
                 {assessment.disclaimer}
               </Text>
             </View>

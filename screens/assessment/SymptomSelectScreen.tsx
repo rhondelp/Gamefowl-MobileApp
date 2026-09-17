@@ -27,9 +27,12 @@ import {
   View,
 } from "react-native";
 
+import { Ionicons } from "@expo/vector-icons";
+
 import { Screen } from "../../components/ui/Screen";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { ChipGroup } from "../../components/ui/ChipGroup";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { EntranceView } from "../../components/ui/EntranceView";
 import { SymptomSelectItem } from "../../components/assessment/SymptomSelectItem";
@@ -185,12 +188,14 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       {/* Processing overlay while scoring/persisting runs. */}
       <Modal transparent visible={submitting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50 px-8">
-          <View className="w-full rounded-2xl bg-white p-6">
-            <ActivityIndicator size="large" color="#2e7d4f" />
+          <View className="w-full items-center rounded-2xl bg-white px-6 py-7" style={elevation.overlay}>
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-50">
+              <ActivityIndicator size="large" color="#2e7d4f" />
+            </View>
             <Text className="mt-4 text-center text-base font-semibold text-gray-900">
               Analyzing symptoms…
             </Text>
-            <Text className="mt-1 text-center text-sm text-gray-500">
+            <Text className="mt-1 text-center text-sm leading-5 text-gray-500">
               Scoring possible conditions against our knowledge base.
             </Text>
           </View>
@@ -213,14 +218,18 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
         </View>
 
         {/* Search/filter */}
-        <TextInput
-          className="mb-4 h-11 rounded-xl border border-gray-300 bg-white px-4 text-base text-gray-900"
-          placeholder="Search symptoms…"
-          placeholderTextColor="#9ca3af"
-          value={search}
-          onChangeText={setSearch}
-          autoCapitalize="none"
-        />
+        <View className="mb-4 h-12 flex-row items-center rounded-xl border-2 border-gray-300 bg-white px-3.5">
+          <Ionicons name="search" size={17} color="#6b7280" />
+          <TextInput
+            className="ml-2 flex-1 text-base text-gray-900"
+            placeholder="Search symptoms…"
+            placeholderTextColor="#9ca3af"
+            accessibilityLabel="Search symptoms"
+            value={search}
+            onChangeText={setSearch}
+            autoCapitalize="none"
+          />
+        </View>
 
         {filteredGroups.length === 0 ? (
           <Text className="py-6 text-center text-sm text-gray-500">
@@ -274,11 +283,12 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
         <View className="mb-2">
           <Text className="mb-1 text-sm font-medium text-gray-700">
             Additional notes{" "}
-            <Text className="text-xs font-normal text-gray-400">(optional)</Text>
+            <Text className="text-xs font-normal text-gray-500">(optional)</Text>
           </Text>
           <TextInput
-            className="rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900"
-            style={{ minHeight: 80, textAlignVertical: "top" }}
+            className="rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900"
+            accessibilityLabel="Additional notes"
+            style={{ minHeight: 88, textAlignVertical: "top" }}
             placeholder="Anything else the vet-facing record should say…"
             placeholderTextColor="#9ca3af"
             value={notes}
@@ -291,10 +301,14 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       </ScrollView>
 
       {/* Sticky action bar */}
-      <View className="border-t border-gray-200 bg-white px-1 pt-3">
+      <View className="border-t border-gray-200 bg-white px-1 pb-1 pt-3">
         {formError ? (
-          <View className="mb-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2">
-            <Text className="text-sm text-alert">{formError}</Text>
+          <View
+            accessibilityRole="alert"
+            className="mb-2 flex-row items-center rounded-xl border border-red-200 bg-red-50 px-3 py-2"
+          >
+            <Ionicons name="alert-circle" size={16} color="#b3401f" />
+            <Text className="ml-1.5 flex-1 text-sm text-alert">{formError}</Text>
           </View>
         ) : null}
         {!canSubmit && !formError ? (

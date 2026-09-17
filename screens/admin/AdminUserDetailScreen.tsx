@@ -14,6 +14,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { showToast } from "../../components/ui/Toast";
@@ -107,8 +108,13 @@ export function AdminUserDetailScreen({ route }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading user…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading user…</Text>
         </View>
       </Screen>
     );
@@ -157,7 +163,10 @@ export function AdminUserDetailScreen({ route }: Props) {
         </View>
 
         {/* Detail card */}
-        <View className="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-1">
+        <View
+          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-1"
+          style={elevation.card}
+        >
           <InfoRow label="Role" value={user.role} />
           <InfoRow label="Birds owned" value={String(user.gamefowl_count ?? 0)} />
           <InfoRow label="Assessments" value={String(user.health_assessment_count ?? 0)} />

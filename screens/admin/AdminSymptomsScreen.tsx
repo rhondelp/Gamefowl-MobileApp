@@ -11,6 +11,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -63,8 +64,13 @@ export function AdminSymptomsScreen({ navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading symptoms…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading symptoms…</Text>
         </View>
       </Screen>
     );
@@ -100,7 +106,11 @@ export function AdminSymptomsScreen({ navigation }: Props) {
               onPress={() =>
                 navigation.navigate("AdminSymptomForm", { symptomId: item.id })
               }
-              className="mb-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 active:bg-brand-50"
+              className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
+              style={({ pressed }) => [
+                elevation.card,
+                pressed ? { transform: [{ scale: 0.99 }] } : null,
+              ]}
             >
               <View className="flex-row items-center">
                 {/* Severity cue matches the owner-facing checklist dot. */}

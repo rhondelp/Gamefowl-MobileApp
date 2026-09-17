@@ -15,6 +15,8 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
+import { Ionicons } from "@expo/vector-icons";
+
 import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
@@ -86,8 +88,12 @@ export function LoginScreen({ navigation }: Props) {
 
       {/* Forced sign-out explanation (token revoked/expired mid-session). */}
       {sessionExpired ? (
-        <View className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-          <Text className="text-sm text-amber-800">
+        <View
+          accessibilityRole="alert"
+          className="mb-4 flex-row items-start rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+        >
+          <Ionicons name="time-outline" size={18} color="#b45309" />
+          <Text className="ml-2 flex-1 text-sm leading-5 text-amber-800">
             Your session has expired or was revoked. Please log in again.
           </Text>
         </View>
@@ -116,15 +122,18 @@ export function LoginScreen({ navigation }: Props) {
           the user has actually typed an email, so an untouched Login lands
           on an empty Forgot Password field. */}
       <TouchableOpacity
-        className="mb-4 self-end"
+        className="mb-3 self-end justify-center px-1"
+        style={{ minHeight: 44 }}
+        hitSlop={8}
         onPress={() =>
           navigation.navigate("ForgotPassword", {
             prefillEmail: email.trim() || undefined,
           })
         }
         accessibilityRole="link"
+        accessibilityLabel="Forgot password"
       >
-        <Text className="text-sm font-semibold text-brand-600">
+        <Text className="text-sm font-semibold text-brand-700">
           Forgot Password?
         </Text>
       </TouchableOpacity>
@@ -132,13 +141,15 @@ export function LoginScreen({ navigation }: Props) {
       <Button label="Log In" onPress={handleSubmit} loading={submitting} />
 
       <TouchableOpacity
-        className="mt-6 self-center"
+        className="mt-5 self-center justify-center px-2"
+        style={{ minHeight: 44 }}
         onPress={() => navigation.navigate("Register")}
         accessibilityRole="button"
+        accessibilityLabel="Create an account"
       >
         <Text className="text-sm text-gray-500">
           Don't have an account?{" "}
-          <Text className="font-semibold text-brand-600">Create one</Text>
+          <Text className="font-semibold text-brand-700">Create one</Text>
         </Text>
       </TouchableOpacity>
     </Screen>

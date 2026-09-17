@@ -16,6 +16,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { elevation } from "../../components/ui/elevation";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { useAuth } from "../../contexts/AuthContext";
@@ -94,8 +95,13 @@ export function HealthRecordDetailScreen({ route, navigation }: Props) {
     return (
       <Screen>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading record…</Text>
+          <View
+            className="h-16 w-16 items-center justify-center rounded-full bg-white"
+            style={elevation.card}
+          >
+            <ActivityIndicator size="large" color="#2e7d4f" />
+          </View>
+          <Text className="mt-4 text-sm font-medium text-gray-500">Loading record…</Text>
         </View>
       </Screen>
     );
@@ -132,7 +138,10 @@ export function HealthRecordDetailScreen({ route, navigation }: Props) {
         </View>
 
         {/* Detail card */}
-        <View className="mt-5 rounded-2xl border border-gray-200 bg-white px-4 py-2">
+        <View
+          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          style={elevation.card}
+        >
           <View className="flex-row py-3 border-b border-gray-100">
             <Text className="w-32 text-sm text-gray-500">Event date</Text>
             <Text className="flex-1 text-sm font-medium text-gray-900">
@@ -155,7 +164,7 @@ export function HealthRecordDetailScreen({ route, navigation }: Props) {
           </View>
         </View>
 
-        <Text className="mt-2 px-1 text-xs text-gray-400">
+        <Text className="mt-2 px-1 text-xs leading-5 text-gray-500">
           Logged {formatDateTime(record.created_at)}. Manual entries can be
           backdated; the event date above is what appears in the timeline.
         </Text>

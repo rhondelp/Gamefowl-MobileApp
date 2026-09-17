@@ -16,6 +16,8 @@
 import React from "react";
 import { ActivityIndicator, Pressable, Text } from "react-native";
 
+import { elevation } from "./elevation";
+
 interface ButtonProps {
   label: string;
   onPress: () => void;
@@ -30,15 +32,21 @@ export function Button({ label, onPress, variant = "primary", loading = false }:
       ? "bg-brand-600 active:bg-brand-700"
       : variant === "danger"
         ? "bg-alert active:opacity-90"
-        : "border border-brand-600 bg-transparent active:bg-brand-50";
+        : "border-2 border-brand-600 bg-transparent active:bg-brand-50";
 
   const textColor =
-    variant === "outline" ? "text-brand-600" : "text-white";
+    variant === "outline" ? "text-brand-700" : "text-white";
+
+  // Filled buttons carry a little depth so the primary action on a screen
+  // sits above the form it submits; outline stays flat by design.
+  const depth = variant === "outline" ? null : elevation.card;
 
   return (
     <Pressable
       accessibilityRole="button"
-      className={`h-12 items-center justify-center rounded-xl ${container} ${
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: loading, busy: loading }}
+      className={`h-12 items-center justify-center rounded-xl px-5 ${container} ${
         loading ? "opacity-70" : ""
       }`}
       disabled={loading}
@@ -46,13 +54,14 @@ export function Button({ label, onPress, variant = "primary", loading = false }:
       // Subtle press feedback app-wide: slight scale + dim (150ms feel via
       // the platform's default press animation timing).
       style={({ pressed }) => [
+        depth,
         pressed && !loading ? { transform: [{ scale: 0.98 }], opacity: 0.9 } : null,
       ]}
     >
       {loading ? (
         // White spinner reads well on both the filled and danger variants;
         // outline keeps its own colored spinner.
-        <ActivityIndicator color={variant === "outline" ? "#2e7d4f" : "#ffffff"} />
+        <ActivityIndicator color={variant === "outline" ? "#215838" : "#ffffff"} />
       ) : (
         <Text className={`text-base font-semibold ${textColor}`}>{label}</Text>
       )}
