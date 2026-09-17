@@ -53,7 +53,7 @@ function StatCard({
         <Ionicons name={icon} size={18} color="#276a43" />
       </View>
       <Text className="mt-2 text-xl font-bold text-gray-900">{value}</Text>
-      <Text className="mt-0.5 text-center text-[11px] leading-4 text-gray-500">
+      <Text className="mt-0.5 text-center text-[11px] font-normal leading-4 text-gray-500">
         {label}
       </Text>
     </View>

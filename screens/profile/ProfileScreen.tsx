@@ -162,7 +162,7 @@ export function ProfileScreen({ navigation }: Props) {
           <Button label="Log Out" variant="danger" onPress={confirmLogout} />
         </View>
 
-        <Text className="mt-6 self-center text-[11px] text-gray-500">
+        <Text className="mt-6 self-center text-[11px] font-normal text-gray-500">
           GAMEFOWL · Early Bird Disease Monitoring
         </Text>
       </ScrollView>

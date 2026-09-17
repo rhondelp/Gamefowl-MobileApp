@@ -98,5 +98,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
-  skipText: { color: "#ffffff", fontSize: 14, fontWeight: "600" },
+  // fontWeight is inert on a custom, non-variable font (see tailwind.config.js
+  // for why) — this is the app's one Text styled outside NativeWind, so the
+  // weight is selected by family name directly instead.
+  skipText: { color: "#ffffff", fontSize: 14, fontFamily: "Poppins_600SemiBold" },
 });

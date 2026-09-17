@@ -64,7 +64,7 @@ export function TimelineEntryCard({ entry, onPress }: TimelineEntryCardProps) {
                 </Text>
               </View>
               {entry.severity_at_assessment ? (
-                <Text className="ml-2 text-[11px] capitalize text-gray-500">
+                <Text className="ml-2 text-[11px] font-normal capitalize text-gray-500">
                   {entry.severity_at_assessment} severity
                 </Text>
               ) : null}

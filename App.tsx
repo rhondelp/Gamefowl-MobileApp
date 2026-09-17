@@ -12,13 +12,25 @@
  * directives from this entry point.
  */
 import "./global.css";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { StatusBar } from "expo-status-bar";
+import * as SplashScreen from "expo-splash-screen";
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RootNavigator } from "./navigation/RootNavigator";
 import { ToastHost } from "./components/ui/Toast";
 import { IntroVideoScreen } from "./components/intro/IntroVideoScreen";
+
+// Keep the native splash (app.json's expo-splash-screen config) on screen
+// until Poppins is loaded, instead of flashing the system font first.
+void SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   /**
@@ -28,8 +40,27 @@ export default function App() {
    */
   const [introDone, setIntroDone] = useState(false);
 
+  const [fontsLoaded, fontError] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+  // `loaded` never flips true on failure (it just stays false), so a real
+  // font error is treated as "ready anyway" — falling back to the system
+  // font beats leaving the app stuck on the splash screen forever.
+  const fontsReady = fontsLoaded || !!fontError;
+
+  // Native splash stays up until this fires — no gap where unstyled text
+  // (or a second, home-grown loading screen) would flash.
+  const onRootLayout = useCallback(() => {
+    if (fontsReady) void SplashScreen.hideAsync();
+  }, [fontsReady]);
+
+  if (!fontsReady) return null;
+
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider onLayout={onRootLayout}>
       <AuthProvider>
         {!introDone ? (
           <IntroVideoScreen
