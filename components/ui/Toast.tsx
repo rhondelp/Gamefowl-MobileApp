@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { elevation } from "./elevation";
+import { notifyError, notifySuccess } from "./haptics";
 
 export type ToastType = "success" | "error" | "info";
 
@@ -27,8 +28,16 @@ type ToastListener = (message: string, type: ToastType) => void;
 
 let listener: ToastListener | null = null;
 
-/** Fire a toast from anywhere in the app (screens, hooks, services). */
+/**
+ * Fire a toast from anywhere in the app (screens, hooks, services).
+ *
+ * Every save, failure and confirmation already reports through here, so this
+ * is also where the matching haptic fires — one place, rather than a buzz
+ * bolted onto each submit handler.
+ */
 export function showToast(message: string, type: ToastType = "success") {
+  if (type === "success") void notifySuccess();
+  else if (type === "error") void notifyError();
   listener?.(message, type);
 }
 
@@ -93,7 +102,7 @@ export function ToastHost() {
           transform: [{ translateY }],
         },
       ]}
-      className="z-50 flex-row items-center rounded-2xl px-4 py-3.5"
+      className="z-50 flex-row items-center rounded-card px-4 py-3.5"
     >
       <Ionicons name={tone.icon} size={20} color="#ffffff" />
       <Text className="mx-2.5 flex-1 text-sm font-medium leading-5 text-white">

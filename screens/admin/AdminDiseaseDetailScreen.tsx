@@ -26,6 +26,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import {
+  isCriticalSeverity,
+  severityTone,
+  tone,
+} from "../../components/ui/status";
+import { warnDestructive } from "../../components/ui/haptics";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonLines } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -43,18 +49,15 @@ import type { AdminStackScreenProps } from "../../navigation/types";
 
 type Props = AdminStackScreenProps<"AdminDiseaseDetail">;
 
-const SEVERITY_CHIP: Record<string, string> = {
-  mild: "bg-green-100",
-  moderate: "bg-amber-100",
-  severe: "bg-red-100",
-  critical: "bg-alert",
-};
-const SEVERITY_TEXT: Record<string, string> = {
-  mild: "text-green-700",
-  moderate: "text-amber-700",
-  severe: "text-red-700",
-  critical: "text-white",
-};
+/** Same tones the owner-facing screens use — see components/ui/status.ts. */
+function severityChip(severity: string) {
+  const t = tone(severityTone(severity));
+  const solid = isCriticalSeverity(severity);
+  return {
+    backgroundColor: solid ? t.solid : t.soft,
+    color: solid ? "#ffffff" : t.text,
+  };
+}
 
 export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
   const { diseaseId } = route.params;
@@ -103,6 +106,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
     successToast: string,
     action: () => Promise<void>
   ) => {
+    void warnDestructive();
     Alert.alert(title, message, [
       { text: "Cancel", style: "cancel" },
       {
@@ -194,16 +198,20 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         {/* Identity header */}
         <View className="mt-2 flex-row items-center">
           <View className="ml-0 flex-1">
-            <Text className="text-lg font-bold text-gray-900">{disease.name}</Text>
+            <Text className="text-lg font-bold text-ink-primary">{disease.name}</Text>
             <View className="mt-1 flex-row items-center">
-              <View className={`rounded-full px-2 py-0.5 ${SEVERITY_CHIP[disease.severity] ?? "bg-gray-100"}`}>
-                <Text className={`text-[10px] font-semibold uppercase ${SEVERITY_TEXT[disease.severity] ?? "text-gray-500"}`}>
+              <View
+                className="rounded-full px-2.5 py-1"
+                style={{ backgroundColor: severityChip(disease.severity).backgroundColor }}
+              >
+                <Text className="text-xs font-semibold uppercase"
+                  style={{ color: severityChip(disease.severity).color }}>
                   {disease.severity}
                 </Text>
               </View>
               {!disease.is_active ? (
                 <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                  <Text className="text-[10px] font-semibold uppercase text-gray-500">
+                  <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
                     Inactive
                   </Text>
                 </View>
@@ -219,7 +227,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
 
         {/* Profile card */}
         <View
-          className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          className="mt-4 rounded-card bg-surface-card px-4 py-2"
           style={elevation.card}
         >
           <InfoBlock label="Description" text={disease.description} />
@@ -229,7 +237,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
 
         {(disease.prevention_info || disease.vet_warning) ? (
           <View
-            className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+            className="mt-3 rounded-card bg-surface-card px-4 py-2"
             style={elevation.card}
           >
             {disease.vet_warning ? (
@@ -251,17 +259,17 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         <Text className="mb-2 mt-6 text-xs font-semibold uppercase tracking-widest text-brand-600">
           Symptom weights ({disease.rules.length})
         </Text>
-        <Text className="mb-2 text-xs leading-4 text-gray-500">
+        <Text className="mb-2 text-xs leading-4 text-ink-tertiary">
           These pairs are what the engine scores. Weight 5 = highly indicative;
           removing a rule affects future assessments only — past records keep
           their snapshots.
         </Text>
         <View
-          className="overflow-hidden rounded-2xl border border-gray-100 bg-white"
+          className="overflow-hidden rounded-card bg-surface-card"
           style={elevation.card}
         >
           {disease.rules.length === 0 ? (
-            <Text className="px-4 py-3 text-sm text-gray-500">
+            <Text className="px-4 py-3 text-sm text-ink-tertiary">
               No rules yet — this disease can never match an assessment until it
               has at least one symptom.
             </Text>
@@ -306,7 +314,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         <Pressable
           accessibilityRole="button"
           onPress={() => void openSymptomPicker()}
-          className="mt-3 flex-row items-center rounded-xl border border-dashed border-brand-500 bg-brand-50 px-4 py-3"
+          className="mt-3 flex-row items-center rounded-control border border-dashed border-brand-500 bg-brand-50 px-4 py-3"
         >
           <Ionicons name={showSymptomPicker ? "close" : "add"} size={16} color="#276a43" />
           <Text className="ml-1.5 text-sm font-semibold text-brand-700">
@@ -315,11 +323,11 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         </Pressable>
         {showSymptomPicker ? (
           <View
-            className="mt-2 rounded-2xl border border-gray-100 bg-white p-3"
+            className="mt-2 rounded-card bg-surface-card p-3"
             style={elevation.card}
           >
             {availableSymptoms.length === 0 ? (
-              <Text className="py-1 text-sm text-gray-500">
+              <Text className="py-1 text-sm text-ink-tertiary">
                 {symptoms.length === 0
                   ? "Loading symptoms…"
                   : "Every symptom is already attached to this disease."}
@@ -332,10 +340,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                     accessibilityRole="radio"
                     accessibilityState={{ selected: selectedSymptomId === symptom.id }}
                     onPress={() => setSelectedSymptomId(symptom.id)}
-                    className={`mb-1.5 flex-row items-center rounded-xl border px-3 py-2.5 ${
+                    className={`mb-1.5 flex-row items-center rounded-control border px-3 py-2.5 ${
                       selectedSymptomId === symptom.id
                         ? "border-brand-600 bg-brand-50"
-                        : "border-gray-200 bg-white"
+                        : "border-gray-200 bg-surface-card"
                     }`}
                   >
                     <Ionicons
@@ -347,7 +355,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                       size={16}
                       color="#276a43"
                     />
-                    <Text className="ml-2 flex-1 text-sm text-gray-800">
+                    <Text className="ml-2 flex-1 text-sm text-ink-primary">
                       {symptom.name}
                     </Text>
                   </Pressable>
@@ -355,7 +363,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
 
                 {/* Weight stepper for the pending attachment */}
                 <View className="mt-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-medium text-gray-700">Weight</Text>
+                  <Text className="text-sm font-medium text-ink-secondary">Weight</Text>
                   <Stepper value={newWeight} onChange={setNewWeight} />
                 </View>
 
@@ -400,11 +408,11 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
           Linked care recommendations ({disease.recommendations.length})
         </Text>
         <View
-          className="rounded-2xl border border-gray-100 bg-white"
+          className="rounded-card bg-surface-card"
           style={elevation.card}
         >
           {disease.recommendations.length === 0 ? (
-            <Text className="px-4 py-3 text-sm text-gray-500">
+            <Text className="px-4 py-3 text-sm text-ink-tertiary">
               None linked yet — results will show guidance only from the disease itself.
             </Text>
           ) : (
@@ -416,8 +424,8 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                 }`}
               >
                 <View className="flex-1">
-                  <Text className="text-sm font-semibold text-gray-900">{rec.title}</Text>
-                  <Text className="text-xs capitalize text-gray-500">{rec.category}</Text>
+                  <Text className="text-sm font-semibold text-ink-primary">{rec.title}</Text>
+                  <Text className="text-xs capitalize text-ink-tertiary">{rec.category}</Text>
                 </View>
                 <Pressable
                   accessibilityRole="button"
@@ -442,7 +450,7 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         <Pressable
           accessibilityRole="button"
           onPress={openRecPicker}
-          className="mt-3 flex-row items-center rounded-xl border border-dashed border-brand-500 bg-brand-50 px-4 py-3"
+          className="mt-3 flex-row items-center rounded-control border border-dashed border-brand-500 bg-brand-50 px-4 py-3"
         >
           <Ionicons name={showRecPicker ? "close" : "add"} size={16} color="#276a43" />
           <Text className="ml-1.5 text-sm font-semibold text-brand-700">
@@ -451,11 +459,11 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
         </Pressable>
         {showRecPicker ? (
           <View
-            className="mt-2 rounded-2xl border border-gray-100 bg-white p-3"
+            className="mt-2 rounded-card bg-surface-card p-3"
             style={elevation.card}
           >
             {availableRecs.length === 0 ? (
-              <Text className="py-1 text-sm text-gray-500">
+              <Text className="py-1 text-sm text-ink-tertiary">
                 {recommendations.length === 0
                   ? "Loading recommendations…"
                   : "All recommendations are already linked."}
@@ -476,10 +484,10 @@ export function AdminDiseaseDetailScreen({ route, navigation }: Props) {
                       }
                     )
                   }
-                  className="mb-1.5 rounded-xl border border-gray-200 px-3 py-2.5 active:bg-brand-50"
+                  className="mb-1.5 rounded-control border border-gray-200 px-3 py-2.5 active:bg-brand-50"
                 >
-                  <Text className="text-sm font-medium text-gray-900">{rec.title}</Text>
-                  <Text className="text-xs capitalize text-gray-500">{rec.category}</Text>
+                  <Text className="text-sm font-medium text-ink-primary">{rec.title}</Text>
+                  <Text className="text-xs capitalize text-ink-tertiary">{rec.category}</Text>
                 </Pressable>
               ))
             )}
@@ -544,7 +552,7 @@ function RuleRow({
     <View
       className={`flex-row items-center px-4 py-3 ${isLast ? "" : "border-b border-gray-100"}`}
     >
-      <Text className="flex-1 text-sm font-medium text-gray-900" numberOfLines={1}>
+      <Text className="flex-1 text-sm font-medium text-ink-primary" numberOfLines={1}>
         {rule.symptom_name}
       </Text>
       {/* Weight stepper constrained to the backend's 1–5 range. */}
@@ -554,7 +562,7 @@ function RuleRow({
           disabled={busy || rule.weight <= 1}
           onPress={() => onChangeWeight(rule.weight - 1)}
         />
-        <Text className="w-7 text-center text-sm font-bold text-gray-900">
+        <Text className="w-7 text-center text-sm font-bold text-ink-primary">
           {rule.weight}
         </Text>
         <StepButton
@@ -610,7 +618,7 @@ function Stepper({
   return (
     <View className="flex-row items-center">
       <StepButton icon="remove" disabled={value <= 1} onPress={() => onChange(value - 1)} />
-      <Text className="w-8 text-center text-base font-bold text-gray-900">
+      <Text className="w-8 text-center text-base font-bold text-ink-primary">
         {value}
       </Text>
       <StepButton icon="add" disabled={value >= 5} onPress={() => onChange(value + 1)} />
@@ -634,12 +642,12 @@ function InfoBlock({
     <View className={`py-3 ${last ? "" : "border-b border-gray-100"}`}>
       <Text
         className={`text-xs font-semibold uppercase tracking-wide ${
-          tone === "alert" ? "text-alert" : "text-gray-500"
+          tone === "alert" ? "text-alert" : "text-ink-tertiary"
         }`}
       >
         {label}
       </Text>
-      <Text className="mt-1 text-sm leading-5 text-gray-800">{text}</Text>
+      <Text className="mt-1 text-sm leading-5 text-ink-primary">{text}</Text>
     </View>
   );
 }

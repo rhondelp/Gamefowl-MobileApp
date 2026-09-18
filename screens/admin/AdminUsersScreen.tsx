@@ -10,10 +10,12 @@
  *   Tap any account -> AdminUserDetail for role/status actions.
  */
 import React, { useCallback, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { tone } from "../../components/ui/status";
+import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import { EmptyState } from "../../components/ui/EmptyState";
@@ -84,7 +86,7 @@ export function AdminUsersScreen({ navigation }: Props) {
             selected={showInactive}
             onPress={() => setShowInactive(true)}
           />
-          <Text className="ml-auto text-xs text-gray-500">{total} total</Text>
+          <Text className="ml-auto text-xs text-ink-tertiary">{total} total</Text>
         </View>
       </View>
 
@@ -104,7 +106,7 @@ export function AdminUsersScreen({ navigation }: Props) {
           )}
           ListEmptyComponent={
             <EmptyState
-              icon="people-outline"
+              variant="search"
               title="No users match"
               message="Try a different role or status filter."
             />
@@ -118,8 +120,13 @@ export function AdminUsersScreen({ navigation }: Props) {
           }
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
-          refreshing={refreshing}
-          onRefresh={refresh}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              {...brandRefreshColors}
+            />
+          }
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         />
@@ -134,7 +141,7 @@ function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={`Open ${user.name}`}
       onPress={onPress}
-      className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
+      className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
       style={({ pressed }) => [
         elevation.card,
         pressed ? { transform: [{ scale: 0.99 }] } : null,
@@ -148,7 +155,7 @@ function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
         </View>
         <View className="ml-3 flex-1">
           <View className="flex-row items-center">
-            <Text className="flex-shrink text-sm font-semibold text-gray-900" numberOfLines={1}>
+            <Text className="flex-shrink text-sm font-semibold text-ink-primary" numberOfLines={1}>
               {user.name}
             </Text>
             {/* Role + status badges mirror what the admin can change. */}
@@ -159,21 +166,24 @@ function UserRow({ user, onPress }: { user: AdminUser; onPress: () => void }) {
             >
               <Text
                 className={`text-[10px] font-semibold uppercase ${
-                  user.role === "admin" ? "text-white" : "text-gray-500"
+                  user.role === "admin" ? "text-white" : "text-ink-tertiary"
                 }`}
               >
                 {user.role}
               </Text>
             </View>
             {!user.is_active ? (
-              <View className="ml-1.5 rounded-full bg-red-100 px-2 py-0.5">
+              <View
+                className="ml-1.5 rounded-full px-2 py-0.5"
+                style={{ backgroundColor: tone("neutral").soft }}
+              >
                 <Text className="text-[10px] font-semibold uppercase text-alert">
                   Deactivated
                 </Text>
               </View>
             ) : null}
           </View>
-          <Text className="mt-0.5 text-xs text-gray-500" numberOfLines={1}>
+          <Text className="mt-0.5 text-xs text-ink-tertiary" numberOfLines={1}>
             {user.email}
           </Text>
         </View>
@@ -197,10 +207,10 @@ function FilterChip({
       accessibilityState={{ selected }}
       onPress={onPress}
       className={`mr-2 rounded-full border px-3.5 py-1.5 ${
-        selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+        selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-surface-card"
       }`}
     >
-      <Text className={`text-xs font-medium capitalize ${selected ? "text-white" : "text-gray-700"}`}>
+      <Text className={`text-xs font-medium capitalize ${selected ? "text-white" : "text-ink-secondary"}`}>
         {label}
       </Text>
     </Pressable>

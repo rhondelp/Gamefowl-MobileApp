@@ -8,6 +8,8 @@
 // bold — the only four the app uses) to do that, and gives every font-size
 // utility a Poppins Regular default so unweighted body text picks it up too
 // — together that covers text app-wide without editing any screen.
+const { brand, surface, status, text } = require("./components/ui/palette");
+
 const POPPINS_BY_WEIGHT = {
   normal: "Poppins_400Regular",
   medium: "Poppins_500Medium",
@@ -15,10 +17,21 @@ const POPPINS_BY_WEIGHT = {
   bold: "Poppins_700Bold",
 };
 
+// One scale, app-wide: 12 / 14 / 16 / 20 / 24 / 32. Anything outside it was a
+// per-screen one-off, so the ladder deliberately stops at six steps.
+const TYPE_SCALE = {
+  xs: ["12px", { lineHeight: "16px" }],
+  sm: ["14px", { lineHeight: "20px" }],
+  base: ["16px", { lineHeight: "24px" }],
+  lg: ["20px", { lineHeight: "28px" }],
+  xl: ["24px", { lineHeight: "32px" }],
+  "2xl": ["32px", { lineHeight: "40px" }],
+};
+
 function poppinsPlugin({ addUtilities }) {
   addUtilities(
     Object.fromEntries(
-      ["xs", "sm", "base", "lg", "xl", "2xl", "3xl"].map((size) => [
+      Object.keys(TYPE_SCALE).map((size) => [
         `.text-${size}`,
         { fontFamily: POPPINS_BY_WEIGHT.normal },
       ])
@@ -52,18 +65,25 @@ module.exports = {
     fontWeight: false,
   },
   theme: {
+    // Replaced, not extended: the point is that sizes outside this ladder
+    // stop being reachable.
+    fontSize: TYPE_SCALE,
     extend: {
       colors: {
-        // Health-monitoring palette: calm greens with a warm alert accent.
-        brand: {
-          50: "#f0f9f4",
-          100: "#dcf0e3",
-          500: "#2e7d4f",
-          600: "#276a43",
-          700: "#215838",
-          900: "#123122",
-        },
-        alert: "#b3401f",
+        brand,
+        alert: status.critical.solid,
+        surface,
+        // Semantic status tones — see components/ui/palette.js. Flattened to
+        // `healthy-soft` / `attention-text` etc. so they read as one system.
+        ...Object.fromEntries(
+          Object.entries(status).map(([name, shades]) => [name, shades])
+        ),
+        ink: text,
+      },
+      borderRadius: {
+        // Cards sit at 20, controls and chips at 16.
+        card: "20px",
+        control: "16px",
       },
       fontFamily: {
         sans: [POPPINS_BY_WEIGHT.normal],

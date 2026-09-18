@@ -28,13 +28,13 @@ export function Screen({ children, scroll = false }: ScreenProps) {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-surface-canvas"
       >
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: "center",
-            paddingHorizontal: 24,
+            paddingHorizontal: 20,
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
           }}
@@ -49,7 +49,7 @@ export function Screen({ children, scroll = false }: ScreenProps) {
   return (
     <View
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 bg-gray-50 px-6"
+      className="flex-1 bg-surface-canvas px-5"
     >
       {children}
     </View>

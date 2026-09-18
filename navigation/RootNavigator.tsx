@@ -25,6 +25,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
+import { palette } from "../components/ui/status";
 import { useAuth } from "../contexts/AuthContext";
 import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
@@ -272,7 +273,19 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
     <MainTabs.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2e7d4f",
+        tabBarActiveTintColor: palette.brand[500],
+        tabBarInactiveTintColor: palette.text.tertiary,
+        tabBarStyle: {
+          backgroundColor: palette.surface.card,
+          borderTopColor: palette.surface.line,
+          height: 62,
+          paddingTop: 6,
+          paddingBottom: 8,
+        },
+        tabBarLabelStyle: {
+          fontFamily: "Poppins_500Medium",
+          fontSize: 11,
+        },
       }}
     >
       <MainTabs.Screen
@@ -280,8 +293,14 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
         component={DashboardStackScreen}
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          // Outline when inactive, filled when active — the standard mobile
+          // read for "you are here".
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -291,8 +310,12 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
           component={AdminStackScreen}
           options={{
             title: "Admin",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="shield-checkmark" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons
+                name={focused ? "shield-checkmark" : "shield-checkmark-outline"}
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
@@ -302,8 +325,12 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
         component={ProfileStackScreen}
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={size}
+              color={color}
+            />
           ),
         }}
       />

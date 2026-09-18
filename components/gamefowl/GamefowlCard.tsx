@@ -25,7 +25,7 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`View details for ${gamefowl.name}`}
-      className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-4 active:bg-brand-50"
+      className="mb-3 rounded-card bg-surface-card px-4 py-4 active:bg-brand-50"
       onPress={onPress}
       style={({ pressed }) => [
         elevation.card,
@@ -41,7 +41,7 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
         >
           <Text
             className={`text-lg font-bold ${
-              gamefowl.is_active ? "text-brand-700" : "text-gray-500"
+              gamefowl.is_active ? "text-brand-700" : "text-ink-tertiary"
             }`}
           >
             {gamefowl.name.charAt(0).toUpperCase()}
@@ -50,19 +50,19 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
 
         <View className="ml-3 flex-1">
           <View className="flex-row items-center">
-            <Text className="flex-shrink text-base font-semibold text-gray-900" numberOfLines={1}>
+            <Text className="flex-shrink text-base font-semibold text-ink-primary" numberOfLines={1}>
               {gamefowl.name}
             </Text>
             {/* Retired birds stay visible in "show inactive" lists but read as such. */}
             {!gamefowl.is_active ? (
               <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                <Text className="text-[10px] font-semibold uppercase tracking-wide text-gray-600">
+                <Text className="text-[10px] font-semibold uppercase tracking-wide text-ink-secondary">
                   Inactive
                 </Text>
               </View>
             ) : null}
           </View>
-          <Text className="mt-1 text-sm text-gray-500" numberOfLines={1}>
+          <Text className="mt-1 text-sm text-ink-tertiary" numberOfLines={1}>
             {gamefowl.breed?.trim() || "Breed not set"} · {formatAge(gamefowl.age)} ·{" "}
             {gamefowl.sex}
           </Text>

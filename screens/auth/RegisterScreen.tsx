@@ -88,8 +88,8 @@ export function RegisterScreen({ navigation }: Props) {
           source={require("../../assets/images/main_logo.png")}
           style={{ width: 72, height: 72, resizeMode: "contain", alignSelf: "center" }}
         />
-        <Text className="mt-2 text-center text-2xl font-bold text-gray-900">Create your account</Text>
-        <Text className="mt-1 text-center text-sm text-gray-500">
+        <Text className="mt-2 text-center text-2xl font-bold text-ink-primary">Create your account</Text>
+        <Text className="mt-1 text-center text-sm text-ink-tertiary">
           Start monitoring your gamefowl's health today.
         </Text>
       </View>
@@ -137,7 +137,7 @@ export function RegisterScreen({ navigation }: Props) {
         onPress={() => navigation.navigate("Login")}
         accessibilityRole="button"
       >
-        <Text className="text-sm text-gray-500">
+        <Text className="text-sm text-ink-tertiary">
           Already have an account?{" "}
           <Text className="font-semibold text-brand-700">Log in</Text>
         </Text>

@@ -165,7 +165,7 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Owners tick these when reporting a sick bird.
         </Text>
 
@@ -199,7 +199,7 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
 
         {/* Severity chips — exact backend enum. */}
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">Severity *</Text>
+          <Text className="mb-1 text-sm font-medium text-ink-secondary">Severity *</Text>
           <View className="flex-row">
             {SEVERITY_OPTIONS.map((option) => {
               const selected = values.severity === option;
@@ -211,15 +211,15 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
                   onPress={() =>
                     setValues((prev) => ({ ...prev, severity: option }))
                   }
-                  className={`mr-2 flex-1 items-center rounded-xl border py-3 ${
+                  className={`mr-2 flex-1 items-center rounded-control border py-3 ${
                     selected
                       ? "border-brand-600 bg-brand-600"
-                      : "border-gray-300 bg-white"
+                      : "border-gray-300 bg-surface-card"
                   }`}
                 >
                   <Text
                     className={`text-sm font-semibold capitalize ${
-                      selected ? "text-white" : "text-gray-700"
+                      selected ? "text-white" : "text-ink-secondary"
                     }`}
                   >
                     {option}
@@ -250,7 +250,7 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
             accessibilityState={{ checked: isActive }}
             onPress={() => setIsActive((prev) => !prev)}
             style={({ pressed }) => [{ minHeight: 56 }, pressed ? { opacity: 0.9 } : null]}
-            className="mb-5 flex-row items-center rounded-xl border-2 border-gray-200 bg-white px-4 py-3 active:bg-gray-50"
+            className="mb-5 flex-row items-center rounded-control border-2 border-gray-200 bg-surface-card px-4 py-3 active:bg-gray-50"
           >
             <Ionicons
               name={isActive ? "toggle" : "toggle-outline"}
@@ -259,8 +259,8 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
               style={{ transform: [{ rotate: isActive ? "180deg" : "0deg" }] }}
             />
             <View className="ml-3 flex-1">
-              <Text className="text-sm font-semibold text-gray-900">Active</Text>
-              <Text className="text-xs text-gray-500">
+              <Text className="text-sm font-semibold text-ink-primary">Active</Text>
+              <Text className="text-xs text-ink-tertiary">
                 Inactive symptoms vanish from owner checklists and are ignored by
                 the engine.
               </Text>

@@ -61,10 +61,10 @@ export function DatePickerField({
   const [iosOpen, setIosOpen] = useState(false);
   // Mirrors TextField: error outranks the open/focused state.
   const borderColor = error
-    ? "border-alert bg-red-50"
+    ? "border-alert bg-critical-soft"
     : iosOpen
-      ? "border-brand-600 bg-white"
-      : "border-gray-300 bg-white";
+      ? "border-brand-600 bg-surface-card"
+      : "border-gray-300 bg-surface-card";
 
   const openAndroid = () => {
     // Android fires this once per selection in default mode — a dialog,
@@ -85,16 +85,16 @@ export function DatePickerField({
 
   return (
     <View className="mb-4">
-      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="mb-1.5 text-sm font-medium text-ink-secondary">{label}</Text>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${value ? formatDate(value) : placeholder}`}
         onPress={() => (Platform.OS === "android" ? openAndroid() : setIosOpen((p) => !p))}
-        className={`flex-row items-center rounded-xl border-2 ${borderColor} px-4 py-3`}
+        className={`flex-row items-center rounded-control border-2 ${borderColor} px-4 py-3`}
         style={({ pressed }) => [{ minHeight: 48 }, pressed ? { opacity: 0.9 } : null]}
       >
         <Text
-          className={`flex-1 text-base ${value ? "text-gray-900" : "text-gray-400"}`}
+          className={`flex-1 text-base ${value ? "text-ink-primary" : "text-ink-tertiary"}`}
         >
           {value ? formatDate(value) : placeholder}
         </Text>
@@ -108,7 +108,7 @@ export function DatePickerField({
       ) : null}
 
       {Platform.OS === "ios" && iosOpen ? (
-        <View className="mt-2 rounded-xl border border-gray-200 bg-white p-3" style={elevation.card}>
+        <View className="mt-2 rounded-control bg-surface-card p-3" style={elevation.card}>
           <DateTimePicker
             value={value ? toDate(value) : new Date()}
             mode="date"
@@ -120,7 +120,7 @@ export function DatePickerField({
             accessibilityRole="button"
             onPress={() => setIosOpen(false)}
             style={({ pressed }) => [{ minHeight: 44 }, pressed ? { opacity: 0.9 } : null]}
-            className="items-center justify-center rounded-xl bg-brand-600 active:bg-brand-700"
+            className="items-center justify-center rounded-control bg-brand-600 active:bg-brand-700"
           >
             <Text className="text-sm font-semibold text-white">Done</Text>
           </Pressable>

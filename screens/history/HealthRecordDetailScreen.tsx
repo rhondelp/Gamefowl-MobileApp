@@ -16,6 +16,7 @@ import { ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { tone } from "../../components/ui/status";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonLines } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -121,12 +122,15 @@ export function HealthRecordDetailScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Identity header */}
         <View className="mt-2 flex-row items-center">
-          <View className="h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+          <View
+            className="h-12 w-12 items-center justify-center rounded-full"
+            style={{ backgroundColor: tone("neutral").soft }}
+          >
             <Ionicons name={meta.icon} size={24} color="#b45309" />
           </View>
           <View className="ml-3 flex-1">
-            <Text className="text-lg font-bold text-gray-900">{record.title}</Text>
-            <Text className="text-sm text-gray-500">
+            <Text className="text-lg font-bold text-ink-primary">{record.title}</Text>
+            <Text className="text-sm text-ink-tertiary">
               {meta.label} · {formatDate(record.recorded_at)}
             </Text>
           </View>
@@ -134,32 +138,32 @@ export function HealthRecordDetailScreen({ route, navigation }: Props) {
 
         {/* Detail card */}
         <View
-          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          className="mt-5 rounded-card bg-surface-card px-4 py-2"
           style={elevation.card}
         >
           <View className="flex-row py-3 border-b border-gray-100">
-            <Text className="w-32 text-sm text-gray-500">Event date</Text>
-            <Text className="flex-1 text-sm font-medium text-gray-900">
+            <Text className="w-32 text-sm text-ink-tertiary">Event date</Text>
+            <Text className="flex-1 text-sm font-medium text-ink-primary">
               {formatDate(record.recorded_at)}
             </Text>
           </View>
           {record.weight !== null ? (
             <View className="flex-row py-3 border-b border-gray-100">
-              <Text className="w-32 text-sm text-gray-500">Weight</Text>
-              <Text className="flex-1 text-sm font-medium text-gray-900">
+              <Text className="w-32 text-sm text-ink-tertiary">Weight</Text>
+              <Text className="flex-1 text-sm font-medium text-ink-primary">
                 {formatWeight(record.weight)}
               </Text>
             </View>
           ) : null}
           <View className="flex-row py-3">
-            <Text className="w-32 text-sm text-gray-500">Notes</Text>
-            <Text className="flex-1 text-sm font-medium leading-5 text-gray-900">
+            <Text className="w-32 text-sm text-ink-tertiary">Notes</Text>
+            <Text className="flex-1 text-sm font-medium leading-5 text-ink-primary">
               {record.notes?.trim() || "—"}
             </Text>
           </View>
         </View>
 
-        <Text className="mt-2 px-1 text-xs leading-5 text-gray-500">
+        <Text className="mt-2 px-1 text-xs leading-5 text-ink-tertiary">
           Logged {formatDateTime(record.created_at)}. Manual entries can be
           backdated; the event date above is what appears in the timeline.
         </Text>

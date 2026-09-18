@@ -14,10 +14,11 @@
  *     last_page), explicit loading/error/empty states.
  */
 import React, { useCallback, useRef } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { SkeletonList } from "../../components/ui/Skeleton";
@@ -96,16 +97,16 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
           ListHeaderComponent={
             <View className="mb-3">
               {birdName ? (
-                <Text className="text-sm text-gray-500">
+                <Text className="text-sm text-ink-tertiary">
                   Health timeline for{" "}
-                  <Text className="font-semibold text-gray-700">{birdName}</Text>
+                  <Text className="font-semibold text-ink-secondary">{birdName}</Text>
                 </Text>
               ) : null}
             </View>
           }
           ListEmptyComponent={
             <EmptyState
-              icon="time-outline"
+              variant="history"
               title="No health history yet"
               message="Run a symptom assessment or log a record to start building this bird's timeline."
               actionLabel="+ Start Assessment"
@@ -123,8 +124,13 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
           }
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
-          refreshing={refreshing}
-          onRefresh={refresh}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              {...brandRefreshColors}
+            />
+          }
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         />

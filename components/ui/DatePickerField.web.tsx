@@ -41,10 +41,10 @@ export function DatePickerField({
   const [focused, setFocused] = useState(false);
   // Mirrors TextField: error outranks focus.
   const borderColor = error
-    ? "border-alert bg-red-50"
+    ? "border-alert bg-critical-soft"
     : focused
-      ? "border-brand-600 bg-white"
-      : "border-gray-300 bg-white";
+      ? "border-brand-600 bg-surface-card"
+      : "border-gray-300 bg-surface-card";
 
   const handleChange = (text: string) => {
     onChange(text);
@@ -63,13 +63,13 @@ export function DatePickerField({
 
   return (
     <View className="mb-4">
-      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="mb-1.5 text-sm font-medium text-ink-secondary">{label}</Text>
       <View
-        className={`h-12 flex-row items-center rounded-xl border-2 ${borderColor} px-4`}
+        className={`h-12 flex-row items-center rounded-control border-2 ${borderColor} px-4`}
       >
         <TextInput
           accessibilityLabel={`${label} date, formatted as year, month, day`}
-          className="flex-1 text-base text-gray-900"
+          className="flex-1 text-base text-ink-primary"
           value={value}
           onChangeText={handleChange}
           onFocus={() => setFocused(true)}
@@ -83,7 +83,7 @@ export function DatePickerField({
       {hint ? (
         <View className="mt-1.5 flex-row items-center">
           <Ionicons name="information-circle-outline" size={14} color="#6b7280" />
-          <Text className="ml-1 flex-1 text-xs text-gray-500">{hint}</Text>
+          <Text className="ml-1 flex-1 text-xs text-ink-tertiary">{hint}</Text>
         </View>
       ) : null}
       {error ? (

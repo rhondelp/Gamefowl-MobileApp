@@ -12,8 +12,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { tone } from "../../components/ui/status";
 
 import { Screen } from "../../components/ui/Screen";
+import { warnDestructive } from "../../components/ui/haptics";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonLines } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -75,6 +77,7 @@ export function AdminUserDetailScreen({ route }: Props) {
       successToast: string,
       apply: () => Promise<void>
     ) => {
+      void warnDestructive();
       Alert.alert(confirmTitle, confirmMessage, [
         { text: "Cancel", style: "cancel" },
         {
@@ -138,13 +141,13 @@ export function AdminUserDetailScreen({ route }: Props) {
             </Text>
           </View>
           <View className="ml-3 flex-1">
-            <Text className="text-lg font-bold text-gray-900">{user.name}</Text>
-            <Text className="text-sm text-gray-500">{user.email}</Text>
+            <Text className="text-lg font-bold text-ink-primary">{user.name}</Text>
+            <Text className="text-sm text-ink-tertiary">{user.email}</Text>
           </View>
           {/* Status chip */}
           <View
             className={`rounded-full px-3 py-1 ${
-              user.is_active ? "bg-brand-100" : "bg-red-100"
+              user.is_active ? "bg-brand-100" : "bg-neutral-soft"
             }`}
           >
             <Text
@@ -159,7 +162,7 @@ export function AdminUserDetailScreen({ route }: Props) {
 
         {/* Detail card */}
         <View
-          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-1"
+          className="mt-5 rounded-card bg-surface-card px-4 py-1"
           style={elevation.card}
         >
           <InfoRow label="Role" value={user.role} />
@@ -170,9 +173,15 @@ export function AdminUserDetailScreen({ route }: Props) {
 
         {/* Self-lockout: actions don't exist for your own account. */}
         {isSelf ? (
-          <View className="mt-5 flex-row items-start rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3">
+          <View
+            className="mt-5 flex-row items-start rounded-card px-4 py-3"
+            style={{ backgroundColor: tone("attention").soft }}
+          >
             <Ionicons name="lock-closed" size={16} color="#b45309" style={{ marginTop: 2 }} />
-            <Text className="ml-2 flex-1 text-xs leading-4 text-amber-800">
+            <Text
+              className="ml-2 flex-1 text-xs leading-4"
+              style={{ color: tone("attention").text }}
+            >
               This is your own account. Role and status actions are disabled to
               prevent locking yourself out of the admin panel.
             </Text>
@@ -261,8 +270,8 @@ function InfoRow({
     <View
       className={`flex-row items-center py-3 ${last ? "" : "border-b border-gray-100"}`}
     >
-      <Text className="w-32 text-sm text-gray-500">{label}</Text>
-      <Text className="flex-1 text-sm font-medium capitalize text-gray-900">{value}</Text>
+      <Text className="w-32 text-sm text-ink-tertiary">{label}</Text>
+      <Text className="flex-1 text-sm font-medium capitalize text-ink-primary">{value}</Text>
     </View>
   );
 }

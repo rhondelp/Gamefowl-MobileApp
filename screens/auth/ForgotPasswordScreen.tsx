@@ -95,8 +95,8 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
           source={require("../../assets/images/main_logo.png")}
           style={{ width: 72, height: 72, resizeMode: "contain" }}
         />
-        <Text className="mt-2 text-2xl font-bold text-gray-900">Forgot your password?</Text>
-        <Text className="mt-1 text-center text-sm text-gray-500">
+        <Text className="mt-2 text-2xl font-bold text-ink-primary">Forgot your password?</Text>
+        <Text className="mt-1 text-center text-sm text-ink-tertiary">
           Enter the email on your account and we'll send you a reset link.
         </Text>
       </View>
@@ -106,14 +106,14 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
         // Replaces the form entirely. Copy is intentionally non-revealing
         // so probing the endpoint cannot distinguish "email registered"
         // from "email not registered".
-        <View className="rounded-2xl border border-brand-200 bg-brand-50 px-6 py-8">
-          <View className="mb-4 self-center rounded-full bg-white p-3">
+        <View className="rounded-card border border-brand-200 bg-brand-50 px-6 py-8">
+          <View className="mb-4 self-center rounded-full bg-surface-card p-3">
             <Ionicons name="mail-unread-outline" size={32} color="#2e7d4f" />
           </View>
-          <Text className="text-center text-base font-semibold text-gray-900">
+          <Text className="text-center text-base font-semibold text-ink-primary">
             Check your inbox
           </Text>
-          <Text className="mt-2 text-center text-sm leading-5 text-gray-700">
+          <Text className="mt-2 text-center text-sm leading-5 text-ink-secondary">
             If an account exists for that email, we've sent a password reset
             link. Check your inbox (and spam folder).
           </Text>
@@ -161,7 +161,7 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
             onPress={goBackToLogin}
             accessibilityRole="link"
           >
-            <Text className="text-sm text-gray-500">
+            <Text className="text-sm text-ink-tertiary">
               Remembered it?{" "}
               <Text className="font-semibold text-brand-700">Back to Login</Text>
             </Text>

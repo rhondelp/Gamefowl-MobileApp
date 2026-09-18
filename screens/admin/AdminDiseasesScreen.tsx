@@ -8,10 +8,16 @@
  *   recommendations are managed.
  */
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
+import {
+  isCriticalSeverity,
+  severityTone,
+  tone,
+} from "../../components/ui/status";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -23,18 +29,15 @@ import { ApiError } from "../../services/api/client";
 import type { AdminDisease } from "../../types/admin";
 import type { AdminStackScreenProps } from "../../navigation/types";
 
-const SEVERITY_CHIP: Record<string, string> = {
-  mild: "bg-green-100",
-  moderate: "bg-amber-100",
-  severe: "bg-red-100",
-  critical: "bg-alert",
-};
-const SEVERITY_TEXT: Record<string, string> = {
-  mild: "text-green-700",
-  moderate: "text-amber-700",
-  severe: "text-red-700",
-  critical: "text-white",
-};
+/** Same tones the owner-facing screens use — see components/ui/status.ts. */
+function severityChip(severity: string) {
+  const t = tone(severityTone(severity));
+  const solid = isCriticalSeverity(severity);
+  return {
+    backgroundColor: solid ? t.solid : t.soft,
+    color: solid ? "#ffffff" : t.text,
+  };
+}
 
 type Props = AdminStackScreenProps<"AdminDiseases">;
 
@@ -98,7 +101,7 @@ export function AdminDiseasesScreen({ navigation }: Props) {
           ListEmptyComponent={
             <View className="mt-3">
               <EmptyState
-                icon="book-outline"
+                variant="archive"
                 title="No diseases yet"
                 message="Add the first condition to start building the knowledge base."
               />
@@ -110,33 +113,37 @@ export function AdminDiseasesScreen({ navigation }: Props) {
               onPress={() =>
                 navigation.navigate("AdminDiseaseDetail", { diseaseId: item.id })
               }
-              className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
+              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
               style={({ pressed }) => [
                 elevation.card,
                 pressed ? { transform: [{ scale: 0.99 }] } : null,
               ]}
             >
               <View className="flex-row items-center">
-                <Text className="flex-shrink text-base font-semibold text-gray-900" numberOfLines={1}>
+                <Text className="flex-shrink text-base font-semibold text-ink-primary" numberOfLines={1}>
                   {item.name}
                 </Text>
                 {!item.is_active ? (
                   <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-gray-500">
+                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
                       Inactive
                     </Text>
                   </View>
                 ) : null}
               </View>
               <View className="mt-1.5 flex-row items-center">
-                <View className={`rounded-full px-2 py-0.5 ${SEVERITY_CHIP[item.severity] ?? "bg-gray-100"}`}>
+                <View
+                className="rounded-full px-2.5 py-1"
+                style={{ backgroundColor: severityChip(item.severity).backgroundColor }}
+              >
                   <Text
-                    className={`text-[10px] font-semibold uppercase ${SEVERITY_TEXT[item.severity] ?? "text-gray-500"}`}
+                    className="text-xs font-semibold uppercase"
+                  style={{ color: severityChip(item.severity).color }}
                   >
                     {item.severity}
                   </Text>
                 </View>
-                <Text className="ml-2 text-xs text-gray-500">
+                <Text className="ml-2 text-xs text-ink-tertiary">
                   {item.rules.length} {item.rules.length === 1 ? "rule" : "rules"}
                   {" · "}
                   {item.recommendations.length}{" "}
@@ -145,15 +152,20 @@ export function AdminDiseasesScreen({ navigation }: Props) {
               </View>
             </Pressable>
           )}
-          onRefresh={
-            refreshing
-              ? undefined
-              : () => {
-                  setRefreshing(true);
-                  void load().finally(() => setRefreshing(false));
-                }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={
+                refreshing
+                  ? undefined
+                  : () => {
+                      setRefreshing(true);
+                      void load().finally(() => setRefreshing(false));
+                    }
+              }
+              {...brandRefreshColors}
+            />
           }
-          refreshing={refreshing}
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         />

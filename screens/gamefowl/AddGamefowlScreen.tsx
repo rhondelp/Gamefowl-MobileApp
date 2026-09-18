@@ -37,7 +37,7 @@ export function AddGamefowlScreen({ navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Only a name is required — you can fill in the rest anytime.
         </Text>
 

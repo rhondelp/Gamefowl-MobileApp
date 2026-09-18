@@ -8,37 +8,35 @@
  */
 import React from "react";
 import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import type { HealthStatusLabel } from "../../types/api";
+import { healthStatusTone, tone } from "../ui/status";
 
-const STATUS_STYLE: Record<HealthStatusLabel, { chip: string; text: string; label: string }> = {
-  healthy: {
-    chip: "bg-brand-100",
-    text: "text-brand-700",
-    label: "Healthy",
-  },
-  needs_attention: {
-    chip: "bg-red-100",
-    text: "text-alert",
-    label: "Needs attention",
-  },
-  stale: {
-    chip: "bg-amber-100",
-    text: "text-amber-700",
-    label: "Stale data",
-  },
-  no_data: {
-    chip: "bg-gray-100",
-    text: "text-gray-600",
-    label: "No data yet",
-  },
+/** Only the wording and the glyph live here — color comes from the tone. */
+const STATUS_META: Record<
+  HealthStatusLabel,
+  { label: string; icon: keyof typeof Ionicons.glyphMap }
+> = {
+  healthy: { label: "Healthy", icon: "checkmark-circle" },
+  needs_attention: { label: "Needs attention", icon: "alert-circle" },
+  stale: { label: "Stale data", icon: "time" },
+  no_data: { label: "No data yet", icon: "ellipse-outline" },
 };
 
 export function HealthStatusBadge({ status }: { status: HealthStatusLabel }) {
-  const style = STATUS_STYLE[status];
+  const meta = STATUS_META[status];
+  const t = tone(healthStatusTone(status));
+
   return (
-    <View className={`self-start rounded-full px-3 py-1 ${style.chip}`}>
-      <Text className={`text-xs font-bold ${style.text}`}>{style.label}</Text>
+    <View
+      className="flex-row items-center self-start rounded-full px-3 py-1.5"
+      style={{ backgroundColor: t.soft }}
+    >
+      <Ionicons name={meta.icon} size={13} color={t.solid} />
+      <Text className="ml-1.5 text-xs font-semibold" style={{ color: t.text }}>
+        {meta.label}
+      </Text>
     </View>
   );
 }

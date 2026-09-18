@@ -16,6 +16,7 @@ import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { Ionicons } from "@expo/vector-icons";
+import { tone } from "../../components/ui/status";
 
 import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
@@ -82,18 +83,22 @@ export function LoginScreen({ navigation }: Props) {
           source={require("../../assets/images/main_logo.png")}
           style={{ width: 130, height: 130, resizeMode: "contain" }}
         />
-        <Text className="mt-2 text-3xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
-        <Text className="mt-1 text-sm text-gray-500">Early Bird Disease Monitoring</Text>
+        <Text className="mt-2 text-2xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
+        <Text className="mt-1 text-sm text-ink-tertiary">Early Bird Disease Monitoring</Text>
       </View>
 
       {/* Forced sign-out explanation (token revoked/expired mid-session). */}
       {sessionExpired ? (
         <View
           accessibilityRole="alert"
-          className="mb-4 flex-row items-start rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+          className="mb-4 flex-row items-start rounded-control px-4 py-3"
+          style={{ backgroundColor: tone("attention").soft }}
         >
-          <Ionicons name="time-outline" size={18} color="#b45309" />
-          <Text className="ml-2 flex-1 text-sm leading-5 text-amber-800">
+          <Ionicons name="time-outline" size={18} color={tone("attention").solid} />
+          <Text
+            className="ml-2 flex-1 text-sm leading-5"
+            style={{ color: tone("attention").text }}
+          >
             Your session has expired or was revoked. Please log in again.
           </Text>
         </View>
@@ -147,7 +152,7 @@ export function LoginScreen({ navigation }: Props) {
         accessibilityRole="button"
         accessibilityLabel="Create an account"
       >
-        <Text className="text-sm text-gray-500">
+        <Text className="text-sm text-ink-tertiary">
           Don't have an account?{" "}
           <Text className="font-semibold text-brand-700">Create one</Text>
         </Text>

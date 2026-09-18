@@ -48,24 +48,24 @@ export function TextField({
 
   // Error outranks focus so a field never looks "fine" while it's invalid.
   const borderColor = error
-    ? "border-alert bg-red-50"
+    ? "border-alert bg-critical-soft"
     : focused
-      ? "border-brand-600 bg-white"
-      : "border-gray-300 bg-white";
+      ? "border-brand-600 bg-surface-card"
+      : "border-gray-300 bg-surface-card";
 
   return (
     <View className="mb-4">
-      <Text className="mb-1.5 text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="mb-1.5 text-sm font-medium text-ink-secondary">{label}</Text>
       {/* The border lives on the wrapper so the reveal toggle can sit inside
           it; multiline grows the wrapper and top-aligns both children. */}
       <View
-        className={`flex-row rounded-xl border-2 ${borderColor} px-4 ${
+        className={`flex-row rounded-control border-2 ${borderColor} px-4 ${
           multiline ? "items-start py-3" : "items-center"
         }`}
         style={multiline ? { minHeight: 96 } : { minHeight: 48 }}
       >
         <TextInput
-          className="flex-1 text-base text-gray-900"
+          className="flex-1 text-base text-ink-primary"
           style={
             multiline
               ? { textAlignVertical: "top", minHeight: 72 }

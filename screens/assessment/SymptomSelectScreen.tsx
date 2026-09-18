@@ -29,11 +29,13 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+import { tone } from "../../components/ui/status";
 
 import { Screen } from "../../components/ui/Screen";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { ChipGroup } from "../../components/ui/ChipGroup";
 import { elevation } from "../../components/ui/elevation";
+import { notifyError, tapSelection } from "../../components/ui/haptics";
 import { Button } from "../../components/ui/Button";
 import { EntranceView } from "../../components/ui/EntranceView";
 import { SymptomSelectItem } from "../../components/assessment/SymptomSelectItem";
@@ -118,6 +120,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
   }, [groups, search]);
 
   const toggleSymptom = useCallback((id: number) => {
+    void tapSelection();
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -150,6 +153,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       navigation.replace("AssessmentResult", { assessmentId: data.id });
     } catch (err) {
       setSubmitting(false);
+      void notifyError();
       if (err instanceof ApiError) {
         // Surface backend validation clearly — e.g. an inactive symptom ID
         // somehow submitted must name that problem, not fail generically.
@@ -168,7 +172,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       <Screen>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading symptom checklist…</Text>
+          <Text className="mt-3 text-sm text-ink-tertiary">Loading symptom checklist…</Text>
         </View>
       </Screen>
     );
@@ -189,14 +193,14 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       {/* Processing overlay while scoring/persisting runs. */}
       <Modal transparent visible={submitting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50 px-8">
-          <View className="w-full items-center rounded-2xl bg-white px-6 py-7" style={elevation.overlay}>
+          <View className="w-full items-center rounded-card bg-surface-card px-6 py-7" style={elevation.overlay}>
             <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-50">
               <ActivityIndicator size="large" color="#2e7d4f" />
             </View>
-            <Text className="mt-4 text-center text-base font-semibold text-gray-900">
+            <Text className="mt-4 text-center text-base font-semibold text-ink-primary">
               Analyzing symptoms…
             </Text>
-            <Text className="mt-1 text-center text-sm leading-5 text-gray-500">
+            <Text className="mt-1 text-center text-sm leading-5 text-ink-tertiary">
               Scoring possible conditions against our knowledge base.
             </Text>
           </View>
@@ -206,23 +210,23 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Who is being assessed */}
         <View className="mt-1 mb-4">
-          <Text className="text-lg font-bold text-gray-900">
+          <Text className="text-lg font-bold text-ink-primary">
             What signs is your bird showing?
           </Text>
           {birdName ? (
-            <Text className="mt-0.5 text-sm text-gray-500">
+            <Text className="mt-0.5 text-sm text-ink-tertiary">
               Assessing <Text className="font-semibold">{birdName}</Text>. Tick all that apply.
             </Text>
           ) : (
-            <Text className="mt-0.5 text-sm text-gray-500">Tick all that apply.</Text>
+            <Text className="mt-0.5 text-sm text-ink-tertiary">Tick all that apply.</Text>
           )}
         </View>
 
         {/* Search/filter */}
-        <View className="mb-4 h-12 flex-row items-center rounded-xl border-2 border-gray-300 bg-white px-3.5">
+        <View className="mb-4 h-12 flex-row items-center rounded-control border-2 border-gray-300 bg-surface-card px-3.5">
           <Ionicons name="search" size={17} color="#6b7280" />
           <TextInput
-            className="ml-2 flex-1 text-base text-gray-900"
+            className="ml-2 flex-1 text-base text-ink-primary"
             placeholder="Search symptoms…"
             placeholderTextColor="#9ca3af"
             accessibilityLabel="Search symptoms"
@@ -244,7 +248,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
         </View>
 
         {filteredGroups.length === 0 ? (
-          <Text className="py-6 text-center text-sm text-gray-500">
+          <Text className="py-6 text-center text-sm text-ink-tertiary">
             No symptoms match “{search.trim()}”.
           </Text>
         ) : (
@@ -293,12 +297,12 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
         />
 
         <View className="mb-2">
-          <Text className="mb-1 text-sm font-medium text-gray-700">
+          <Text className="mb-1 text-sm font-medium text-ink-secondary">
             Additional notes{" "}
-            <Text className="text-xs font-normal text-gray-500">(optional)</Text>
+            <Text className="text-xs font-normal text-ink-tertiary">(optional)</Text>
           </Text>
           <TextInput
-            className="rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900"
+            className="rounded-control border-2 border-gray-300 bg-surface-card px-4 py-3 text-base text-ink-primary"
             accessibilityLabel="Additional notes"
             style={{ minHeight: 88, textAlignVertical: "top" }}
             placeholder="Anything else the vet-facing record should say…"
@@ -313,18 +317,24 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
       </ScrollView>
 
       {/* Sticky action bar */}
-      <View className="border-t border-gray-200 bg-white px-1 pb-1 pt-3">
+      <View className="border-t border-gray-200 bg-surface-card px-1 pb-1 pt-3">
         {formError ? (
           <View
             accessibilityRole="alert"
-            className="mb-2 flex-row items-center rounded-xl border border-red-200 bg-red-50 px-3 py-2"
+            className="mb-2 flex-row items-center rounded-control px-3 py-2"
+            style={{ backgroundColor: tone("critical").soft }}
           >
             <Ionicons name="alert-circle" size={16} color="#b3401f" />
-            <Text className="ml-1.5 flex-1 text-sm text-alert">{formError}</Text>
+            <Text
+              className="ml-1.5 flex-1 text-sm"
+              style={{ color: tone("critical").text }}
+            >
+              {formError}
+            </Text>
           </View>
         ) : null}
         {!canSubmit && !formError ? (
-          <Text className="mb-2 text-center text-sm text-gray-500">
+          <Text className="mb-2 text-center text-sm text-ink-tertiary">
             Select at least one symptom to continue.
           </Text>
         ) : (

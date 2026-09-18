@@ -148,7 +148,7 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Care guidance linked to diseases and shown on results.
         </Text>
 
@@ -169,7 +169,7 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
 
         {/* Category chips — exact backend CATEGORIES enum. */}
         <View className="mb-4">
-          <Text className="mb-1 text-sm font-medium text-gray-700">Category *</Text>
+          <Text className="mb-1 text-sm font-medium text-ink-secondary">Category *</Text>
           <View className="flex-row flex-wrap">
             {RECOMMENDATION_CATEGORIES.map((option) => {
               const selected = category === option;
@@ -183,12 +183,12 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
                     clearFieldError("category");
                   }}
                   className={`mr-2 mb-2 rounded-full border px-3.5 py-2 ${
-                    selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+                    selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-surface-card"
                   }`}
                 >
                   <Text
                     className={`text-sm font-medium capitalize ${
-                      selected ? "text-white" : "text-gray-700"
+                      selected ? "text-white" : "text-ink-secondary"
                     }`}
                   >
                     {option}
@@ -219,7 +219,7 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
             accessibilityState={{ checked: isActive }}
             onPress={() => setIsActive((prev) => !prev)}
             style={({ pressed }) => [{ minHeight: 56 }, pressed ? { opacity: 0.9 } : null]}
-            className="mb-5 flex-row items-center rounded-xl border-2 border-gray-200 bg-white px-4 py-3 active:bg-gray-50"
+            className="mb-5 flex-row items-center rounded-control border-2 border-gray-200 bg-surface-card px-4 py-3 active:bg-gray-50"
           >
             <Ionicons
               name={isActive ? "toggle" : "toggle-outline"}
@@ -228,8 +228,8 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
               style={{ transform: [{ rotate: isActive ? "180deg" : "0deg" }] }}
             />
             <View className="ml-3 flex-1">
-              <Text className="text-sm font-semibold text-gray-900">Active</Text>
-              <Text className="text-xs text-gray-500">
+              <Text className="text-sm font-semibold text-ink-primary">Active</Text>
+              <Text className="text-xs text-ink-tertiary">
                 Inactive recommendations stay editable but stop appearing to owners.
               </Text>
             </View>

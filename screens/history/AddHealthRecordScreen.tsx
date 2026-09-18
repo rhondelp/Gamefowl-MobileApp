@@ -36,7 +36,7 @@ export function AddHealthRecordScreen({ route, navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           {birdName ? `A manual entry for ${birdName}.` : "A manual logbook entry."}{" "}
           Past events can be backdated.
         </Text>

@@ -94,7 +94,7 @@ export function ChangePasswordScreen({ navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Changing your password keeps this device signed in and signs out all
           other devices.
         </Text>

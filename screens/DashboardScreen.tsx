@@ -14,11 +14,13 @@
  *   silently refreshes so counts and rows are never stale.
  */
 import React, { useCallback, useRef } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../components/ui/Screen";
+import { brandRefreshColors } from "../components/ui/BrandRefreshControl";
+import { Fab } from "../components/ui/Fab";
 import { elevation } from "../components/ui/elevation";
 import { Skeleton, SkeletonList } from "../components/ui/Skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -58,7 +60,7 @@ export function DashboardScreen({ navigation }: Props) {
         <Text className="text-xs font-semibold uppercase tracking-widest text-brand-500">
           Welcome back
         </Text>
-        <Text className="mt-1 text-2xl font-bold text-gray-900" numberOfLines={1}>
+        <Text className="mt-1 text-2xl font-bold text-ink-primary" numberOfLines={1}>
           {user?.name}
         </Text>
       </View>
@@ -67,24 +69,12 @@ export function DashboardScreen({ navigation }: Props) {
         // Mirrors the loaded layout (summary card, section heading, rows) so
         // nothing shifts when the data arrives.
         <View accessibilityLabel="Loading your flock" accessibilityState={{ busy: true }}>
-          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4" style={elevation.raised}>
-            <Skeleton width="35%" height={10} style={{ backgroundColor: "#ffffff55" }} />
-            <Skeleton
-              width="55%"
-              height={26}
-              style={{ marginTop: 10, backgroundColor: "#ffffff55" }}
-            />
+          <View className="mt-4 rounded-card bg-brand-600 px-5 py-4" style={elevation.raised}>
+            <Skeleton width="35%" height={10} onBrand />
+            <Skeleton width="55%" height={26} onBrand style={{ marginTop: 10 }} />
             <View className="mt-4 flex-row">
-              <Skeleton
-                height={44}
-                radius={12}
-                style={{ flex: 1, marginRight: 8, backgroundColor: "#ffffff33" }}
-              />
-              <Skeleton
-                height={44}
-                radius={12}
-                style={{ flex: 1, marginLeft: 8, backgroundColor: "#ffffff33" }}
-              />
+              <Skeleton height={44} radius={12} onBrand style={{ flex: 1, marginRight: 8 }} />
+              <Skeleton height={44} radius={12} onBrand style={{ flex: 1, marginLeft: 8 }} />
             </View>
           </View>
           <View className="mb-2 mt-6">
@@ -97,13 +87,13 @@ export function DashboardScreen({ navigation }: Props) {
       ) : (
         <>
           {/* Summary card — the one raised surface on this screen. */}
-          <View className="mt-4 rounded-2xl bg-brand-600 px-5 py-4" style={elevation.raised}>
+          <View className="mt-4 rounded-card bg-brand-600 px-5 py-4" style={elevation.raised}>
             <View className="flex-row items-center justify-between">
               <View className="flex-1">
                 <Text className="text-xs font-semibold uppercase tracking-wider text-brand-100">
                   Your flock
                 </Text>
-                <Text className="mt-0.5 text-3xl font-bold text-white">
+                <Text className="mt-0.5 text-2xl font-bold text-white">
                   {activeTotal} {activeTotal === 1 ? "bird" : "birds"}
                 </Text>
               </View>
@@ -120,7 +110,7 @@ export function DashboardScreen({ navigation }: Props) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="See all birds"
-                className="mr-2 h-11 flex-1 items-center justify-center rounded-xl bg-white/15 active:bg-white/25"
+                className="mr-2 h-11 flex-1 items-center justify-center rounded-control bg-white/15 active:bg-white/25"
                 style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
                 onPress={() => navigation.navigate("MyGamefowl")}
               >
@@ -129,7 +119,7 @@ export function DashboardScreen({ navigation }: Props) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Add bird"
-                className="ml-2 h-11 flex-1 flex-row items-center justify-center rounded-xl bg-white active:bg-brand-50"
+                className="ml-2 h-11 flex-1 flex-row items-center justify-center rounded-control bg-surface-card active:bg-brand-50"
                 style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
                 onPress={() => navigation.navigate("AddGamefowl")}
               >
@@ -140,12 +130,12 @@ export function DashboardScreen({ navigation }: Props) {
           </View>
 
           {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
-          <Text className="mb-2 mt-6 text-base font-semibold text-gray-900">
+          <Text className="mb-2 mt-6 text-base font-semibold text-ink-primary">
             Recent birds
           </Text>
           {gamefowls.length === 0 ? (
             <EmptyState
-              image={require("../assets/images/badge_green.png")}
+              variant="flock"
               title="No gamefowl yet"
               message="Add your first bird to start tracking its health."
               actionLabel="+ Add Gamefowl"
@@ -165,15 +155,31 @@ export function DashboardScreen({ navigation }: Props) {
                   />
                 </EntranceView>
               )}
-              refreshing={refreshing}
-              onRefresh={refresh}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={refresh}
+                  {...brandRefreshColors}
+                />
+              }
               style={{ flexGrow: 0 }}
-              contentContainerStyle={{ paddingBottom: 8 }}
+              contentContainerStyle={{ paddingBottom: 96 }}
               showsVerticalScrollIndicator={false}
             />
           )}
         </>
       )}
+
+      {/* The flock list is the bird picker the assessment flow needs, so the
+          FAB routes there rather than inventing a bird selection. Hidden
+          while empty — the empty state already carries the "add one" CTA. */}
+      {!loading && !error && gamefowls.length > 0 ? (
+        <Fab
+          label="Start Assessment"
+          icon="pulse"
+          onPress={() => navigation.navigate("MyGamefowl")}
+        />
+      ) : null}
     </Screen>
   );
 }

@@ -8,6 +8,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { tone } from "./status";
 
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
@@ -16,10 +17,16 @@ export function FormError({ message }: { message?: string | null }) {
     <View
       accessibilityLiveRegion="polite"
       accessibilityRole="alert"
-      className="mb-4 flex-row items-start rounded-xl border border-red-200 bg-red-50 px-4 py-3"
+      className="mb-4 flex-row items-start rounded-control px-4 py-3"
+      style={{ backgroundColor: tone("critical").soft }}
     >
       <Ionicons name="alert-circle" size={18} color="#b3401f" />
-      <Text className="ml-2 flex-1 text-sm leading-5 text-alert">{message}</Text>
+      <Text
+        className="ml-2 flex-1 text-sm leading-5"
+        style={{ color: tone("critical").text }}
+      >
+        {message}
+      </Text>
     </View>
   );
 }

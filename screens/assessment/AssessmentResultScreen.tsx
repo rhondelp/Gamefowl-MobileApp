@@ -27,6 +27,7 @@ import { ErrorState } from "../../components/ui/ErrorState";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { elevation } from "../../components/ui/elevation";
 import { Skeleton } from "../../components/ui/Skeleton";
+import { tone } from "../../components/ui/status";
 import { DiseaseResultCard } from "../../components/assessment/DiseaseResultCard";
 import {
   activityLabel,
@@ -120,7 +121,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           accessibilityState={{ busy: true }}
         >
           <View
-            className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+            className="mt-3 rounded-card bg-surface-card px-4 py-3.5"
             style={elevation.card}
           >
             <Skeleton width="60%" height={13} />
@@ -134,23 +135,23 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           {[0, 1, 2].map((i) => (
             <View
               key={i}
-              className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+              className="mt-4 rounded-card bg-surface-card px-5 pb-4 pt-5"
               style={elevation.card}
             >
               <View className="flex-row items-center">
-                <Skeleton width={28} height={28} radius={14} />
-                <View className="ml-2.5 flex-1">
-                  <Skeleton width="65%" height={14} />
+                {/* Matches the RadialScore ring. */}
+                <Skeleton width={72} height={72} radius={36} />
+                <View className="ml-4 flex-1">
+                  <Skeleton width="30%" height={10} />
+                  <Skeleton width="70%" height={15} style={{ marginTop: 8 }} />
+                  <Skeleton width={110} height={22} radius={11} style={{ marginTop: 10 }} />
                 </View>
-                <Skeleton width={52} height={26} radius={13} />
               </View>
-              {/* Matches the AnimatedScoreBar track. */}
-              <Skeleton height={8} radius={4} style={{ marginTop: 14 }} />
-              <Skeleton width={110} height={20} radius={10} style={{ marginTop: 12 }} />
+              <Skeleton width="55%" height={13} style={{ marginTop: 20 }} />
             </View>
           ))}
 
-          <Text className="mt-5 text-center text-sm font-medium text-gray-500">
+          <Text className="mt-5 text-center text-sm font-medium text-ink-tertiary">
             Scoring possible conditions…
           </Text>
         </View>
@@ -179,7 +180,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Historical framing: this is a frozen record, not a fresh run. */}
         {historical && assessment.created_at ? (
-          <View className="mt-2 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3">
+          <View className="mt-2 rounded-card border border-brand-100 bg-brand-50 px-4 py-3">
             <View className="flex-row items-start">
               <Ionicons name="archive" size={16} color="#215838" style={{ marginTop: 2 }} />
               <Text className="ml-2 flex-1 text-xs leading-5 text-brand-700">
@@ -196,19 +197,28 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           // Escalation outranks everything else on the screen, so it is the
           // only element here carrying a solid fill and raised depth.
           <View
-            className="mt-2 rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-3.5"
-            style={elevation.raised}
+            className="mt-2 rounded-card px-5 py-4"
+            style={[elevation.raised, { backgroundColor: tone("critical").soft }]}
             accessibilityRole="alert"
           >
             <View className="flex-row items-center">
-              <View className="h-9 w-9 items-center justify-center rounded-full bg-red-100">
-                <Ionicons name="medkit" size={19} color="#b3401f" />
+              <View
+                className="h-10 w-10 items-center justify-center rounded-full"
+                style={{ backgroundColor: tone("critical").solid }}
+              >
+                <Ionicons name="medkit" size={20} color="#ffffff" />
               </View>
-              <Text className="ml-2.5 flex-1 text-base font-bold text-alert">
+              <Text
+                className="ml-3 flex-1 text-base font-bold"
+                style={{ color: tone("critical").text }}
+              >
                 Veterinary attention advised
               </Text>
             </View>
-            <Text className="mt-2 text-xs leading-5 text-alert">
+            <Text
+              className="mt-3 text-sm leading-5"
+              style={{ color: tone("critical").text }}
+            >
               One or more findings below carry an official warning. Consult a
               licensed veterinarian promptly.
             </Text>
@@ -217,14 +227,14 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
 
         {/* Submission summary */}
         <View
-          className="mt-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+          className="mt-3 rounded-card bg-surface-card px-4 py-3.5"
           style={elevation.card}
         >
           <View className="flex-row items-center justify-between">
-            <Text className="flex-1 text-sm font-semibold text-gray-900">
+            <Text className="flex-1 text-sm font-semibold text-ink-primary">
               Symptoms you reported ({assessment.submitted_symptoms.length})
             </Text>
-            <Text className="ml-2 text-xs text-gray-500">
+            <Text className="ml-2 text-xs text-ink-tertiary">
               {formatTimestamp(assessment.created_at)}
             </Text>
           </View>
@@ -249,7 +259,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             assessment.activity_level) ? (
             <>
               <View className="mt-2 border-t border-gray-100 pt-2" />
-              <Text className="text-xs leading-5 text-gray-500">
+              <Text className="text-xs leading-5 text-ink-tertiary">
                 {[
                   assessment.age_at_assessment ? `Age: ${assessment.age_at_assessment}` : null,
                   assessment.sex_at_assessment ? `Sex: ${assessment.sex_at_assessment}` : null,
@@ -267,7 +277,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             </>
           ) : null}
           {assessment.additional_notes ? (
-            <Text className="mt-1.5 text-xs italic leading-4 text-gray-500">
+            <Text className="mt-1.5 text-xs italic leading-4 text-ink-tertiary">
               Notes: “{assessment.additional_notes}”
             </Text>
           ) : null}
@@ -277,7 +287,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
         {assessment.results.length === 0 ? (
           <View className="mt-4">
             <EmptyState
-              icon="search-outline"
+              variant="search"
               title="No strong match found"
               message="The reported symptoms did not clearly match a known condition. Keep monitoring your bird, and consult a licensed veterinarian directly if signs persist or worsen."
             />
@@ -298,12 +308,28 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
         )}
 
         {/* Unmissable disclaimer — always rendered, exact backend wording. */}
-        <View className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3.5">
+        <View
+          className="mt-5 rounded-card px-5 py-4"
+          style={{ backgroundColor: tone("attention").soft }}
+        >
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={18} color="#b45309" style={{ marginTop: 1 }} />
-            <View className="ml-2 flex-1">
-              <Text className="text-sm font-bold text-amber-800">Important reminder</Text>
-              <Text className="mt-1 text-xs leading-5 text-amber-800">
+            <Ionicons
+              name="information-circle"
+              size={18}
+              color={tone("attention").solid}
+              style={{ marginTop: 1 }}
+            />
+            <View className="ml-2.5 flex-1">
+              <Text
+                className="text-sm font-bold"
+                style={{ color: tone("attention").text }}
+              >
+                Important reminder
+              </Text>
+              <Text
+                className="mt-1 text-xs leading-5"
+                style={{ color: tone("attention").text }}
+              >
                 {assessment.disclaimer}
               </Text>
             </View>

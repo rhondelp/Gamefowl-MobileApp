@@ -30,8 +30,8 @@ export function ChipGroup<T extends string>({
   return (
     <View className="mb-4">
       <View className="mb-2 flex-row items-baseline">
-        <Text className="text-sm font-medium text-gray-700">{label}</Text>
-        {hint ? <Text className="ml-1 text-xs text-gray-500">{hint}</Text> : null}
+        <Text className="text-sm font-medium text-ink-secondary">{label}</Text>
+        {hint ? <Text className="ml-1 text-xs text-ink-tertiary">{hint}</Text> : null}
       </View>
       <View className="flex-row flex-wrap">
         {options.map((option) => {
@@ -52,12 +52,12 @@ export function ChipGroup<T extends string>({
               className={`mr-2 mb-2 items-center justify-center rounded-full border-2 px-4 ${
                 selected
                   ? "border-brand-600 bg-brand-600"
-                  : "border-gray-300 bg-white active:bg-brand-50"
+                  : "border-gray-300 bg-surface-card active:bg-brand-50"
               }`}
             >
               <Text
                 className={`text-sm font-medium ${
-                  selected ? "text-white" : "text-gray-700"
+                  selected ? "text-white" : "text-ink-secondary"
                 }`}
               >
                 {option.label}

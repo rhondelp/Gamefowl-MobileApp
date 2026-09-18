@@ -11,13 +11,12 @@ import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Symptom, SymptomSeverity } from "../../types/api";
+import { severityTone, tone } from "../ui/status";
 
-/** Small color cue mirroring how serious the sign tends to be. */
-const SEVERITY_DOT: Record<SymptomSeverity, string> = {
-  mild: "#22c55e", // green-500
-  moderate: "#d97706", // amber-600
-  severe: "#b3401f", // alert
-};
+/** Same four tones as every other severity surface in the app. */
+function severityDot(severity: SymptomSeverity): string {
+  return tone(severityTone(severity)).solid;
+}
 
 interface SymptomSelectItemProps {
   symptom: Symptom;
@@ -34,10 +33,10 @@ export function SymptomSelectItem({ symptom, selected, onToggle }: SymptomSelect
       onPress={() => onToggle(symptom.id)}
       // Border width stays constant and only its color changes, so toggling a
       // row never reflows the checklist.
-      className={`mb-2 flex-row items-start rounded-xl border-2 px-3 py-3 ${
+      className={`mb-2 flex-row items-start rounded-control border-2 px-3 py-3 ${
         selected
           ? "border-brand-600 bg-brand-50"
-          : "border-gray-200 bg-white active:bg-gray-50"
+          : "border-gray-200 bg-surface-card active:bg-gray-50"
       }`}
       style={({ pressed }) => [
         { minHeight: 56 },
@@ -46,7 +45,7 @@ export function SymptomSelectItem({ symptom, selected, onToggle }: SymptomSelect
     >
       <View
         className={`mr-3 mt-0.5 h-7 w-7 items-center justify-center rounded-full border-2 ${
-          selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+          selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-surface-card"
         }`}
       >
         {selected ? (
@@ -58,18 +57,18 @@ export function SymptomSelectItem({ symptom, selected, onToggle }: SymptomSelect
           {/* Severity cue sits before the name so scanning stays easy. */}
           <View
             className="mr-1.5 h-2 w-2 rounded-full"
-            style={{ backgroundColor: SEVERITY_DOT[symptom.severity] }}
+            style={{ backgroundColor: severityDot(symptom.severity) }}
           />
           <Text
             className={`flex-shrink text-sm font-semibold ${
-              selected ? "text-brand-700" : "text-gray-900"
+              selected ? "text-brand-700" : "text-ink-primary"
             }`}
           >
             {symptom.name}
           </Text>
         </View>
         {symptom.description ? (
-          <Text className="mt-1 text-xs leading-4 text-gray-500" numberOfLines={2}>
+          <Text className="mt-1 text-xs leading-4 text-ink-tertiary" numberOfLines={2}>
             {symptom.description}
           </Text>
         ) : null}

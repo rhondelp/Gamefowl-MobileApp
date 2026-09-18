@@ -80,7 +80,7 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
           ListEmptyComponent={
             <View className="mt-3">
               <EmptyState
-                icon="list-outline"
+                variant="archive"
                 title="No recommendations yet"
                 message="Care guidance shown alongside disease results."
               />
@@ -94,25 +94,25 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
                   recommendationId: item.id,
                 })
               }
-              className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
+              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
               style={({ pressed }) => [
                 elevation.card,
                 pressed ? { transform: [{ scale: 0.99 }] } : null,
               ]}
             >
               <View className="flex-row items-center">
-                <Text className="flex-shrink flex-1 text-sm font-semibold text-gray-900" numberOfLines={1}>
+                <Text className="flex-shrink flex-1 text-sm font-semibold text-ink-primary" numberOfLines={1}>
                   {item.title}
                 </Text>
                 {!item.is_active ? (
                   <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-gray-500">
+                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
                       Inactive
                     </Text>
                   </View>
                 ) : null}
               </View>
-              <Text className="mt-0.5 text-xs capitalize text-gray-500" numberOfLines={2}>
+              <Text className="mt-0.5 text-xs capitalize text-ink-tertiary" numberOfLines={2}>
                 {item.category} · {item.content}
               </Text>
             </Pressable>

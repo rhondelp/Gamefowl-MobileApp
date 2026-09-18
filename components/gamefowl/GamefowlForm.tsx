@@ -157,7 +157,7 @@ export function GamefowlForm({
 
       {/* Sex: chips instead of free text so only valid enum values exist. */}
       <View className="mb-4">
-        <Text className="mb-1 text-sm font-medium text-gray-700">Sex *</Text>
+        <Text className="mb-1 text-sm font-medium text-ink-secondary">Sex *</Text>
         <View className="flex-row">
           {SEX_OPTIONS.map((option) => {
             const selected = values.sex === option.value;
@@ -167,13 +167,13 @@ export function GamefowlForm({
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 onPress={() => setField("sex", option.value)}
-                className={`mr-2 flex-1 items-center rounded-xl border py-3 ${
-                  selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+                className={`mr-2 flex-1 items-center rounded-control border py-3 ${
+                  selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-surface-card"
                 }`}
               >
                 <Text
                   className={`text-sm font-semibold ${
-                    selected ? "text-white" : "text-gray-700"
+                    selected ? "text-white" : "text-ink-secondary"
                   }`}
                 >
                   {option.label}

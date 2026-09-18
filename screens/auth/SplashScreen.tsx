@@ -13,7 +13,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 export function SplashScreen() {
   return (
     <View className="items-center justify-center flex-1 bg-brand-600">
-      <Text className="text-4xl font-bold tracking-widest text-white">GAMEFOWL</Text>
+      <Text className="text-2xl font-bold tracking-widest text-white">GAMEFOWL</Text>
       <Text className="mt-2 text-sm text-brand-100">Early Bird Disease Monitoring</Text>
       <ActivityIndicator color="#ffffff" className="mt-8" />
     </View>

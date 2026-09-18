@@ -16,20 +16,9 @@ import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { AssessmentResultItem, DiseaseInfo } from "../../types/api";
-import { MatchScoreBadge } from "./MatchScoreBadge";
-import { scoreTier } from "./scoreTiers";
-import { AnimatedScoreBar } from "./AnimatedScoreBar";
+import { RadialScore } from "./RadialScore";
 import { elevation } from "../ui/elevation";
-
-// Chip background and label color are kept as separate classes: React Native
-// does not inherit text color across a View boundary, so a combined
-// "bg-x text-y" string would silently drop the label color.
-const SEVERITY_CHIP: Record<string, { chip: string; text: string }> = {
-  mild: { chip: "bg-green-100", text: "text-green-800" },
-  moderate: { chip: "bg-amber-100", text: "text-amber-800" },
-  severe: { chip: "bg-red-100", text: "text-red-800" },
-  critical: { chip: "bg-alert", text: "text-white" },
-};
+import { isCriticalSeverity, severityTone, tone } from "../ui/status";
 
 interface DiseaseResultCardProps {
   result: AssessmentResultItem;
@@ -39,29 +28,32 @@ interface DiseaseResultCardProps {
 
 export function DiseaseResultCard({ result, detail = null }: DiseaseResultCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const tier = scoreTier(result.match_score);
 
-  const severity = SEVERITY_CHIP[result.severity_at_assessment] ?? {
-    chip: "bg-gray-100",
-    text: "text-gray-700",
-  };
+  // Severity drives every color on this card — chip, ring, rank marker — so
+  // one condition never reads as two different urgencies in one view.
+  const severity = tone(severityTone(result.severity_at_assessment));
+  const critical = isCriticalSeverity(result.severity_at_assessment);
 
-  // The top-ranked result is the screen's headline — give it a brand ring so
-  // it outranks the cards below it visually, not just by position.
+  // The top-ranked result is the screen's headline — lifted higher rather
+  // than outlined, so the card set stays borderless.
   const isTop = result.rank === 1;
 
   return (
     <View
-      className={`mb-3 overflow-hidden rounded-2xl bg-white ${
-        isTop ? "border-2 border-brand-600" : "border border-gray-100"
-      }`}
+      className="mb-4 overflow-hidden rounded-card bg-surface-card"
       style={isTop ? elevation.raised : elevation.card}
     >
       {/* Vet warning sits ABOVE everything in the card — unmissable. */}
       {result.vet_warning_at_assessment ? (
-        <View className="flex-row items-start border-b border-red-200 bg-red-50 px-4 py-2.5">
-          <Ionicons name="warning" size={16} color="#b3401f" />
-          <Text className="ml-2 flex-1 text-xs font-medium leading-4 text-alert">
+        <View
+          className="flex-row items-start px-4 py-3"
+          style={{ backgroundColor: tone("critical").soft }}
+        >
+          <Ionicons name="warning" size={16} color={tone("critical").solid} />
+          <Text
+            className="ml-2 flex-1 text-xs font-medium leading-4"
+            style={{ color: tone("critical").text }}
+          >
             {result.vet_warning_at_assessment}
           </Text>
         </View>
@@ -72,80 +64,78 @@ export function DiseaseResultCard({ result, detail = null }: DiseaseResultCardPr
         accessibilityState={{ expanded }}
         accessibilityLabel={`${result.possible_disease.name}, ${result.match_score} percent match`}
         onPress={() => setExpanded((prev) => !prev)}
-        className="px-4 pb-3 pt-3.5 active:bg-gray-50"
+        className="px-5 pb-4 pt-5 active:bg-surface-muted"
       >
         <View className="flex-row items-center">
-          <View
-            className={`h-7 w-7 items-center justify-center rounded-full ${
-              isTop ? "bg-brand-600" : "bg-gray-100"
-            }`}
-          >
-            <Text
-              className={`text-xs font-bold ${isTop ? "text-white" : "text-gray-600"}`}
-            >
-              {result.rank}
+          <RadialScore
+            score={result.match_score}
+            severity={result.severity_at_assessment}
+            delayMs={(result.rank - 1) * 120}
+          />
+
+          <View className="ml-4 flex-1">
+            <Text className="text-xs font-semibold uppercase tracking-wider text-ink-tertiary">
+              Rank {result.rank}
             </Text>
+            <Text className="mt-0.5 text-base font-semibold text-ink-primary">
+              {result.possible_disease.name}
+            </Text>
+            <View
+              className="mt-2 self-start rounded-full px-2.5 py-1"
+              style={{ backgroundColor: critical ? severity.solid : severity.soft }}
+            >
+              <Text
+                className="text-xs font-semibold uppercase tracking-wide"
+                style={{ color: critical ? "#ffffff" : severity.text }}
+              >
+                {result.severity_at_assessment} severity
+              </Text>
+            </View>
           </View>
-          <Text className="ml-2.5 flex-1 text-base font-semibold text-gray-900">
-            {result.possible_disease.name}
+        </View>
+
+        {/* Accordion control — the chevron is the affordance, so it gets the
+            whole row rather than sitting as grey hint text in a corner. */}
+        <View className="mt-4 flex-row items-center border-t border-surface-line pt-3">
+          <Text className="flex-1 text-sm font-medium text-ink-secondary">
+            Why did the system suggest this?
           </Text>
-          <MatchScoreBadge score={result.match_score} />
-        </View>
-
-        {/* Score as an animated bar, not just a number (UX spec). */}
-        <View className="mt-3">
-          <AnimatedScoreBar score={result.match_score} tier={tier} delayMs={(result.rank - 1) * 120} />
-        </View>
-
-        <View className="mt-2.5 flex-row items-center">
-          <View className={`rounded-full px-2.5 py-1 ${severity.chip}`}>
-            <Text
-              className={`text-[10px] font-semibold uppercase tracking-wide ${severity.text}`}
-            >
-              {result.severity_at_assessment} severity
-            </Text>
-          </View>
-          {/* Reads as the affordance it is, rather than grey hint text. */}
-          <View className="ml-auto flex-row items-center">
-            <Text className="text-xs font-semibold text-brand-700">
-              {expanded ? "Hide details" : "Why this?"}
-            </Text>
+          <View className="h-7 w-7 items-center justify-center rounded-full bg-surface-muted">
             <Ionicons
               name={expanded ? "chevron-up" : "chevron-down"}
-              size={13}
-              color="#215838"
-              style={{ marginLeft: 2 }}
+              size={15}
+              color="#5b655d"
             />
           </View>
         </View>
       </Pressable>
 
       {expanded ? (
-        <View className="border-t border-gray-100 px-4 pb-4 pt-3">
+        <View className="px-5 pb-5">
           {/* WHY: matched evidence first. */}
-          <Text className="text-sm font-semibold text-gray-900">
+          <Text className="text-sm font-semibold text-ink-primary">
             Symptoms that match ({result.matched_symptoms.length})
           </Text>
           {result.matched_symptoms.map((name) => (
-            <View key={name} className="mt-1.5 flex-row items-start">
-              <Ionicons name="checkmark-circle" size={15} color="#276a43" style={{ marginTop: 1 }} />
-              <Text className="ml-1.5 flex-1 text-sm leading-5 text-gray-700">{name}</Text>
+            <View key={name} className="mt-2 flex-row items-start">
+              <Ionicons name="checkmark-circle" size={15} color={tone("healthy").solid} style={{ marginTop: 1 }} />
+              <Text className="ml-2 flex-1 text-sm leading-5 text-ink-secondary">{name}</Text>
             </View>
           ))}
 
           {/* WHY NOT HIGHER: transparent missing-evidence list. */}
           {result.missing_symptoms.length > 0 ? (
             <>
-              <Text className="mt-4 text-sm font-semibold text-gray-900">
+              <Text className="mt-5 text-sm font-semibold text-ink-primary">
                 Not reported ({result.missing_symptoms.length})
               </Text>
-              <Text className="mt-0.5 text-xs leading-4 text-gray-500">
+              <Text className="mt-1 text-xs leading-4 text-ink-tertiary">
                 This condition would score higher if your bird also showed these:
               </Text>
               {result.missing_symptoms.map((name) => (
-                <View key={name} className="mt-1.5 flex-row items-start">
-                  <Ionicons name="remove-circle-outline" size={15} color="#9ca3af" style={{ marginTop: 1 }} />
-                  <Text className="ml-1.5 flex-1 text-sm leading-5 text-gray-500">{name}</Text>
+                <View key={name} className="mt-2 flex-row items-start">
+                  <Ionicons name="remove-circle-outline" size={15} color={tone("neutral").solid} style={{ marginTop: 1 }} />
+                  <Text className="ml-2 flex-1 text-sm leading-5 text-ink-tertiary">{name}</Text>
                 </View>
               ))}
             </>
@@ -154,16 +144,16 @@ export function DiseaseResultCard({ result, detail = null }: DiseaseResultCardPr
           {/* Educational content from the knowledge base (enrichment fetch). */}
           {detail?.recommended_action ? (
             <>
-              <Text className="mt-4 text-sm font-semibold text-gray-900">What to do</Text>
-              <Text className="mt-0.5 text-sm leading-5 text-gray-700">
+              <Text className="mt-5 text-sm font-semibold text-ink-primary">What to do</Text>
+              <Text className="mt-1 text-sm leading-5 text-ink-secondary">
                 {detail.recommended_action}
               </Text>
             </>
           ) : null}
           {detail?.prevention_info ? (
             <>
-              <Text className="mt-4 text-sm font-semibold text-gray-900">Prevention tips</Text>
-              <Text className="mt-0.5 text-sm leading-5 text-gray-700">
+              <Text className="mt-5 text-sm font-semibold text-ink-primary">Prevention tips</Text>
+              <Text className="mt-1 text-sm leading-5 text-ink-secondary">
                 {detail.prevention_info}
               </Text>
             </>

@@ -74,7 +74,7 @@ export function EditProfileScreen({ navigation }: Props) {
   return (
     <Screen scroll>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Your account details are visible only to you and system admins.
         </Text>
 

@@ -23,6 +23,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { elevation } from "../../components/ui/elevation";
+import { warnDestructive } from "../../components/ui/haptics";
 import { SkeletonLines } from "../../components/ui/Skeleton";
 import { HealthStatusBadge } from "../../components/history/HealthStatusBadge";
 import { showToast } from "../../components/ui/Toast";
@@ -77,6 +78,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
   /** Confirmation dialog, then the reversible retirement call. */
   const confirmDeactivate = () => {
     if (!gamefowl || !token) return;
+    void warnDestructive();
     Alert.alert(
       "Deactivate bird",
       `${gamefowl.name} will be moved to your inactive list. Its health history is kept and you can reactivate it later.`,
@@ -150,8 +152,8 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
             </Text>
           </View>
           <View className="ml-3 flex-1">
-            <Text className="text-xl font-bold text-gray-900">{gamefowl.name}</Text>
-            <Text className="text-sm text-gray-500">
+            <Text className="text-xl font-bold text-ink-primary">{gamefowl.name}</Text>
+            <Text className="text-sm text-ink-tertiary">
               {gamefowl.breed?.trim() || "Breed not set"} · {formatAge(gamefowl.age)}
             </Text>
           </View>
@@ -163,7 +165,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
           >
             <Text
               className={`text-xs font-semibold ${
-                gamefowl.is_active ? "text-brand-700" : "text-gray-600"
+                gamefowl.is_active ? "text-brand-700" : "text-ink-secondary"
               }`}
             >
               {gamefowl.is_active ? "Active" : "Inactive"}
@@ -174,18 +176,18 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
         {/* Health Status card — displays the backend's derived summary. */}
         {statusSummary ? (
           <View
-            className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+            className="mt-4 rounded-card bg-surface-card px-4 py-3.5"
             style={elevation.raised}
           >
             <View className="flex-row items-center justify-between">
-              <Text className="text-sm font-semibold text-gray-900">Health status</Text>
+              <Text className="text-sm font-semibold text-ink-primary">Health status</Text>
               <HealthStatusBadge status={statusSummary.status} />
             </View>
 
             {statusSummary.based_on ? (
-              <Text className="mt-2 text-xs leading-5 text-gray-600">
+              <Text className="mt-2 text-xs leading-5 text-ink-secondary">
                 Top match:{" "}
-                <Text className="font-semibold text-gray-800">
+                <Text className="font-semibold text-ink-primary">
                   {statusSummary.based_on.top_possible_disease.name} ·{" "}
                   {statusSummary.based_on.match_score}%
                 </Text>
@@ -196,13 +198,13 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
                   : null}
               </Text>
             ) : statusSummary.status === "no_data" ? (
-              <Text className="mt-2 text-xs leading-5 text-gray-500">
+              <Text className="mt-2 text-xs leading-5 text-ink-tertiary">
                 No symptom assessments yet — start one below to establish a baseline.
               </Text>
             ) : null}
 
             {statusSummary.latest_health_record ? (
-              <Text className="mt-1 text-xs leading-5 text-gray-600">
+              <Text className="mt-1 text-xs leading-5 text-ink-secondary">
                 Last record: {statusSummary.latest_health_record.title} ·{" "}
                 {formatDate(statusSummary.latest_health_record.recorded_at)}
               </Text>
@@ -231,7 +233,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
 
         {/* Profile card */}
         <View
-          className="mt-5 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          className="mt-5 rounded-card bg-surface-card px-4 py-2"
           style={elevation.card}
         >
           <InfoRow label="Sex" value={gamefowl.sex} />
@@ -242,7 +244,7 @@ export function GamefowlDetailsScreen({ route, navigation }: Props) {
         </View>
 
         <View
-          className="mt-4 rounded-2xl border border-gray-100 bg-white px-4 py-2"
+          className="mt-4 rounded-card bg-surface-card px-4 py-2"
           style={elevation.card}
         >
           <InfoRow label="Date acquired" value={formatDate(gamefowl.date_acquired)} />
@@ -324,9 +326,9 @@ function InfoRow({
         multiline ? "items-start" : "items-center"
       }`}
     >
-      <Text className="w-32 text-sm text-gray-500">{label}</Text>
+      <Text className="w-32 text-sm text-ink-tertiary">{label}</Text>
       <Text
-        className={`flex-1 text-sm font-medium text-gray-900 ${multiline ? "leading-5" : ""}`}
+        className={`flex-1 text-sm font-medium text-ink-primary ${multiline ? "leading-5" : ""}`}
       >
         {value ?? "—"}
       </Text>

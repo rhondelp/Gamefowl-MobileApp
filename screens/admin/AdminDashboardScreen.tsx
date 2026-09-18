@@ -21,6 +21,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
+import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonLines } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -46,14 +47,14 @@ function StatCard({
 }) {
   return (
     <View
-      className="flex-1 items-center rounded-2xl border border-gray-100 bg-white px-2 py-4"
+      className="flex-1 items-center rounded-card bg-surface-card px-2 py-4"
       style={elevation.card}
     >
       <View className="h-9 w-9 items-center justify-center rounded-full bg-brand-100">
         <Ionicons name={icon} size={18} color="#276a43" />
       </View>
-      <Text className="mt-2 text-xl font-bold text-gray-900">{value}</Text>
-      <Text className="mt-0.5 text-center text-[11px] font-normal leading-4 text-gray-500">
+      <Text className="mt-2 text-xl font-bold text-ink-primary">{value}</Text>
+      <Text className="mt-0.5 text-center text-[11px] font-normal leading-4 text-ink-tertiary">
         {label}
       </Text>
     </View>
@@ -76,8 +77,8 @@ function CountRow({
   return (
     <View className="mb-2">
       <View className="flex-row items-center">
-        <Text className="w-5 text-xs font-semibold text-gray-500">{rank}.</Text>
-        <Text className="flex-1 text-sm font-medium text-gray-800" numberOfLines={1}>
+        <Text className="w-5 text-xs font-semibold text-ink-tertiary">{rank}.</Text>
+        <Text className="flex-1 text-sm font-medium text-ink-primary" numberOfLines={1}>
           {name}
         </Text>
         <Text className="ml-2 text-sm font-bold text-brand-700">{count}</Text>
@@ -164,14 +165,13 @@ export function AdminDashboardScreen({ navigation }: Props) {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-surface-canvas"
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={() => void onRefresh()}
-          tintColor="#2e7d4f"
-          colors={["#2e7d4f"]}
+          {...brandRefreshColors}
         />
       }
       showsVerticalScrollIndicator={false}
@@ -186,7 +186,7 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Management shortcuts — entry points to every admin surface. */}
       <SectionTitle>Manage</SectionTitle>
       <View
-        className="overflow-hidden rounded-2xl border border-gray-100 bg-white"
+        className="overflow-hidden rounded-card bg-surface-card"
         style={elevation.card}
       >
         <MenuRow
@@ -219,12 +219,12 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Breakdowns */}
       <SectionTitle>Accounts</SectionTitle>
       <View
-        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        className="rounded-card bg-surface-card px-4 py-3"
         style={elevation.card}
       >
         <View className="flex-row">
           <View className="flex-1">
-            <Text className="text-xs uppercase tracking-wide text-gray-500">By role</Text>
+            <Text className="text-xs uppercase tracking-wide text-ink-tertiary">By role</Text>
             <View className="mt-1.5 flex-row">
               {(["owner", "admin"] as const).map((role) => (
                 <View key={role} className="mr-2 rounded-full bg-brand-50 px-2.5 py-1">
@@ -236,8 +236,8 @@ export function AdminDashboardScreen({ navigation }: Props) {
             </View>
           </View>
           <View className="items-end">
-            <Text className="text-xs uppercase tracking-wide text-gray-500">Status</Text>
-            <Text className="mt-1.5 text-xs text-gray-600">
+            <Text className="text-xs uppercase tracking-wide text-ink-tertiary">Status</Text>
+            <Text className="mt-1.5 text-xs text-ink-secondary">
               {stats.users_by_active_status.active} active ·{" "}
               {stats.users_by_active_status.inactive} inactive
             </Text>
@@ -248,11 +248,11 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Most reported symptoms */}
       <SectionTitle>Most reported symptoms</SectionTitle>
       <View
-        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        className="rounded-card bg-surface-card px-4 py-3"
         style={elevation.card}
       >
         {stats.most_frequently_reported_symptoms.length === 0 ? (
-          <Text className="py-2 text-sm text-gray-500">No assessments yet.</Text>
+          <Text className="py-2 text-sm text-ink-tertiary">No assessments yet.</Text>
         ) : (
           stats.most_frequently_reported_symptoms.map((symptom, index) => (
             <CountRow
@@ -269,11 +269,11 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Most suggested diseases */}
       <SectionTitle>Most suggested diseases</SectionTitle>
       <View
-        className="rounded-2xl border border-gray-100 bg-white px-4 py-3"
+        className="rounded-card bg-surface-card px-4 py-3"
         style={elevation.card}
       >
         {stats.most_frequently_suggested_diseases.length === 0 ? (
-          <Text className="py-2 text-sm text-gray-500">No results recorded yet.</Text>
+          <Text className="py-2 text-sm text-ink-tertiary">No results recorded yet.</Text>
         ) : (
           stats.most_frequently_suggested_diseases.map((disease, index) => (
             <CountRow
@@ -290,11 +290,11 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Recent assessments across all owners */}
       <SectionTitle>Recent assessments</SectionTitle>
       <View
-        className="rounded-2xl border border-gray-100 bg-white px-4 py-1"
+        className="rounded-card bg-surface-card px-4 py-1"
         style={elevation.card}
       >
         {stats.recent_assessments.length === 0 ? (
-          <Text className="py-3 text-sm text-gray-500">Nothing submitted yet.</Text>
+          <Text className="py-3 text-sm text-ink-tertiary">Nothing submitted yet.</Text>
         ) : (
           stats.recent_assessments.map((row) => (
             <View
@@ -302,10 +302,10 @@ export function AdminDashboardScreen({ navigation }: Props) {
               className="flex-row items-center border-b border-gray-100 py-3 last:border-b-0"
             >
               <View className="flex-1">
-                <Text className="text-sm font-semibold text-gray-900" numberOfLines={1}>
+                <Text className="text-sm font-semibold text-ink-primary" numberOfLines={1}>
                   {row.gamefowl_name}
                 </Text>
-                <Text className="text-xs text-gray-500">
+                <Text className="text-xs text-ink-tertiary">
                   {row.top_possible_disease
                     ? `${row.top_possible_disease.name}`
                     : "No strong match"}
@@ -325,7 +325,7 @@ export function AdminDashboardScreen({ navigation }: Props) {
                 >
                   <Text
                     className={`text-xs font-bold ${
-                      scoreTier(row.match_score) === "weak" ? "text-gray-500" : "text-white"
+                      scoreTier(row.match_score) === "weak" ? "text-ink-tertiary" : "text-white"
                     }`}
                   >
                     {row.match_score}%
@@ -375,8 +375,8 @@ function MenuRow({
         <Ionicons name={icon} size={17} color="#276a43" />
       </View>
       <View className="ml-3 flex-1">
-        <Text className="text-sm font-semibold text-gray-900">{label}</Text>
-        <Text className="text-xs text-gray-500">{sub}</Text>
+        <Text className="text-sm font-semibold text-ink-primary">{label}</Text>
+        <Text className="text-xs text-ink-tertiary">{sub}</Text>
       </View>
       <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
     </Pressable>

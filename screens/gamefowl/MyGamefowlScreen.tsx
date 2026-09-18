@@ -11,10 +11,11 @@
  *   - Tap any bird -> Gamefowl Details
  */
 import React, { useCallback, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { SkeletonList } from "../../components/ui/Skeleton";
@@ -68,7 +69,7 @@ export function MyGamefowlScreen({ navigation }: Props) {
           selected={showInactive}
           onPress={() => setShowInactive(true)}
         />
-        <Text className="ml-auto text-xs text-gray-500">{total} total</Text>
+        <Text className="ml-auto text-xs text-ink-tertiary">{total} total</Text>
       </View>
 
       {loading ? (
@@ -92,13 +93,13 @@ export function MyGamefowlScreen({ navigation }: Props) {
           ListEmptyComponent={
             showInactive ? (
               <EmptyState
-                icon="archive-outline"
+                variant="archive"
                 title="No birds here yet"
                 message="Retired (inactive) birds will appear in this view."
               />
             ) : (
               <EmptyState
-                icon="paw-outline"
+                variant="flock"
                 title="No gamefowl yet"
                 message="Add your first bird to start tracking its health."
                 actionLabel="+ Add Gamefowl"
@@ -115,8 +116,13 @@ export function MyGamefowlScreen({ navigation }: Props) {
           }
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
-          refreshing={refreshing}
-          onRefresh={refresh}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              {...brandRefreshColors}
+            />
+          }
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}
         />
@@ -146,10 +152,10 @@ function FilterChip({
       className={`mr-2 items-center justify-center rounded-full border-2 px-4 ${
         selected
           ? "border-brand-600 bg-brand-600"
-          : "border-gray-300 bg-white active:bg-brand-50"
+          : "border-gray-300 bg-surface-card active:bg-brand-50"
       }`}
     >
-      <Text className={`text-sm font-medium ${selected ? "text-white" : "text-gray-700"}`}>
+      <Text className={`text-sm font-medium ${selected ? "text-white" : "text-ink-secondary"}`}>
         {label}
       </Text>
     </Pressable>

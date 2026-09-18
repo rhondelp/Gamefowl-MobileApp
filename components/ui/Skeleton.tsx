@@ -7,9 +7,9 @@
  *   tells the owner WHAT is coming — a bare spinner doesn't.
  *
  * Motion:
- *   A slow opacity pulse (~1000ms), not the 250ms entrance used elsewhere —
- *   a loop needs to read as ambient rather than as an arriving element. The
- *   loop is dropped entirely when the OS asks for reduced motion.
+ *   A slow shimmer (~1200ms) that interpolates the fill, not the 250ms
+ *   entrance used elsewhere — a loop needs to read as ambient rather than as
+ *   an arriving element. It is dropped entirely under reduced motion.
  *
  * Accessibility:
  *   Each group reports itself as one busy element with a label, so a screen
@@ -18,6 +18,7 @@
 import React from "react";
 import { View, type ViewStyle } from "react-native";
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -25,32 +26,55 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-/** One pulsing block. Width may be a number or a "60%" string. */
+import { surface } from "./palette";
+import { elevation } from "./elevation";
+
+const skeletonBase = surface.muted;
+const skeletonHighlight = "#e3e8e3";
+
+/**
+ * One shimmering block. Width may be a number or a "60%" string.
+ *
+ * `onBrand` switches to translucent white for skeletons sitting on a filled
+ * brand surface — the default grey would disappear against it.
+ */
 export function Skeleton({
   width = "100%",
   height = 12,
   radius = 6,
+  onBrand = false,
   style,
 }: {
   width?: number | `${number}%`;
   height?: number;
   radius?: number;
+  onBrand?: boolean;
   style?: ViewStyle;
 }) {
   const reduceMotion = useReducedMotion();
-  const pulse = useSharedValue(reduceMotion ? 0.6 : 0.45);
+  const shimmer = useSharedValue(0);
+
+  const [base, highlight] = onBrand
+    ? ["#ffffff33", "#ffffff66"]
+    : [skeletonBase, skeletonHighlight];
 
   React.useEffect(() => {
     if (reduceMotion) return;
-    pulse.value = withRepeat(withTiming(0.9, { duration: 1000 }), -1, true);
-  }, [pulse, reduceMotion]);
+    shimmer.value = withRepeat(withTiming(1, { duration: 1200 }), -1, true);
+  }, [shimmer, reduceMotion]);
 
-  const animatedStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
+  // A travelling highlight reads as "loading" more clearly than a pulse, and
+  // interpolating the fill (not the opacity) keeps it from ghosting the card
+  // behind it. This sets backgroundColor, so it is applied AFTER `style` —
+  // callers tint via `onBrand` rather than by passing backgroundColor.
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(shimmer.value, [0, 1], [base, highlight]),
+  }));
 
   return (
     <Animated.View
       style={[
-        { width, height, borderRadius: radius, backgroundColor: "#d1d5db" },
+        { width, height, borderRadius: radius, backgroundColor: base },
         style,
         animatedStyle,
       ]}
@@ -64,7 +88,10 @@ export function Skeleton({
  */
 export function SkeletonRow() {
   return (
-    <View className="mb-3 flex-row items-center rounded-2xl border border-gray-100 bg-white px-4 py-4">
+    <View
+      className="mb-3 flex-row items-center rounded-card bg-surface-card px-4 py-4"
+      style={elevation.card}
+    >
       <Skeleton width={48} height={48} radius={24} />
       <View className="ml-3 flex-1">
         <Skeleton width="55%" height={14} />
@@ -110,7 +137,8 @@ export function SkeletonLines({
       accessibilityRole="progressbar"
       accessibilityLabel={label}
       accessibilityState={{ busy: true }}
-      className="rounded-2xl border border-gray-100 bg-white px-4 py-4"
+      className="rounded-card bg-surface-card px-4 py-4"
+      style={elevation.card}
     >
       {Array.from({ length: lines }, (_, i) => (
         <View key={i} className="flex-row items-center justify-between py-2.5">

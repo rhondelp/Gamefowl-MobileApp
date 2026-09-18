@@ -114,7 +114,7 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
 
       {/* Type: chips instead of free text so only valid enum values exist. */}
       <View className="mb-4">
-        <Text className="mb-1 text-sm font-medium text-gray-700">Record type *</Text>
+        <Text className="mb-1 text-sm font-medium text-ink-secondary">Record type *</Text>
         <View className="flex-row flex-wrap">
           {TYPE_OPTIONS.map((option) => {
             const selected = type === option.value;
@@ -128,12 +128,12 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
                   clearFieldError("type");
                 }}
                 className={`mr-2 mb-2 rounded-full border px-3.5 py-2 ${
-                  selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-white"
+                  selected ? "border-brand-600 bg-brand-600" : "border-gray-300 bg-surface-card"
                 }`}
               >
                 <Text
                   className={`text-sm font-medium ${
-                    selected ? "text-white" : "text-gray-700"
+                    selected ? "text-white" : "text-ink-secondary"
                   }`}
                 >
                   {option.label}

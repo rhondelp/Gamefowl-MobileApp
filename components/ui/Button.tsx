@@ -46,7 +46,7 @@ export function Button({ label, onPress, variant = "primary", loading = false }:
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: loading, busy: loading }}
-      className={`h-12 items-center justify-center rounded-xl px-5 ${container} ${
+      className={`h-12 items-center justify-center rounded-control px-5 ${container} ${
         loading ? "opacity-70" : ""
       }`}
       disabled={loading}

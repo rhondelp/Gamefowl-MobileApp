@@ -34,8 +34,13 @@ function shadow(
   }) as ViewStyle;
 }
 
+/**
+ * Wide and faint, not tight and dark: a large radius at low opacity is what
+ * separates a card from the canvas without drawing a visible edge. These
+ * replaced the hairline borders cards used to carry.
+ */
 export const elevation = {
-  card: shadow(0.06, 8, 2, 2),
-  raised: shadow(0.12, 16, 6, 6),
-  overlay: shadow(0.18, 24, 10, 12),
+  card: shadow(0.05, 16, 4, 2),
+  raised: shadow(0.08, 28, 10, 6),
+  overlay: shadow(0.14, 40, 16, 12),
 };

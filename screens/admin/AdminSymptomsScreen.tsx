@@ -87,7 +87,7 @@ export function AdminSymptomsScreen({ navigation }: Props) {
           ListEmptyComponent={
             <View className="mt-3">
               <EmptyState
-                icon="medkit-outline"
+                variant="archive"
                 title="No symptoms yet"
                 message="Add the first sign owners can report in assessments."
               />
@@ -99,7 +99,7 @@ export function AdminSymptomsScreen({ navigation }: Props) {
               onPress={() =>
                 navigation.navigate("AdminSymptomForm", { symptomId: item.id })
               }
-              className="mb-3 rounded-2xl border border-gray-100 bg-white px-4 py-3.5 active:bg-brand-50"
+              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
               style={({ pressed }) => [
                 elevation.card,
                 pressed ? { transform: [{ scale: 0.99 }] } : null,
@@ -111,18 +111,18 @@ export function AdminSymptomsScreen({ navigation }: Props) {
                   className="mr-2 h-2 w-2 rounded-full"
                   style={{ backgroundColor: SEVERITY_DOT[item.severity] ?? "#9ca3af" }}
                 />
-                <Text className="flex-shrink text-sm font-semibold text-gray-900" numberOfLines={1}>
+                <Text className="flex-shrink text-sm font-semibold text-ink-primary" numberOfLines={1}>
                   {item.name}
                 </Text>
                 {!item.is_active ? (
                   <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-gray-500">
+                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
                       Inactive
                     </Text>
                   </View>
                 ) : null}
               </View>
-              <Text className="ml-4 mt-0.5 text-xs capitalize text-gray-500">
+              <Text className="ml-4 mt-0.5 text-xs capitalize text-ink-tertiary">
                 {item.category} · {item.severity}
               </Text>
             </Pressable>

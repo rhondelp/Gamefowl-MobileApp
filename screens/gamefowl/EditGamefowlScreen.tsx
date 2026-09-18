@@ -59,7 +59,7 @@ export function EditGamefowlScreen({ route, navigation }: Props) {
       <Screen>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#2e7d4f" />
-          <Text className="mt-3 text-sm text-gray-500">Loading profile…</Text>
+          <Text className="mt-3 text-sm text-ink-tertiary">Loading profile…</Text>
         </View>
       </Screen>
     );
@@ -76,7 +76,7 @@ export function EditGamefowlScreen({ route, navigation }: Props) {
   return (
     <Screen scroll key={gamefowl?.id}>
       <View>
-        <Text className="mb-6 text-center text-sm text-gray-500">
+        <Text className="mb-6 text-center text-sm text-ink-tertiary">
           Update {gamefowl?.name}&apos;s details below.
         </Text>
 
