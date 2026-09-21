@@ -180,6 +180,19 @@ export interface HealthAssessmentSubmission {
   additional_notes?: string | null;
 }
 
+/**
+ * One piece of care advice copied onto a result at submission time: the
+ * disease's linked, active recommendations (what admins manage as "Linked
+ * care recommendations"). Frozen — later knowledge-base edits never change it.
+ */
+export interface AssessmentRecommendation {
+  id: number;
+  title: string;
+  content: string;
+  /** A backend Recommendation::CATEGORIES value, e.g. "hygiene". */
+  category: string;
+}
+
 /** One ranked engine output line (HealthAssessmentResultResource). */
 export interface AssessmentResultItem {
   rank: number;
@@ -191,6 +204,12 @@ export interface AssessmentResultItem {
   missing_symptoms: string[];
   severity_at_assessment: DiseaseSeverity;
   vet_warning_at_assessment: string | null;
+  /**
+   * Care advice snapshot, in the order an admin linked it. `null` = saved
+   * before this snapshot existed (nothing recorded); `[]` = recorded, but
+   * the disease had no active recommendations linked at the time.
+   */
+  recommendations: AssessmentRecommendation[] | null;
 }
 
 /** Snapshot of one submitted symptom (name frozen at submission time). */

@@ -10,12 +10,14 @@
  *
  * Data strategy:
  *   1. GET /health-assessments/{id} loads the scored record (also used for
- *      any later revisit — same endpoint).
- *   2. Enrichment: assessment snapshots intentionally do NOT embed care
- *      advice, so each candidate disease's knowledge-base entry is fetched
- *      (GET /diseases/{id}, <=5 parallel calls) to power "What to do" /
- *      "Prevention tips". Per-disease failures degrade gracefully — the
- *      explanation lists never depend on it.
+ *      any later revisit — same endpoint). Each result carries its own
+ *      care-recommendation snapshot, which DiseaseResultCard renders as
+ *      "Recommended care" with no extra request.
+ *   2. Enrichment: the snapshots do NOT embed a disease's recommended action
+ *      or prevention text, so each candidate disease's knowledge-base entry
+ *      is fetched (GET /diseases/{id}, <=5 parallel calls) to power "What to
+ *      do" / "Prevention tips". Per-disease failures degrade gracefully —
+ *      the explanation lists and recommended care never depend on it.
  */
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
