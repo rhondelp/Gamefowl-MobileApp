@@ -127,7 +127,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             style={elevation.card}
           >
             <Skeleton width="60%" height={13} />
-            <View className="mt-3 flex-row">
+            <View className="flex-row mt-3">
               <Skeleton width={72} height={22} radius={11} style={{ marginRight: 6 }} />
               <Skeleton width={88} height={22} radius={11} style={{ marginRight: 6 }} />
               <Skeleton width={64} height={22} radius={11} />
@@ -137,13 +137,13 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           {[0, 1, 2].map((i) => (
             <View
               key={i}
-              className="mt-4 rounded-card bg-surface-card px-5 pb-4 pt-5"
+              className="px-5 pt-5 pb-4 mt-4 rounded-card bg-surface-card"
               style={elevation.card}
             >
               <View className="flex-row items-center">
                 {/* Matches the RadialScore ring. */}
                 <Skeleton width={72} height={72} radius={36} />
-                <View className="ml-4 flex-1">
+                <View className="flex-1 ml-4">
                   <Skeleton width="30%" height={10} />
                   <Skeleton width="70%" height={15} style={{ marginTop: 8 }} />
                   <Skeleton width={110} height={22} radius={11} style={{ marginTop: 10 }} />
@@ -153,7 +153,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             </View>
           ))}
 
-          <Text className="mt-5 text-center text-sm font-medium text-ink-tertiary">
+          <Text className="mt-5 text-sm font-medium text-center text-ink-tertiary">
             Scoring possible conditions…
           </Text>
         </View>
@@ -164,7 +164,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
   if (error && !assessment) {
     return (
       <Screen>
-        <View className="flex-1 justify-center">
+        <View className="justify-center flex-1">
           <ErrorState message={error} onRetry={() => void load()} />
         </View>
       </Screen>
@@ -182,10 +182,10 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Historical framing: this is a frozen record, not a fresh run. */}
         {historical && assessment.created_at ? (
-          <View className="mt-2 rounded-card border border-brand-100 bg-brand-50 px-4 py-3">
+          <View className="px-4 py-3 mt-2 border rounded-card border-brand-100 bg-brand-50">
             <View className="flex-row items-start">
               <Ionicons name="archive" size={16} color="#215838" style={{ marginTop: 2 }} />
-              <Text className="ml-2 flex-1 text-xs leading-5 text-brand-700">
+              <Text className="flex-1 ml-2 text-xs leading-5 text-brand-700">
                 Saved assessment from {formatTimestamp(assessment.created_at)} —
                 shown exactly as reported at the time. Later knowledge-base
                 changes never alter past records.
@@ -199,19 +199,19 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           // Escalation outranks everything else on the screen, so it is the
           // only element here carrying a solid fill and raised depth.
           <View
-            className="mt-2 rounded-card px-5 py-4"
+            className="px-5 py-4 mt-2 rounded-card"
             style={[elevation.raised, { backgroundColor: tone("critical").soft }]}
             accessibilityRole="alert"
           >
             <View className="flex-row items-center">
               <View
-                className="h-10 w-10 items-center justify-center rounded-full"
+                className="items-center justify-center w-10 h-10 rounded-full"
                 style={{ backgroundColor: tone("critical").solid }}
               >
                 <Ionicons name="medkit" size={20} color="#ffffff" />
               </View>
               <Text
-                className="ml-3 flex-1 text-base font-bold"
+                className="flex-1 ml-3 text-base font-bold"
                 style={{ color: tone("critical").text }}
               >
                 Veterinary attention advised
@@ -240,7 +240,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
               {formatTimestamp(assessment.created_at)}
             </Text>
           </View>
-          <View className="mt-2 flex-row flex-wrap">
+          <View className="flex-row flex-wrap mt-2">
             {assessment.submitted_symptoms.map((symptom) => (
               <View
                 key={symptom.id}
@@ -260,7 +260,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
             assessment.appetite ||
             assessment.activity_level) ? (
             <>
-              <View className="mt-2 border-t border-gray-100 pt-2" />
+              <View className="pt-2 mt-2 border-t border-gray-100" />
               <Text className="text-xs leading-5 text-ink-tertiary">
                 {[
                   assessment.age_at_assessment ? `Age: ${assessment.age_at_assessment}` : null,
@@ -296,7 +296,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
           </View>
         ) : (
           <>
-            <Text className="mb-2 mt-5 text-xs font-semibold uppercase tracking-widest text-brand-600">
+            <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest uppercase text-brand-600">
               Possible conditions · best match first
             </Text>
             {assessment.results.map((result) => (
@@ -311,7 +311,7 @@ export function AssessmentResultScreen({ route, navigation }: Props) {
 
         {/* Unmissable disclaimer — always rendered, exact backend wording. */}
         <View
-          className="mt-5 rounded-card px-5 py-4"
+          className="px-5 py-4 mt-5 rounded-card"
           style={{ backgroundColor: tone("attention").soft }}
         >
           <View className="flex-row items-start">

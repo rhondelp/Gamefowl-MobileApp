@@ -26,6 +26,12 @@
       "expo-status-bar",
       "expo-video",
       [
+        "./plugins/withCleartextHosts",
+        {
+          "hosts": ["201.18.208.199"]
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/app_icon.png",
