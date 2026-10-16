@@ -112,7 +112,7 @@ export function ProfileScreen({ navigation }: Props) {
         >
           <View className="items-center py-3">
             <Image
-              source={require("../../assets/images/main_logo.png")}
+              source={require("../../assets/images/logo-mark.png")}
               style={{ width: 88, height: 88, resizeMode: "contain" }}
             />
           </View>

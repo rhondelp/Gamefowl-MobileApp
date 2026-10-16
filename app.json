@@ -4,15 +4,16 @@
     "slug": "Gamefowl-MobileApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app_icon.png",
+    "icon": "./assets/images/app-icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.gamefowl.mobileapp",
       "adaptiveIcon": {
-        "backgroundColor": "#123122",
-        "foregroundImage": "./assets/images/app_icon.png"
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/adaptive-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -28,7 +29,9 @@
       [
         "./plugins/withCleartextHosts",
         {
-          "hosts": ["201.18.208.199"]
+          "hosts": [
+            "201.18.208.199"
+          ]
         }
       ],
       [
@@ -39,6 +42,12 @@
           "backgroundColor": "#123122"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ad800625-cc17-4fab-9a63-02e0b3025bb5"
+      }
+    },
+    "owner": "laradevv"
   }
 }

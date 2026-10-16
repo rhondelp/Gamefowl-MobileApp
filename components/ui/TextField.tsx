@@ -14,6 +14,8 @@ import React, { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { text } from "./palette";
+
 interface TextFieldProps {
   label: string;
   value: string;
@@ -77,7 +79,8 @@ export function TextField({
           onBlur={() => setFocused(false)}
           accessibilityLabel={label}
           placeholder={placeholder}
-          placeholderTextColor="#9ca3af"
+          // Tertiary ink (~4.9:1 on white) — #9ca3af washed out outdoors.
+          placeholderTextColor={text.tertiary}
           secureTextEntry={secure && !revealed}
           autoCapitalize={autoCapitalize}
           autoComplete="off"
@@ -90,9 +93,13 @@ export function TextField({
             accessibilityRole="button"
             accessibilityLabel={revealed ? "Hide password" : "Show password"}
             accessibilityState={{ selected: revealed }}
-            hitSlop={12}
             onPress={() => setRevealed((prev) => !prev)}
-            style={({ pressed }) => (pressed ? { opacity: 0.6 } : null)}
+            // A real 44×44 box (not just hitSlop) so the target is reliable;
+            // the negative margin keeps the icon where the px-4 padding put it.
+            style={({ pressed }) => [
+              { width: 44, height: 44, marginRight: -12, alignItems: "center", justifyContent: "center" },
+              pressed ? { opacity: 0.6 } : null,
+            ]}
           >
             <Ionicons
               name={revealed ? "eye-off-outline" : "eye-outline"}

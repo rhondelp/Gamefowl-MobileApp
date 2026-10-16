@@ -13,7 +13,7 @@
  *   - 429 rate limiting surfaces friendly copy in the banner.
  */
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { Ionicons } from "@expo/vector-icons";
 import { tone } from "../../components/ui/status";
@@ -28,8 +28,16 @@ import type { AuthStackScreenProps } from "../../navigation/types";
 /** Props include navigation for switching to the Register screen. */
 type Props = AuthStackScreenProps<"Login">;
 
+/** logo-full.png is 684×558 (mark + wordmark, tagline cropped off). */
+const LOGO_RATIO = 684 / 558;
+
 export function LoginScreen({ navigation }: Props) {
   const { login, sessionExpired } = useAuth();
+
+  // ~58% of screen width, but capped by height so the whole form still fits
+  // above the fold on short phones.
+  const { width: winW, height: winH } = useWindowDimensions();
+  const logoH = Math.min((winW * 0.58) / LOGO_RATIO, winH * 0.24, 230);
 
   // Local form state — kept in the screen because only this screen cares.
   const [email, setEmail] = useState("");
@@ -78,13 +86,17 @@ export function LoginScreen({ navigation }: Props) {
 
   return (
     <Screen scroll>
-      <View className="mb-10 items-center">
+      {/* The wordmark is part of the logo image, so it doubles as the title;
+          the subtitle stays live text so it's readable and scales. */}
+      <View className="mb-8 items-center">
         <Image
-          source={require("../../assets/images/main_logo.png")}
-          style={{ width: 130, height: 130, resizeMode: "contain" }}
+          source={require("../../assets/images/logo-full.png")}
+          style={{ width: logoH * LOGO_RATIO, height: logoH, resizeMode: "contain" }}
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel="Gamefowl"
         />
-        <Text className="mt-2 text-2xl font-bold tracking-widest text-brand-600">GAMEFOWL</Text>
-        <Text className="mt-1 text-sm text-ink-tertiary">Early Bird Disease Monitoring</Text>
+        <Text className="mt-3 text-base text-ink-secondary">Early Bird Disease Monitoring</Text>
       </View>
 
       {/* Forced sign-out explanation (token revoked/expired mid-session). */}
@@ -127,7 +139,7 @@ export function LoginScreen({ navigation }: Props) {
           the user has actually typed an email, so an untouched Login lands
           on an empty Forgot Password field. */}
       <TouchableOpacity
-        className="mb-3 self-end justify-center px-1"
+        className="-mt-2 mb-4 self-end justify-center px-1"
         style={{ minHeight: 44 }}
         hitSlop={8}
         onPress={() =>
@@ -146,13 +158,14 @@ export function LoginScreen({ navigation }: Props) {
       <Button label="Log In" onPress={handleSubmit} loading={submitting} />
 
       <TouchableOpacity
-        className="mt-5 self-center justify-center px-2"
+        className="mt-4 self-center justify-center px-2"
         style={{ minHeight: 44 }}
+        hitSlop={8}
         onPress={() => navigation.navigate("Register")}
         accessibilityRole="button"
         accessibilityLabel="Create an account"
       >
-        <Text className="text-sm text-ink-tertiary">
+        <Text className="text-sm text-ink-secondary">
           Don't have an account?{" "}
           <Text className="font-semibold text-brand-700">Create one</Text>
         </Text>

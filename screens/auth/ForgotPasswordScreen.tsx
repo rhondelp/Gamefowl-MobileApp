@@ -92,7 +92,7 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
     <Screen scroll>
       <View className="mb-8 items-center">
         <Image
-          source={require("../../assets/images/main_logo.png")}
+          source={require("../../assets/images/logo-mark.png")}
           style={{ width: 72, height: 72, resizeMode: "contain" }}
         />
         <Text className="mt-2 text-2xl font-bold text-ink-primary">Forgot your password?</Text>

@@ -85,7 +85,7 @@ export function RegisterScreen({ navigation }: Props) {
     <Screen scroll>
       <View className="mb-8">
         <Image
-          source={require("../../assets/images/main_logo.png")}
+          source={require("../../assets/images/logo-mark.png")}
           style={{ width: 72, height: 72, resizeMode: "contain", alignSelf: "center" }}
         />
         <Text className="mt-2 text-2xl font-bold text-center text-ink-primary">Create your account</Text>

@@ -106,4 +106,4 @@ export async function changePassword(
   payload: PasswordChangePayload
 ): Promise<void> {
   await request<null>("/auth/me/password", { method: "PUT", body: payload, token });
-}
+}XMLDocument
