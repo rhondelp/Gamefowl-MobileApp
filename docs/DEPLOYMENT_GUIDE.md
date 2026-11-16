@@ -71,7 +71,6 @@ These changes are already committed; documented for reference:
 |---|---|---|
 | @react-native-community/datetimepicker | No web implementation | `DatePickerField` is platform-split: `.native.tsx` uses the picker, `.web.tsx` renders a styled `YYYY-MM-DD` input with a live not-in-future hint |
 | expo-secure-store | Official web build exists (browser storage) | Works out of the box. **Security note:** tokens live in browser localStorage on web — unencrypted by design; acceptable for a demo, not for real credentials |
-| expo-video | Supported (renders `<video>`) | Intro plays and skips normally |
 | react-dom / react-native-web | Required runtime | Already added via `npx expo install react-dom react-native-web` |
 
 ---

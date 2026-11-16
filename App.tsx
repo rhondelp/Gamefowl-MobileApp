@@ -12,7 +12,7 @@
  * directives from this entry point.
  */
 import "./global.css";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import {
@@ -26,20 +26,12 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "./contexts/AuthContext";
 import { RootNavigator } from "./navigation/RootNavigator";
 import { ToastHost } from "./components/ui/Toast";
-import { IntroVideoScreen } from "./components/intro/IntroVideoScreen";
 
 // Keep the native splash (app.json's expo-splash-screen config) on screen
 // until Poppins is loaded, instead of flashing the system font first.
 void SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  /**
-   * Cold-launch animated intro (Milestone 15 branding). It renders only
-   * until finished/skipped — meanwhile the AuthProvider bootstrap runs
-   * underneath, so skipping never delays access to auth or data.
-   */
-  const [introDone, setIntroDone] = useState(false);
-
   const [fontsLoaded, fontError] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -51,8 +43,8 @@ export default function App() {
   // font beats leaving the app stuck on the splash screen forever.
   const fontsReady = fontsLoaded || !!fontError;
 
-  // Native splash stays up until this fires — no gap where unstyled text
-  // (or a second, home-grown loading screen) would flash.
+  // Native splash stays up until the first real frame (RootNavigator's
+  // auth-check splash) has laid out — no blank gap in between.
   const onRootLayout = useCallback(() => {
     if (fontsReady) void SplashScreen.hideAsync();
   }, [fontsReady]);
@@ -62,14 +54,7 @@ export default function App() {
   return (
     <SafeAreaProvider onLayout={onRootLayout}>
       <AuthProvider>
-        {!introDone ? (
-          <IntroVideoScreen
-            videoSource={require("./assets/videos/intro.mp4")}
-            onFinish={() => setIntroDone(true)}
-          />
-        ) : (
-          <RootNavigator />
-        )}
+        <RootNavigator />
         {/* Global transient feedback (Milestone 15): sits above navigation. */}
         <ToastHost />
       </AuthProvider>

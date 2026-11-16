@@ -35,7 +35,6 @@ React Native (Expo) client for the GAMEFOWL expert system: early bird disease mo
 | Networking | Built-in `fetch` behind a typed client (`services/api/client.ts`) |
 | Animation | react-native-reanimated |
 | Date input | @react-native-community/datetimepicker |
-| Video | expo-video (cold-launch intro) |
 | Testing | Jest + jest-expo |
 
 ## Getting Started
@@ -53,6 +52,7 @@ Scan the QR code with **Expo Go** (Android/iOS). Which base URL to use:
 | iOS Simulator | `http://localhost:8000/api/v1` |
 | Android Emulator | `http://10.0.2.2:8000/api/v1` |
 | Physical device via Expo Go | your PC's LAN IP, e.g. `http://192.168.1.20:8000/api/v1` |
+| Hosted backend (release builds) | `https://api.gamefowl.tech/api/v1` (set in `eas.json` for EAS builds) |
 
 Start the backend alongside it (`php artisan serve --host=0.0.0.0` in the Gamefowl-API repo) so LAN devices can reach it.
 
@@ -94,7 +94,6 @@ components/gamefowl/   GamefowlCard, GamefowlForm
 components/assessment/ DiseaseResultCard, MatchScoreBadge, AnimatedScoreBar,
                        SymptomSelectItem, scoreTiers, contextOptions
 components/history/    TimelineEntryCard, HealthStatusBadge, HealthRecordForm
-components/intro/      IntroVideoScreen (cold-launch animated splash)
 screens/auth/          Login, Register
 screens/gamefowl/      Dashboard, My Gamefowl list, Details, Add, Edit
 screens/assessment/    Symptom selection, Diagnostic Results
@@ -115,7 +114,7 @@ docs/                  E2E test log, capstone documentation
 
 ## Auth Flow
 
-1. App launch → optional intro video (skippable) → SecureStore checked for a stored Sanctum token.
+1. App launch → native splash → SecureStore checked for a stored Sanctum token.
 2. Token found → validated against `GET /auth/me`; valid goes to Dashboard, invalid clears storage and goes to Login (with an explanatory banner if expiry was forced mid-session).
 3. Register/Login receive a bearer token → stored in SecureStore and kept in memory for API calls.
 4. Any authenticated request returning 401 triggers a central sign-out back to Login.
