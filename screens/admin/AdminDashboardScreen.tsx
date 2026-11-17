@@ -20,7 +20,11 @@ import {
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { Screen } from "../../components/ui/Screen";
+import { columnStyle } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonLines } from "../../components/ui/Skeleton";
@@ -99,6 +103,10 @@ function CountRow({
 }
 
 export function AdminDashboardScreen({ navigation }: Props) {
+  // Own ScrollView (not <Screen>), so it applies the tablet column and the
+  // landscape side insets itself.
+  const { isTablet } = useResponsive();
+  const insets = useSafeAreaInsets();
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -171,7 +179,15 @@ export function AdminDashboardScreen({ navigation }: Props) {
   return (
     <ScrollView
       className="flex-1 bg-surface-canvas"
-      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+      contentContainerStyle={[
+        {
+          padding: 16,
+          paddingBottom: 32,
+          paddingLeft: 16 + insets.left,
+          paddingRight: 16 + insets.right,
+        },
+        columnStyle(isTablet, "content", true),
+      ]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

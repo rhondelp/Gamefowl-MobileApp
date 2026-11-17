@@ -18,6 +18,8 @@ import { ActivityIndicator, FlatList, RefreshControl, Text, View } from "react-n
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { GridCell, gridKey, gridListProps } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
@@ -31,6 +33,7 @@ import type { DashboardStackScreenProps } from "../../navigation/types";
 type Props = DashboardStackScreenProps<"HealthHistory">;
 
 export function HealthHistoryScreen({ route, navigation }: Props) {
+  const { columns } = useResponsive();
   const { gamefowlId, birdName } = route.params;
   const {
     entries,
@@ -76,13 +79,15 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
   );
 
   return (
-    <Screen>
+    <Screen width="list">
       {loading ? (
-        <SkeletonList count={4} label="Loading history" />
+        <SkeletonList count={4} label="Loading history" columns={columns} />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={entries}
           keyExtractor={(entry) =>
             entry.type === "assessment"
@@ -90,9 +95,11 @@ export function HealthHistoryScreen({ route, navigation }: Props) {
               : `r-${entry.record_id}`
           }
           renderItem={({ item, index }) => (
-            <EntranceView index={Math.min(index, 10)}>
-              <TimelineEntryCard entry={item} onPress={() => handlePress(item)} />
-            </EntranceView>
+            <GridCell columns={columns}>
+              <EntranceView index={Math.min(index, 10)}>
+                <TimelineEntryCard entry={item} onPress={() => handlePress(item)} />
+              </EntranceView>
+            </GridCell>
           )}
           ListHeaderComponent={
             <View className="mb-3">

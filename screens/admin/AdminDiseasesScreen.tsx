@@ -12,6 +12,8 @@ import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { GridCell, InlineAction, gridKey, gridListProps } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import {
   isCriticalSeverity,
@@ -42,6 +44,7 @@ function severityChip(severity: string) {
 type Props = AdminStackScreenProps<"AdminDiseases">;
 
 export function AdminDiseasesScreen({ navigation }: Props) {
+  const { columns } = useResponsive();
   const { token } = useAuth();
   const [diseases, setDiseases] = useState<AdminDisease[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,18 +80,20 @@ export function AdminDiseasesScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <Screen>
-        <SkeletonList count={5} label="Loading diseases" />
+      <Screen width="list">
+        <SkeletonList count={5} label="Loading diseases" columns={columns} />
       </Screen>
     );
   }
 
   return (
-    <Screen>
-      <Button
-        label="+ Add Disease"
-        onPress={() => navigation.navigate("AdminDiseaseForm", {})}
-      />
+    <Screen width="list">
+      <InlineAction>
+        <Button
+          label="+ Add Disease"
+          onPress={() => navigation.navigate("AdminDiseaseForm", {})}
+        />
+      </InlineAction>
 
       {error ? (
         <View className="mt-4 flex-1 justify-center">
@@ -96,6 +101,8 @@ export function AdminDiseasesScreen({ navigation }: Props) {
         </View>
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={diseases}
           keyExtractor={(item) => String(item.id)}
           ListEmptyComponent={
@@ -108,49 +115,51 @@ export function AdminDiseasesScreen({ navigation }: Props) {
             </View>
           }
           renderItem={({ item }) => (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() =>
-                navigation.navigate("AdminDiseaseDetail", { diseaseId: item.id })
-              }
-              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
-              style={({ pressed }) => [
-                elevation.card,
-                pressed ? { transform: [{ scale: 0.99 }] } : null,
-              ]}
-            >
-              <View className="flex-row items-center">
-                <Text className="flex-shrink text-base font-semibold text-ink-primary" numberOfLines={1}>
-                  {item.name}
-                </Text>
-                {!item.is_active ? (
-                  <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
-                      Inactive
+            <GridCell columns={columns}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() =>
+                  navigation.navigate("AdminDiseaseDetail", { diseaseId: item.id })
+                }
+                className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
+                style={({ pressed }) => [
+                  elevation.card,
+                  pressed ? { transform: [{ scale: 0.99 }] } : null,
+                ]}
+              >
+                <View className="flex-row items-center">
+                  <Text className="flex-shrink text-base font-semibold text-ink-primary" numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {!item.is_active ? (
+                    <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
+                      <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
+                        Inactive
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+                <View className="mt-1.5 flex-row items-center">
+                  <View
+                  className="rounded-full px-2.5 py-1"
+                  style={{ backgroundColor: severityChip(item.severity).backgroundColor }}
+                >
+                    <Text
+                      className="text-xs font-semibold uppercase"
+                    style={{ color: severityChip(item.severity).color }}
+                    >
+                      {item.severity}
                     </Text>
                   </View>
-                ) : null}
-              </View>
-              <View className="mt-1.5 flex-row items-center">
-                <View
-                className="rounded-full px-2.5 py-1"
-                style={{ backgroundColor: severityChip(item.severity).backgroundColor }}
-              >
-                  <Text
-                    className="text-xs font-semibold uppercase"
-                  style={{ color: severityChip(item.severity).color }}
-                  >
-                    {item.severity}
+                  <Text className="ml-2 text-xs text-ink-tertiary">
+                    {item.rules.length} {item.rules.length === 1 ? "rule" : "rules"}
+                    {" · "}
+                    {item.recommendations.length}{" "}
+                    {item.recommendations.length === 1 ? "recommendation" : "recommendations"}
                   </Text>
                 </View>
-                <Text className="ml-2 text-xs text-ink-tertiary">
-                  {item.rules.length} {item.rules.length === 1 ? "rule" : "rules"}
-                  {" · "}
-                  {item.recommendations.length}{" "}
-                  {item.recommendations.length === 1 ? "recommendation" : "recommendations"}
-                </Text>
-              </View>
-            </Pressable>
+              </Pressable>
+            </GridCell>
           )}
           refreshControl={
             <RefreshControl

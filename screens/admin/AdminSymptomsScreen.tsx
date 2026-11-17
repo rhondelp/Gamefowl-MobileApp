@@ -11,6 +11,8 @@ import { FlatList, Pressable, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { GridCell, InlineAction, gridKey, gridListProps } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -31,6 +33,7 @@ const SEVERITY_DOT: Record<string, string> = {
 type Props = AdminStackScreenProps<"AdminSymptoms">;
 
 export function AdminSymptomsScreen({ navigation }: Props) {
+  const { columns } = useResponsive();
   const { token } = useAuth();
   const [symptoms, setSymptoms] = useState<AdminSymptom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,18 +66,20 @@ export function AdminSymptomsScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <Screen>
-        <SkeletonList count={5} label="Loading symptoms" />
+      <Screen width="list">
+        <SkeletonList count={5} label="Loading symptoms" columns={columns} />
       </Screen>
     );
   }
 
   return (
-    <Screen>
-      <Button
-        label="+ Add Symptom"
-        onPress={() => navigation.navigate("AdminSymptomForm", {})}
-      />
+    <Screen width="list">
+      <InlineAction>
+        <Button
+          label="+ Add Symptom"
+          onPress={() => navigation.navigate("AdminSymptomForm", {})}
+        />
+      </InlineAction>
 
       {error ? (
         <View className="mt-4 flex-1 justify-center">
@@ -82,6 +87,8 @@ export function AdminSymptomsScreen({ navigation }: Props) {
         </View>
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={symptoms}
           keyExtractor={(item) => String(item.id)}
           ListEmptyComponent={
@@ -94,38 +101,40 @@ export function AdminSymptomsScreen({ navigation }: Props) {
             </View>
           }
           renderItem={({ item }) => (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() =>
-                navigation.navigate("AdminSymptomForm", { symptomId: item.id })
-              }
-              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
-              style={({ pressed }) => [
-                elevation.card,
-                pressed ? { transform: [{ scale: 0.99 }] } : null,
-              ]}
-            >
-              <View className="flex-row items-center">
-                {/* Severity cue matches the owner-facing checklist dot. */}
-                <View
-                  className="mr-2 h-2 w-2 rounded-full"
-                  style={{ backgroundColor: SEVERITY_DOT[item.severity] ?? "#9ca3af" }}
-                />
-                <Text className="flex-shrink text-sm font-semibold text-ink-primary" numberOfLines={1}>
-                  {item.name}
+            <GridCell columns={columns}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() =>
+                  navigation.navigate("AdminSymptomForm", { symptomId: item.id })
+                }
+                className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
+                style={({ pressed }) => [
+                  elevation.card,
+                  pressed ? { transform: [{ scale: 0.99 }] } : null,
+                ]}
+              >
+                <View className="flex-row items-center">
+                  {/* Severity cue matches the owner-facing checklist dot. */}
+                  <View
+                    className="mr-2 h-2 w-2 rounded-full"
+                    style={{ backgroundColor: SEVERITY_DOT[item.severity] ?? "#9ca3af" }}
+                  />
+                  <Text className="flex-shrink text-sm font-semibold text-ink-primary" numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {!item.is_active ? (
+                    <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
+                      <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
+                        Inactive
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text className="ml-4 mt-0.5 text-xs capitalize text-ink-tertiary">
+                  {item.category} · {item.severity}
                 </Text>
-                {!item.is_active ? (
-                  <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
-                      Inactive
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text className="ml-4 mt-0.5 text-xs capitalize text-ink-tertiary">
-                {item.category} · {item.severity}
-              </Text>
-            </Pressable>
+              </Pressable>
+            </GridCell>
           )}
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}

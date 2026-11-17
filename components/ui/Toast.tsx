@@ -15,7 +15,7 @@
  *   <ToastHost /> once near the app root, then `showToast("...")` anywhere.
  */
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Text, TouchableOpacity } from "react-native";
+import { Animated, Text, TouchableOpacity, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -56,6 +56,10 @@ export function ToastHost() {
   const translateY = useRef(new Animated.Value(-100)).current;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const insets = useSafeAreaInsets();
+  // Tablets: a centered banner capped at 520dp instead of a full-width bar.
+  // On phones the side offsets resolve to the original 16dp.
+  const { width } = useWindowDimensions();
+  const centeredSide = Math.max(16, (width - 520) / 2);
 
   useEffect(() => {
     const dismiss = () => {
@@ -95,8 +99,8 @@ export function ToastHost() {
         elevation.overlay,
         {
           position: "absolute",
-          left: 16,
-          right: 16,
+          left: Math.max(centeredSide, 16 + insets.left),
+          right: Math.max(centeredSide, 16 + insets.right),
           top: insets.top + 8,
           backgroundColor: tone.bg,
           transform: [{ translateY }],

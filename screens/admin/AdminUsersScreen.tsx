@@ -14,6 +14,8 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } fr
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { GridCell, gridKey, gridListProps } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { tone } from "../../components/ui/status";
 import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
 import { elevation } from "../../components/ui/elevation";
@@ -29,6 +31,7 @@ type Props = AdminStackScreenProps<"AdminUsers">;
 type RoleChip = "all" | "owner" | "admin";
 
 export function AdminUsersScreen({ navigation }: Props) {
+  const { columns } = useResponsive();
   // undefined role/status map directly onto backend query params.
   const [roleFilter, setRoleFilter] = useState<RoleChip>("all");
   const [showInactive, setShowInactive] = useState(false);
@@ -62,7 +65,7 @@ export function AdminUsersScreen({ navigation }: Props) {
   );
 
   return (
-    <Screen>
+    <Screen width="list">
       {/* Filter chips */}
       <View className="mb-3">
         <View className="flex-row items-center">
@@ -91,18 +94,22 @@ export function AdminUsersScreen({ navigation }: Props) {
       </View>
 
       {loading ? (
-        <SkeletonList count={5} label="Loading users" />
+        <SkeletonList count={5} label="Loading users" columns={columns} />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={users}
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
-            <UserRow
-              user={item}
-              onPress={() => navigation.navigate("AdminUserDetail", { userId: item.id })}
-            />
+            <GridCell columns={columns}>
+              <UserRow
+                user={item}
+                onPress={() => navigation.navigate("AdminUserDetail", { userId: item.id })}
+              />
+            </GridCell>
           )}
           ListEmptyComponent={
             <EmptyState

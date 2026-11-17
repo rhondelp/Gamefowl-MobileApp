@@ -30,6 +30,7 @@ import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { useAuth } from "../../contexts/AuthContext";
 import { useKeyboardVisible } from "../../hooks/useKeyboardVisible";
+import { MAX_WIDTH } from "../../hooks/useResponsive";
 import { ApiError } from "../../services/api/client";
 import type { AuthStackScreenProps } from "../../navigation/types";
 
@@ -42,10 +43,12 @@ const LOGO_RATIO = 684 / 558;
 export function LoginScreen({ navigation }: Props) {
   const { login, sessionExpired } = useAuth();
 
-  // ~58% of screen width, but capped by height so the whole form still fits
-  // above the fold on short phones.
+  // ~58% of the form's width, but capped by height so the whole form still
+  // fits above the fold on short phones and landscape tablets. The form
+  // column is capped on tablets, so the logo is too (phones: winW < 480).
   const { width: winW, height: winH } = useWindowDimensions();
-  const fullLogoH = Math.min((winW * 0.58) / LOGO_RATIO, winH * 0.24, 230);
+  const formW = Math.min(winW, MAX_WIDTH.form);
+  const fullLogoH = Math.min((formW * 0.58) / LOGO_RATIO, winH * 0.24, 230);
   // Keyboard open: compact the logo so both fields and Log In stay in view
   // on small phones.
   const keyboardVisible = useKeyboardVisible();

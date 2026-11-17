@@ -11,6 +11,8 @@ import { FlatList, Pressable, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../../components/ui/Screen";
+import { GridCell, InlineAction, gridKey, gridListProps } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { elevation } from "../../components/ui/elevation";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import { Button } from "../../components/ui/Button";
@@ -25,6 +27,7 @@ import type { AdminStackScreenProps } from "../../navigation/types";
 type Props = AdminStackScreenProps<"AdminRecommendations">;
 
 export function AdminRecommendationsScreen({ navigation }: Props) {
+  const { columns } = useResponsive();
   const { token } = useAuth();
   const [recommendations, setRecommendations] = useState<AdminRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,18 +59,20 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <Screen>
-        <SkeletonList count={5} label="Loading recommendations" />
+      <Screen width="list">
+        <SkeletonList count={5} label="Loading recommendations" columns={columns} />
       </Screen>
     );
   }
 
   return (
-    <Screen>
-      <Button
-        label="+ Add Recommendation"
-        onPress={() => navigation.navigate("AdminRecommendationForm", {})}
-      />
+    <Screen width="list">
+      <InlineAction>
+        <Button
+          label="+ Add Recommendation"
+          onPress={() => navigation.navigate("AdminRecommendationForm", {})}
+        />
+      </InlineAction>
 
       {error ? (
         <View className="mt-4 flex-1 justify-center">
@@ -75,6 +80,8 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
         </View>
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={recommendations}
           keyExtractor={(item) => String(item.id)}
           ListEmptyComponent={
@@ -87,35 +94,37 @@ export function AdminRecommendationsScreen({ navigation }: Props) {
             </View>
           }
           renderItem={({ item }) => (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() =>
-                navigation.navigate("AdminRecommendationForm", {
-                  recommendationId: item.id,
-                })
-              }
-              className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
-              style={({ pressed }) => [
-                elevation.card,
-                pressed ? { transform: [{ scale: 0.99 }] } : null,
-              ]}
-            >
-              <View className="flex-row items-center">
-                <Text className="flex-shrink flex-1 text-sm font-semibold text-ink-primary" numberOfLines={1}>
-                  {item.title}
+            <GridCell columns={columns}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() =>
+                  navigation.navigate("AdminRecommendationForm", {
+                    recommendationId: item.id,
+                  })
+                }
+                className="mb-3 rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
+                style={({ pressed }) => [
+                  elevation.card,
+                  pressed ? { transform: [{ scale: 0.99 }] } : null,
+                ]}
+              >
+                <View className="flex-row items-center">
+                  <Text className="flex-shrink flex-1 text-sm font-semibold text-ink-primary" numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                  {!item.is_active ? (
+                    <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
+                      <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
+                        Inactive
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text className="mt-0.5 text-xs capitalize text-ink-tertiary" numberOfLines={2}>
+                  {item.category} · {item.content}
                 </Text>
-                {!item.is_active ? (
-                  <View className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
-                    <Text className="text-[10px] font-semibold uppercase text-ink-tertiary">
-                      Inactive
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text className="mt-0.5 text-xs capitalize text-ink-tertiary" numberOfLines={2}>
-                {item.category} · {item.content}
-              </Text>
-            </Pressable>
+              </Pressable>
+            </GridCell>
           )}
           contentContainerStyle={{ paddingBottom: 16 }}
           showsVerticalScrollIndicator={false}

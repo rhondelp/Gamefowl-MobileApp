@@ -38,6 +38,8 @@ import { elevation } from "../../components/ui/elevation";
 import { notifyError, tapSelection } from "../../components/ui/haptics";
 import { Button } from "../../components/ui/Button";
 import { EntranceView } from "../../components/ui/EntranceView";
+import { ResponsiveGrid, columnStyle } from "../../components/ui/Responsive";
+import { useResponsive } from "../../hooks/useResponsive";
 import { SymptomSelectItem } from "../../components/assessment/SymptomSelectItem";
 import {
   ACTIVITY_OPTIONS,
@@ -59,6 +61,9 @@ import type { DashboardStackScreenProps } from "../../navigation/types";
 type Props = DashboardStackScreenProps<"SymptomSelect">;
 
 export function SymptomSelectScreen({ route, navigation }: Props) {
+  // Tablets: the checklist becomes a 2-3 column grid; the context fields
+  // and the sticky action keep a readable width.
+  const { columns, isTablet } = useResponsive();
   const { gamefowlId, birdName } = route.params;
   const { token } = useAuth();
 
@@ -188,14 +193,23 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
     );
   }
 
+  // Context chips + notes: capped at a readable width, aligned with the
+  // checklist's left edge rather than floating in the middle of the grid.
+  const contextStyle = isTablet
+    ? [columnStyle(isTablet, "content"), { alignSelf: "flex-start" as const }]
+    : undefined;
+
   return (
     // avoidKeyboard: the sticky Run button and the notes field ride above
     // the keyboard instead of being covered by it.
-    <Screen avoidKeyboard>
+    <Screen avoidKeyboard width="list">
       {/* Processing overlay while scoring/persisting runs. */}
       <Modal transparent visible={submitting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50 px-8">
-          <View className="w-full items-center rounded-card bg-surface-card px-6 py-7" style={elevation.overlay}>
+          <View
+            className="w-full items-center rounded-card bg-surface-card px-6 py-7"
+            style={[elevation.overlay, columnStyle(isTablet, "modal")]}
+          >
             <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-50">
               <ActivityIndicator size="large" color="#2e7d4f" />
             </View>
@@ -259,97 +273,103 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
               <Text className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-600">
                 {category}
               </Text>
-              {items.map((symptom, index) => (
-                <EntranceView key={symptom.id} index={index}>
-                  <SymptomSelectItem
-                    symptom={symptom}
-                    selected={selected.has(symptom.id)}
-                    onToggle={toggleSymptom}
-                  />
-                </EntranceView>
-              ))}
+              <ResponsiveGrid columns={columns}>
+                {items.map((symptom, index) => (
+                  <EntranceView key={symptom.id} index={index}>
+                    <SymptomSelectItem
+                      symptom={symptom}
+                      selected={selected.has(symptom.id)}
+                      onToggle={toggleSymptom}
+                    />
+                  </EntranceView>
+                ))}
+              </ResponsiveGrid>
             </View>
           ))
         )}
 
-        {/* Optional context — enum chips only, everything skippable. */}
-        <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600">
-          Extra context (optional)
-        </Text>
-        <ChipGroup
-          label="How long have symptoms been present?"
-          hint="(optional)"
-          options={DURATION_OPTIONS}
-          value={duration}
-          onChange={setDuration}
-        />
-        <ChipGroup
-          label="Appetite when observed"
-          hint="(optional)"
-          options={APPETITE_OPTIONS}
-          value={appetite}
-          onChange={setAppetite}
-        />
-        <ChipGroup
-          label="Activity level when observed"
-          hint="(optional)"
-          options={ACTIVITY_OPTIONS}
-          value={activity}
-          onChange={setActivity}
-        />
-
-        <View className="mb-2">
-          <Text className="mb-1 text-sm font-medium text-ink-secondary">
-            Additional notes{" "}
-            <Text className="text-xs font-normal text-ink-tertiary">(optional)</Text>
+        <View style={contextStyle}>
+          {/* Optional context — enum chips only, everything skippable. */}
+          <Text className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-600">
+            Extra context (optional)
           </Text>
-          <TextInput
-            className="rounded-control border-2 border-gray-300 bg-surface-card px-4 py-3 text-base text-ink-primary"
-            accessibilityLabel="Additional notes"
-            style={{ minHeight: 88, textAlignVertical: "top" }}
-            placeholder="Anything else the vet-facing record should say…"
-            placeholderTextColor="#9ca3af"
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-            maxLength={2000}
-            autoCapitalize="sentences"
+          <ChipGroup
+            label="How long have symptoms been present?"
+            hint="(optional)"
+            options={DURATION_OPTIONS}
+            value={duration}
+            onChange={setDuration}
           />
+          <ChipGroup
+            label="Appetite when observed"
+            hint="(optional)"
+            options={APPETITE_OPTIONS}
+            value={appetite}
+            onChange={setAppetite}
+          />
+          <ChipGroup
+            label="Activity level when observed"
+            hint="(optional)"
+            options={ACTIVITY_OPTIONS}
+            value={activity}
+            onChange={setActivity}
+          />
+
+          <View className="mb-2">
+            <Text className="mb-1 text-sm font-medium text-ink-secondary">
+              Additional notes{" "}
+              <Text className="text-xs font-normal text-ink-tertiary">(optional)</Text>
+            </Text>
+            <TextInput
+              className="rounded-control border-2 border-gray-300 bg-surface-card px-4 py-3 text-base text-ink-primary"
+              accessibilityLabel="Additional notes"
+              style={{ minHeight: 88, textAlignVertical: "top" }}
+              placeholder="Anything else the vet-facing record should say…"
+              placeholderTextColor="#9ca3af"
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              maxLength={2000}
+              autoCapitalize="sentences"
+            />
+          </View>
         </View>
       </FormScrollView>
 
       {/* Sticky action bar */}
       <View className="border-t border-gray-200 bg-surface-card px-1 pb-1 pt-3">
-        {formError ? (
-          <View
-            accessibilityRole="alert"
-            className="mb-2 flex-row items-center rounded-control px-3 py-2"
-            style={{ backgroundColor: tone("critical").soft }}
-          >
-            <Ionicons name="alert-circle" size={16} color="#b3401f" />
-            <Text
-              className="ml-1.5 flex-1 text-sm"
-              style={{ color: tone("critical").text }}
+        <View style={columnStyle(isTablet, "form")}>
+          {formError ? (
+            <View
+              accessibilityRole="alert"
+              className="mb-2 flex-row items-center rounded-control px-3 py-2"
+              style={{ backgroundColor: tone("critical").soft }}
             >
-              {formError}
+              <Ionicons name="alert-circle" size={16} color="#b3401f" />
+              <Text
+                className="ml-1.5 flex-1 text-sm"
+                style={{ color: tone("critical").text }}
+              >
+                {formError}
+              </Text>
+            </View>
+          ) : null}
+          {!canSubmit && !formError ? (
+            <Text className="mb-2 text-center text-sm text-ink-tertiary">
+              Select at least one symptom to continue.
             </Text>
+          ) : (
+            <Text className="mb-2 text-center text-sm font-medium text-brand-700">
+              {selected.size} {selected.size === 1 ? "symptom" : "symptoms"} selected
+            </Text>
+          )}
+          <View pointerEvents={canSubmit ? "auto" : "none"} className={canSubmit ? "" : "opacity-40"}>
+            <Button
+              label="Run Health Assessment"
+              onPress={() => void handleSubmit()}
+              loading={submitting}
+            />
           </View>
-        ) : null}
-        {!canSubmit && !formError ? (
-          <Text className="mb-2 text-center text-sm text-ink-tertiary">
-            Select at least one symptom to continue.
-          </Text>
-        ) : (
-          <Text className="mb-2 text-center text-sm font-medium text-brand-700">
-            {selected.size} {selected.size === 1 ? "symptom" : "symptoms"} selected
-          </Text>
-        )}
-        <View pointerEvents={canSubmit ? "auto" : "none"} className={canSubmit ? "" : "opacity-40"}>
-          <Button
-            label="Run Health Assessment"
-            onPress={() => void handleSubmit()}
-            loading={submitting}
-          />
         </View>
       </View>
     </Screen>

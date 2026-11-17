@@ -20,8 +20,10 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import { EntranceView } from "../../components/ui/EntranceView";
+import { GridCell, gridKey, gridListProps } from "../../components/ui/Responsive";
 import { GamefowlCard } from "../../components/gamefowl/GamefowlCard";
 import { useGamefowls } from "../../hooks/useGamefowls";
+import { useResponsive } from "../../hooks/useResponsive";
 import type { DashboardStackScreenProps } from "../../navigation/types";
 
 type Props = DashboardStackScreenProps<"MyGamefowl">;
@@ -39,6 +41,7 @@ export function MyGamefowlScreen({ navigation }: Props) {
     refresh,
     loadMore,
   } = useGamefowls(showInactive);
+  const { columns } = useResponsive();
 
   // Skip-first-focus pattern: hook fetches on mount; later focuses (back
   // from Details after an edit/deactivation) silently revalidate page 1.
@@ -56,7 +59,7 @@ export function MyGamefowlScreen({ navigation }: Props) {
   const total = pagination?.total ?? gamefowls.length;
 
   return (
-    <Screen>
+    <Screen width="list">
       {/* Filter chips + count */}
       <View className="mb-3 flex-row items-center">
         <FilterChip
@@ -73,22 +76,26 @@ export function MyGamefowlScreen({ navigation }: Props) {
       </View>
 
       {loading ? (
-        <SkeletonList count={4} label="Loading your flock" />
+        <SkeletonList count={4} label="Loading your flock" columns={columns} />
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
         <FlatList
+          key={gridKey(columns)}
+          {...gridListProps(columns)}
           data={gamefowls}
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item, index }) => (
-            <EntranceView index={Math.min(index, 10)}>
-              <GamefowlCard
-                gamefowl={item}
-                onPress={() =>
-                  navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
-                }
-              />
-            </EntranceView>
+            <GridCell columns={columns}>
+              <EntranceView index={Math.min(index, 10)}>
+                <GamefowlCard
+                  gamefowl={item}
+                  onPress={() =>
+                    navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
+                  }
+                />
+              </EntranceView>
+            </GridCell>
           )}
           ListEmptyComponent={
             showInactive ? (

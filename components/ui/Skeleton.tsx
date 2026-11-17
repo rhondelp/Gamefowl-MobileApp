@@ -28,6 +28,7 @@ import Animated, {
 
 import { surface } from "./palette";
 import { elevation } from "./elevation";
+import { ResponsiveGrid } from "./Responsive";
 
 const skeletonBase = surface.muted;
 const skeletonHighlight = "#e3e8e3";
@@ -101,13 +102,18 @@ export function SkeletonRow() {
   );
 }
 
-/** `count` card rows, announced to screen readers as a single busy region. */
+/**
+ * `count` card rows, announced to screen readers as a single busy region.
+ * `columns` > 1 lays them out like the grid that replaces them on tablets.
+ */
 export function SkeletonList({
   count = 4,
   label = "Loading",
+  columns = 1,
 }: {
   count?: number;
   label?: string;
+  columns?: number;
 }) {
   return (
     <View
@@ -116,9 +122,11 @@ export function SkeletonList({
       accessibilityLabel={label}
       accessibilityState={{ busy: true }}
     >
-      {Array.from({ length: count }, (_, i) => (
-        <SkeletonRow key={i} />
-      ))}
+      <ResponsiveGrid columns={columns}>
+        {Array.from({ length: Math.max(count, columns) }, (_, i) => (
+          <SkeletonRow key={i} />
+        ))}
+      </ResponsiveGrid>
     </View>
   );
 }

@@ -17,6 +17,7 @@ import React, { useCallback, useRef } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Screen } from "../components/ui/Screen";
 import { brandRefreshColors } from "../components/ui/BrandRefreshControl";
@@ -27,12 +28,21 @@ import { Skeleton, SkeletonList } from "../components/ui/Skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
 import { EntranceView } from "../components/ui/EntranceView";
+import { GridCell, gridKey, gridListProps } from "../components/ui/Responsive";
 import { GamefowlCard } from "../components/gamefowl/GamefowlCard";
 import { useAuth } from "../contexts/AuthContext";
 import { useGamefowls } from "../hooks/useGamefowls";
+import { MAX_WIDTH, SCREEN_GUTTER, useResponsive } from "../hooks/useResponsive";
 import type { DashboardStackScreenProps } from "../navigation/types";
 
 type Props = DashboardStackScreenProps<"Dashboard">;
+
+/** Left column (flock summary + Start Assessment) in the side-by-side layout. */
+const SUMMARY_COLUMN_W = 340;
+/** Gap between the summary column and the recent-birds column. */
+const COLUMN_GAP = 24;
+/** Narrowest bird column that still fits two cards side by side. */
+const TWO_CARD_MIN_W = 560;
 
 export function DashboardScreen({ navigation }: Props) {
   const { user } = useAuth();
@@ -54,8 +64,145 @@ export function DashboardScreen({ navigation }: Props) {
 
   const activeTotal = pagination?.total ?? gamefowls.length;
 
+  // Large screens: on wide or landscape windows the flock summary and the
+  // recent birds sit side by side (stacked, a landscape tablet would leave
+  // the list a sliver of height). Phones keep the original stacked layout.
+  const { width, isTablet, isLandscape, size, columns } = useResponsive();
+  const insets = useSafeAreaInsets();
+  const sideBySide = isTablet && (size === "expanded" || isLandscape);
+  const contentW =
+    Math.min(width - insets.left - insets.right - SCREEN_GUTTER * 2, MAX_WIDTH.list);
+  const birdColumns = sideBySide
+    ? contentW - SUMMARY_COLUMN_W - COLUMN_GAP >= TWO_CARD_MIN_W
+      ? 2
+      : 1
+    : columns;
+
+  const summary = (
+    <>
+      {/* Summary card — the one raised surface on this screen. */}
+      <View className="mt-4 rounded-card bg-brand-600 px-5 py-4" style={elevation.raised}>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1">
+            <Text className="text-xs font-semibold uppercase tracking-wider text-brand-100">
+              Your flock
+            </Text>
+            <Text className="mt-0.5 text-2xl font-bold text-white">
+              {activeTotal} {activeTotal === 1 ? "bird" : "birds"}
+            </Text>
+          </View>
+          {/* Decorative — the count beside it already conveys this. */}
+          <View
+            className="h-14 w-14 items-center justify-center rounded-full bg-white/15"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            <MaterialCommunityIcons name="bird" size={30} color="#dcf0e3" />
+          </View>
+        </View>
+        <View className="mt-4 flex-row">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="See all birds"
+            className="mr-2 h-11 flex-1 items-center justify-center rounded-control bg-white/15 active:bg-white/25"
+            style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
+            onPress={() => navigation.navigate("MyGamefowl")}
+          >
+            <Text className="text-sm font-semibold text-white">See all</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Add bird"
+            className="ml-2 h-11 flex-1 flex-row items-center justify-center rounded-control bg-surface-card active:bg-brand-50"
+            style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
+            onPress={() => navigation.navigate("AddGamefowl")}
+          >
+            <Ionicons name="add" size={16} color="#215838" />
+            <Text className="ml-0.5 text-sm font-semibold text-brand-700">Add bird</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Primary action, placed in the flow right under the flock summary
+          instead of a floating button: it never covers list rows, needs
+          no safe-area math above the tab bar, and leaves no dead gap
+          between a short list and a bottom-anchored button. The flock
+          list is the bird picker the assessment flow needs, so it routes
+          there. Hidden while empty — the empty state carries "add one". */}
+      {gamefowls.length > 0 ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Start assessment"
+          accessibilityHint="Choose a bird to check its symptoms"
+          onPress={() => {
+            void tapMedium();
+            navigation.navigate("MyGamefowl");
+          }}
+          className="mt-3 flex-row items-center rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
+          style={({ pressed }) => [
+            elevation.card,
+            pressed ? { transform: [{ scale: 0.99 }] } : null,
+          ]}
+        >
+          <View className="h-11 w-11 items-center justify-center rounded-full bg-brand-50">
+            <Ionicons name="pulse" size={22} color={palette.brand[500]} />
+          </View>
+          <View className="ml-3 flex-1">
+            <Text className="text-base font-semibold text-ink-primary">
+              Start Assessment
+            </Text>
+            <Text className="text-xs text-ink-tertiary">
+              Check a bird's symptoms in a minute
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+        </Pressable>
+      ) : null}
+    </>
+  );
+
+  const recentBirds =
+    gamefowls.length === 0 ? (
+      <EmptyState
+        variant="flock"
+        title="No gamefowl yet"
+        message="Add your first bird to start tracking its health."
+        actionLabel="+ Add Gamefowl"
+        onAction={() => navigation.navigate("AddGamefowl")}
+      />
+    ) : (
+      <FlatList
+        key={gridKey(birdColumns)}
+        {...gridListProps(birdColumns)}
+        data={gamefowls}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item, index }) => (
+          <GridCell columns={birdColumns}>
+            <EntranceView index={index}>
+              <GamefowlCard
+                gamefowl={item}
+                onPress={() =>
+                  navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
+                }
+              />
+            </EntranceView>
+          </GridCell>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            {...brandRefreshColors}
+          />
+        }
+        style={{ flexGrow: 0 }}
+        contentContainerStyle={{ paddingBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+
   return (
-    <Screen>
+    <Screen width="list">
       {/* Greeting */}
       <View className="mt-2">
         <Text className="text-xs font-semibold uppercase tracking-widest text-brand-500">
@@ -81,130 +228,37 @@ export function DashboardScreen({ navigation }: Props) {
           <View className="mb-2 mt-6">
             <Skeleton width="40%" height={14} />
           </View>
-          <SkeletonList count={3} label="Loading your birds" />
+          <SkeletonList
+            count={3}
+            label="Loading your birds"
+            columns={sideBySide ? 1 : birdColumns}
+          />
         </View>
       ) : error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
-        <>
-          {/* Summary card — the one raised surface on this screen. */}
-          <View className="mt-4 rounded-card bg-brand-600 px-5 py-4" style={elevation.raised}>
-            <View className="flex-row items-center justify-between">
-              <View className="flex-1">
-                <Text className="text-xs font-semibold uppercase tracking-wider text-brand-100">
-                  Your flock
-                </Text>
-                <Text className="mt-0.5 text-2xl font-bold text-white">
-                  {activeTotal} {activeTotal === 1 ? "bird" : "birds"}
-                </Text>
-              </View>
-              {/* Decorative — the count beside it already conveys this. */}
-              <View
-                className="h-14 w-14 items-center justify-center rounded-full bg-white/15"
-                accessibilityElementsHidden
-                importantForAccessibility="no-hide-descendants"
-              >
-                <MaterialCommunityIcons name="bird" size={30} color="#dcf0e3" />
-              </View>
+        sideBySide ? (
+          <View className="flex-1 flex-row">
+            <View style={{ width: SUMMARY_COLUMN_W, marginRight: COLUMN_GAP }}>
+              {summary}
             </View>
-            <View className="mt-4 flex-row">
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="See all birds"
-                className="mr-2 h-11 flex-1 items-center justify-center rounded-control bg-white/15 active:bg-white/25"
-                style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
-                onPress={() => navigation.navigate("MyGamefowl")}
-              >
-                <Text className="text-sm font-semibold text-white">See all</Text>
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Add bird"
-                className="ml-2 h-11 flex-1 flex-row items-center justify-center rounded-control bg-surface-card active:bg-brand-50"
-                style={({ pressed }) => (pressed ? { opacity: 0.9 } : null)}
-                onPress={() => navigation.navigate("AddGamefowl")}
-              >
-                <Ionicons name="add" size={16} color="#215838" />
-                <Text className="ml-0.5 text-sm font-semibold text-brand-700">Add bird</Text>
-              </Pressable>
+            <View className="flex-1">
+              <Text className="mb-2 mt-4 text-base font-semibold text-ink-primary">
+                Recent birds
+              </Text>
+              {recentBirds}
             </View>
           </View>
-
-          {/* Primary action, placed in the flow right under the flock summary
-              instead of a floating button: it never covers list rows, needs
-              no safe-area math above the tab bar, and leaves no dead gap
-              between a short list and a bottom-anchored button. The flock
-              list is the bird picker the assessment flow needs, so it routes
-              there. Hidden while empty — the empty state carries "add one". */}
-          {gamefowls.length > 0 ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Start assessment"
-              accessibilityHint="Choose a bird to check its symptoms"
-              onPress={() => {
-                void tapMedium();
-                navigation.navigate("MyGamefowl");
-              }}
-              className="mt-3 flex-row items-center rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
-              style={({ pressed }) => [
-                elevation.card,
-                pressed ? { transform: [{ scale: 0.99 }] } : null,
-              ]}
-            >
-              <View className="h-11 w-11 items-center justify-center rounded-full bg-brand-50">
-                <Ionicons name="pulse" size={22} color={palette.brand[500]} />
-              </View>
-              <View className="ml-3 flex-1">
-                <Text className="text-base font-semibold text-ink-primary">
-                  Start Assessment
-                </Text>
-                <Text className="text-xs text-ink-tertiary">
-                  Check a bird's symptoms in a minute
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
-            </Pressable>
-          ) : null}
-
-          {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
-          <Text className="mb-2 mt-6 text-base font-semibold text-ink-primary">
-            Recent birds
-          </Text>
-          {gamefowls.length === 0 ? (
-            <EmptyState
-              variant="flock"
-              title="No gamefowl yet"
-              message="Add your first bird to start tracking its health."
-              actionLabel="+ Add Gamefowl"
-              onAction={() => navigation.navigate("AddGamefowl")}
-            />
-          ) : (
-            <FlatList
-              data={gamefowls}
-              keyExtractor={(item) => String(item.id)}
-              renderItem={({ item, index }) => (
-                <EntranceView index={index}>
-                  <GamefowlCard
-                    gamefowl={item}
-                    onPress={() =>
-                      navigation.navigate("GamefowlDetails", { gamefowlId: item.id })
-                    }
-                  />
-                </EntranceView>
-              )}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={refresh}
-                  {...brandRefreshColors}
-                />
-              }
-              style={{ flexGrow: 0 }}
-              contentContainerStyle={{ paddingBottom: 16 }}
-              showsVerticalScrollIndicator={false}
-            />
-          )}
-        </>
+        ) : (
+          <>
+            {summary}
+            {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
+            <Text className="mb-2 mt-6 text-base font-semibold text-ink-primary">
+              Recent birds
+            </Text>
+            {recentBirds}
+          </>
+        )
       )}
     </Screen>
   );
