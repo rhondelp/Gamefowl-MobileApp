@@ -14,8 +14,8 @@
  *
  * Backend 422 field errors are mapped back onto the same inline slots.
  */
-import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { TextField } from "../ui/TextField";
 import { Button } from "../ui/Button";
@@ -51,6 +51,8 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const weightRef = useRef<TextInput>(null);
+  const notesRef = useRef<TextInput>(null);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((prev) => {
@@ -156,6 +158,10 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
         }}
         placeholder="e.g. Quarterly vet checkup"
         autoCapitalize="sentences"
+        returnKeyType="next"
+        onSubmitEditing={() =>
+          (type === "weight_check" ? weightRef : notesRef).current?.focus()
+        }
         maxLength={255}
         error={fieldErrors.title ?? null}
       />
@@ -163,6 +169,7 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
       {/* Weight surfaces only when it makes sense (nice-to-have per spec). */}
       {type === "weight_check" ? (
         <TextField
+          ref={weightRef}
           label="Weight (kg)"
           value={weight}
           onChangeText={(text) => {
@@ -171,6 +178,8 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
           }}
           placeholder="e.g. 2.4"
           keyboardType="decimal-pad"
+          returnKeyType="next"
+          onSubmitEditing={() => notesRef.current?.focus()}
           error={fieldErrors.weight ?? null}
         />
       ) : null}
@@ -187,6 +196,7 @@ export function HealthRecordForm({ onSubmit }: HealthRecordFormProps) {
       />
 
       <TextField
+        ref={notesRef}
         label="Notes"
         value={notes}
         onChangeText={(text) => {

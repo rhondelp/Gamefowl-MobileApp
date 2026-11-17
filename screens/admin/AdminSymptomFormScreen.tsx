@@ -10,8 +10,8 @@
  *   backend's DELETE endpoint just sets is_active:false anyway, so one
  *   control covers both deactivate and reactivate.
  */
-import React, { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
@@ -59,6 +59,8 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const categoryRef = useRef<TextInput>(null);
+  const descriptionRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (!isEdit || !token) return;
@@ -180,11 +182,14 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
           }}
           placeholder="e.g. Purple comb"
           autoCapitalize="sentences"
+          returnKeyType="next"
+          onSubmitEditing={() => categoryRef.current?.focus()}
           maxLength={255}
           error={fieldErrors.name ?? null}
         />
 
         <TextField
+          ref={categoryRef}
           label="Category *"
           value={values.category}
           onChangeText={(t) => {
@@ -193,6 +198,8 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
           }}
           placeholder="e.g. respiratory"
           autoCapitalize="none"
+          returnKeyType="next"
+          onSubmitEditing={() => descriptionRef.current?.focus()}
           maxLength={100}
           error={fieldErrors.category ?? null}
         />
@@ -234,6 +241,7 @@ export function AdminSymptomFormScreen({ route, navigation }: Props) {
         </View>
 
         <TextField
+          ref={descriptionRef}
           label="Description"
           value={values.description}
           onChangeText={(t) => setValues((prev) => ({ ...prev, description: t }))}

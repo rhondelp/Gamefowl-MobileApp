@@ -9,9 +9,14 @@
  * Error sources combined into one line:
  *   - client-side checks (e.g. "Password must be at least 8 characters")
  *   - server-side field errors mapped from the backend envelope
+ *
+ * Keyboard flow: pass `ref` + `returnKeyType="next"` + `onSubmitEditing`
+ * (focusing the next field) to chain fields; the last field uses
+ * "done"/"go" and calls the form's existing submit handler. "next" keeps the
+ * keyboard open between fields instead of letting it bounce.
  */
 import React, { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View, type TextInputProps } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { text } from "./palette";
@@ -29,6 +34,14 @@ interface TextFieldProps {
   /** Hard character cap mirroring backend length rules. */
   maxLength?: number;
   error?: string | null;
+  /** React 19: ref is a plain prop — lets forms focus the next field. */
+  ref?: React.Ref<TextInput>;
+  returnKeyType?: "next" | "done" | "go" | "send";
+  onSubmitEditing?: () => void;
+  /** Autofill hint (Android) — defaults to off. */
+  autoComplete?: TextInputProps["autoComplete"];
+  /** Autofill hint (iOS). */
+  textContentType?: TextInputProps["textContentType"];
 }
 
 export function TextField({
@@ -42,6 +55,11 @@ export function TextField({
   multiline = false,
   maxLength,
   error = null,
+  ref,
+  returnKeyType,
+  onSubmitEditing,
+  autoComplete = "off",
+  textContentType,
 }: TextFieldProps) {
   // Focus and reveal are local presentation state only — neither leaves this
   // component, and neither changes what the field submits.
@@ -67,6 +85,7 @@ export function TextField({
         style={multiline ? { minHeight: 96 } : { minHeight: 48 }}
       >
         <TextInput
+          ref={ref}
           className="flex-1 text-base text-ink-primary"
           style={
             multiline
@@ -83,10 +102,20 @@ export function TextField({
           placeholderTextColor={text.tertiary}
           secureTextEntry={secure && !revealed}
           autoCapitalize={autoCapitalize}
-          autoComplete="off"
+          // Emails and passwords must never be "corrected".
+          autoCorrect={secure || keyboardType === "email-address" ? false : undefined}
+          autoComplete={autoComplete}
+          textContentType={textContentType}
           keyboardType={keyboardType}
           multiline={multiline}
           maxLength={maxLength}
+          returnKeyType={multiline ? undefined : returnKeyType}
+          onSubmitEditing={multiline ? undefined : onSubmitEditing}
+          // "next" keeps the keyboard up while focus moves; the final field
+          // closes it and submits. Multiline keeps Enter as a newline.
+          submitBehavior={
+            multiline ? "newline" : returnKeyType === "next" ? "submit" : "blurAndSubmit"
+          }
         />
         {secure ? (
           <Pressable

@@ -17,8 +17,8 @@
  * Errors from the API arrive as ApiError and are mapped back onto the same
  * per-field display slots, so client- and server-side messages look alike.
  */
-import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { TextField } from "../ui/TextField";
 import { Button } from "../ui/Button";
@@ -77,6 +77,12 @@ export function GamefowlForm({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Keyboard "next" chain over the free-text fields (chips/date pickers
+  // aren't keyboard targets, so the chain skips them).
+  const breedRef = useRef<TextInput>(null);
+  const colorRef = useRef<TextInput>(null);
+  const weightRef = useRef<TextInput>(null);
+  const notesRef = useRef<TextInput>(null);
 
   const setField = <K extends keyof GamefowlFormValues>(key: K, text: string) => {
     // Clear that field's error as soon as the user edits it again.
@@ -141,16 +147,21 @@ export function GamefowlForm({
         onChangeText={(text) => setField("name", text)}
         placeholder="e.g. Mang Tasoy"
         autoCapitalize="words"
+        returnKeyType="next"
+        onSubmitEditing={() => breedRef.current?.focus()}
         maxLength={255}
         error={fieldErrors.name ?? null}
       />
 
       <TextField
+        ref={breedRef}
         label="Breed"
         value={values.breed}
         onChangeText={(text) => setField("breed", text)}
         placeholder="e.g. Hatch"
         autoCapitalize="words"
+        returnKeyType="next"
+        onSubmitEditing={() => colorRef.current?.focus()}
         maxLength={100}
         error={fieldErrors.breed ?? null}
       />
@@ -188,21 +199,27 @@ export function GamefowlForm({
       </View>
 
       <TextField
+        ref={colorRef}
         label="Color"
         value={values.color}
         onChangeText={(text) => setField("color", text)}
         placeholder="e.g. Black breasted red"
         autoCapitalize="sentences"
+        returnKeyType="next"
+        onSubmitEditing={() => weightRef.current?.focus()}
         maxLength={100}
         error={fieldErrors.color ?? null}
       />
 
       <TextField
+        ref={weightRef}
         label="Weight (kg)"
         value={values.weight}
         onChangeText={(text) => setField("weight", text)}
         placeholder="e.g. 2.4"
         keyboardType="decimal-pad"
+        returnKeyType="next"
+        onSubmitEditing={() => notesRef.current?.focus()}
         error={fieldErrors.weight ?? null}
       />
 
@@ -223,6 +240,7 @@ export function GamefowlForm({
       />
 
       <TextField
+        ref={notesRef}
         label="Notes"
         value={values.notes}
         onChangeText={(text) => setField("notes", text)}

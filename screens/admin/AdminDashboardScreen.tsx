@@ -18,7 +18,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
 import { brandRefreshColors } from "../../components/ui/BrandRefreshControl";
@@ -41,7 +41,8 @@ function StatCard({
   value,
   label,
 }: {
-  icon: keyof typeof Ionicons.glyphMap;
+  /** "bird" isn't in Ionicons — it comes from MaterialCommunityIcons. */
+  icon: keyof typeof Ionicons.glyphMap | "bird";
   value: number;
   label: string;
 }) {
@@ -51,7 +52,11 @@ function StatCard({
       style={elevation.card}
     >
       <View className="h-9 w-9 items-center justify-center rounded-full bg-brand-100">
-        <Ionicons name={icon} size={18} color="#276a43" />
+        {icon === "bird" ? (
+          <MaterialCommunityIcons name="bird" size={18} color="#276a43" />
+        ) : (
+          <Ionicons name={icon} size={18} color="#276a43" />
+        )}
       </View>
       <Text className="mt-2 text-xl font-bold text-ink-primary">{value}</Text>
       <Text className="mt-0.5 text-center text-[11px] font-normal leading-4 text-ink-tertiary">
@@ -179,7 +184,7 @@ export function AdminDashboardScreen({ navigation }: Props) {
       {/* Headline counts */}
       <View className="flex-row space-x-3">
         <StatCard icon="people" value={stats.total_users} label="Users" />
-        <StatCard icon="paw" value={stats.total_gamefowls} label="Gamefowls" />
+        <StatCard icon="bird" value={stats.total_gamefowls} label="Gamefowls" />
         <StatCard icon="pulse" value={stats.total_assessments} label="Assessments" />
       </View>
 

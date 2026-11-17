@@ -11,8 +11,8 @@
  *   is_active only appears in edit mode — new diseases always start active,
  *   matching the controller's explicit default.
  */
-import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
@@ -74,6 +74,7 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const descriptionRef = useRef<TextInput>(null);
 
   // Edit mode: prefill once from GET /admin/diseases/{id}.
   useEffect(() => {
@@ -192,6 +193,8 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
           onChangeText={(t) => setField("name", t)}
           placeholder="e.g. Fowl Typhoid"
           autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => descriptionRef.current?.focus()}
           maxLength={255}
           error={fieldErrors.name ?? null}
         />
@@ -229,6 +232,7 @@ export function AdminDiseaseFormScreen({ route, navigation }: Props) {
         </View>
 
         <TextField
+          ref={descriptionRef}
           label="Description *"
           value={values.description}
           onChangeText={(t) => setField("description", t)}

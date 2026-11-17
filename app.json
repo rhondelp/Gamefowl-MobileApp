@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gamefowl-MobileApp",
     "slug": "Gamefowl-MobileApp",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "userInterfaceStyle": "light",
@@ -24,15 +24,22 @@
       "expo-secure-store",
       "expo-font",
       "@react-native-community/datetimepicker",
-      "expo-status-bar",
+      [
+        "expo-status-bar",
+        {
+          "style": "dark"
+        }
+      ],
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/app_icon.png",
+          "image": "./assets/images/logo-mark.png",
+          "imageWidth": 140,
           "resizeMode": "contain",
-          "backgroundColor": "#123122"
+          "backgroundColor": "#f5f7f4"
         }
-      ]
+      ],
+      "./plugins/withAndroidNavigationBar"
     ],
     "extra": {
       "eas": {

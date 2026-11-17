@@ -68,3 +68,13 @@ export function todayDateString(): string {
 export function formatWeight(weightKg: number | null | undefined): string {
   return weightKg === null || weightKg === undefined ? "—" : `${weightKg} kg`;
 }
+
+/**
+ * Display label for the sex enum ("male" -> "Male"). Display only — the
+ * stored/submitted value stays the lowercase backend enum.
+ */
+export function formatSex(sex: string | null | undefined): string {
+  const value = sex?.trim();
+  if (!value) return "—";
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}

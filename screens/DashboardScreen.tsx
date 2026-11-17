@@ -15,13 +15,14 @@
  */
 import React, { useCallback, useRef } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { Screen } from "../components/ui/Screen";
 import { brandRefreshColors } from "../components/ui/BrandRefreshControl";
-import { Fab } from "../components/ui/Fab";
 import { elevation } from "../components/ui/elevation";
+import { tapMedium } from "../components/ui/haptics";
+import { palette } from "../components/ui/status";
 import { Skeleton, SkeletonList } from "../components/ui/Skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
@@ -103,7 +104,7 @@ export function DashboardScreen({ navigation }: Props) {
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
               >
-                <Ionicons name="paw" size={30} color="#dcf0e3" />
+                <MaterialCommunityIcons name="bird" size={30} color="#dcf0e3" />
               </View>
             </View>
             <View className="mt-4 flex-row">
@@ -128,6 +129,42 @@ export function DashboardScreen({ navigation }: Props) {
               </Pressable>
             </View>
           </View>
+
+          {/* Primary action, placed in the flow right under the flock summary
+              instead of a floating button: it never covers list rows, needs
+              no safe-area math above the tab bar, and leaves no dead gap
+              between a short list and a bottom-anchored button. The flock
+              list is the bird picker the assessment flow needs, so it routes
+              there. Hidden while empty — the empty state carries "add one". */}
+          {gamefowls.length > 0 ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Start assessment"
+              accessibilityHint="Choose a bird to check its symptoms"
+              onPress={() => {
+                void tapMedium();
+                navigation.navigate("MyGamefowl");
+              }}
+              className="mt-3 flex-row items-center rounded-card bg-surface-card px-4 py-3.5 active:bg-brand-50"
+              style={({ pressed }) => [
+                elevation.card,
+                pressed ? { transform: [{ scale: 0.99 }] } : null,
+              ]}
+            >
+              <View className="h-11 w-11 items-center justify-center rounded-full bg-brand-50">
+                <Ionicons name="pulse" size={22} color={palette.brand[500]} />
+              </View>
+              <View className="ml-3 flex-1">
+                <Text className="text-base font-semibold text-ink-primary">
+                  Start Assessment
+                </Text>
+                <Text className="text-xs text-ink-tertiary">
+                  Check a bird's symptoms in a minute
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
+            </Pressable>
+          ) : null}
 
           {/* Bird rows (first page; the full paginated list lives in My Gamefowl) */}
           <Text className="mb-2 mt-6 text-base font-semibold text-ink-primary">
@@ -163,23 +200,12 @@ export function DashboardScreen({ navigation }: Props) {
                 />
               }
               style={{ flexGrow: 0 }}
-              contentContainerStyle={{ paddingBottom: 96 }}
+              contentContainerStyle={{ paddingBottom: 16 }}
               showsVerticalScrollIndicator={false}
             />
           )}
         </>
       )}
-
-      {/* The flock list is the bird picker the assessment flow needs, so the
-          FAB routes there rather than inventing a bird selection. Hidden
-          while empty — the empty state already carries the "add one" CTA. */}
-      {!loading && !error && gamefowls.length > 0 ? (
-        <Fab
-          label="Start Assessment"
-          icon="pulse"
-          onPress={() => navigation.navigate("MyGamefowl")}
-        />
-      ) : null}
     </Screen>
   );
 }

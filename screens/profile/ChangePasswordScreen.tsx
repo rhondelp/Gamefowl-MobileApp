@@ -15,8 +15,8 @@
  *     tokens; no re-login is needed here. Fields are never pre-filled or
  *     remembered, and are cleared after success.
  */
-import React, { useState } from "react";
-import { Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Text, TextInput, View } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
@@ -40,6 +40,8 @@ export function ChangePasswordScreen({ navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const nextRef = useRef<TextInput>(null);
+  const confirmRef = useRef<TextInput>(null);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((prev) => {
@@ -110,10 +112,15 @@ export function ChangePasswordScreen({ navigation }: Props) {
           }}
           placeholder="Your current password"
           secure
+          autoComplete="current-password"
+          textContentType="password"
+          returnKeyType="next"
+          onSubmitEditing={() => nextRef.current?.focus()}
           error={fieldErrors.current_password ?? null}
         />
 
         <TextField
+          ref={nextRef}
           label="New password *"
           value={next}
           onChangeText={(t) => {
@@ -122,10 +129,15 @@ export function ChangePasswordScreen({ navigation }: Props) {
           }}
           placeholder="At least 8 characters"
           secure
+          autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="next"
+          onSubmitEditing={() => confirmRef.current?.focus()}
           error={fieldErrors.new_password ?? null}
         />
 
         <TextField
+          ref={confirmRef}
           label="Confirm new password *"
           value={confirmation}
           onChangeText={(t) => {
@@ -134,6 +146,12 @@ export function ChangePasswordScreen({ navigation }: Props) {
           }}
           placeholder="Repeat the new password"
           secure
+          autoComplete="new-password"
+          textContentType="newPassword"
+          returnKeyType="done"
+          onSubmitEditing={() => {
+            if (!submitting) void handleSubmit();
+          }}
           error={fieldErrors.new_password_confirmation ?? null}
         />
 

@@ -6,6 +6,7 @@
 import {
   formatAge,
   formatDate,
+  formatSex,
   formatWeight,
   todayDateString,
 } from "../utils/format";
@@ -71,5 +72,18 @@ describe("formatWeight", () => {
 
   it("appends kg to numeric weights", () => {
     expect(formatWeight(2.4)).toBe("2.4 kg");
+  });
+});
+
+describe("formatSex", () => {
+  it("capitalizes the backend enum for display", () => {
+    expect(formatSex("male")).toBe("Male");
+    expect(formatSex("female")).toBe("Female");
+    expect(formatSex("unknown")).toBe("Unknown");
+  });
+
+  it("shows an em dash when missing", () => {
+    expect(formatSex(null)).toBe("—");
+    expect(formatSex("")).toBe("—");
   });
 });

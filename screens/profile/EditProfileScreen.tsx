@@ -9,8 +9,8 @@
  *   their fields. Success updates the auth context (no re-login) with a
  *   toast, then pops back to Settings.
  */
-import React, { useState } from "react";
-import { Text, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Text, TextInput, View } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
 import { Button } from "../../components/ui/Button";
@@ -32,6 +32,7 @@ export function EditProfileScreen({ navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const emailRef = useRef<TextInput>(null);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((prev) => {
@@ -89,11 +90,16 @@ export function EditProfileScreen({ navigation }: Props) {
           }}
           placeholder="Your full name"
           autoCapitalize="words"
+          autoComplete="name"
+          textContentType="name"
+          returnKeyType="next"
+          onSubmitEditing={() => emailRef.current?.focus()}
           maxLength={255}
           error={fieldErrors.name ?? null}
         />
 
         <TextField
+          ref={emailRef}
           label="Email *"
           value={email}
           onChangeText={(t) => {
@@ -103,6 +109,12 @@ export function EditProfileScreen({ navigation }: Props) {
           placeholder="you@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
+          autoComplete="email"
+          textContentType="emailAddress"
+          returnKeyType="done"
+          onSubmitEditing={() => {
+            if (!submitting) void handleSubmit();
+          }}
           maxLength={255}
           error={fieldErrors.email ?? null}
         />

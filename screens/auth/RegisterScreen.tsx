@@ -13,8 +13,8 @@
  *      credentials" style messages) plus per-field errors mapped from the
  *      backend envelope (duplicate email, weak password...).
  */
-import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
@@ -35,6 +35,9 @@ export function RegisterScreen({ navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmRef = useRef<TextInput>(null);
 
   /** Client checks mirror backend rules so users get instant feedback. */
   const validate = (): boolean => {
@@ -83,12 +86,13 @@ export function RegisterScreen({ navigation }: Props) {
 
   return (
     <Screen scroll>
-      <View className="mb-8">
+      {/* Title scale matches Login (text-xl) so the form starts higher. */}
+      <View className="mb-6">
         <Image
           source={require("../../assets/images/logo-mark.png")}
-          style={{ width: 72, height: 72, resizeMode: "contain", alignSelf: "center" }}
+          style={{ width: 56, height: 56, resizeMode: "contain", alignSelf: "center" }}
         />
-        <Text className="mt-2 text-2xl font-bold text-center text-ink-primary">Create your account</Text>
+        <Text className="mt-2 text-xl font-bold text-center text-ink-primary">Create your account</Text>
         <Text className="mt-1 text-sm text-center text-ink-tertiary">
           Start monitoring your gamefowl's health today.
         </Text>
@@ -102,30 +106,52 @@ export function RegisterScreen({ navigation }: Props) {
         onChangeText={setName}
         placeholder="Juan Dela Cruz"
         autoCapitalize="words"
+        autoComplete="name"
+        textContentType="name"
+        returnKeyType="next"
+        onSubmitEditing={() => emailRef.current?.focus()}
         error={fieldErrors.name ?? null}
       />
       <TextField
+        ref={emailRef}
         label="Email"
         value={email}
         onChangeText={setEmail}
         placeholder="you@example.com"
         keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+        textContentType="emailAddress"
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
         error={fieldErrors.email ?? null}
       />
       <TextField
+        ref={passwordRef}
         label="Password"
         value={password}
         onChangeText={setPassword}
         placeholder="At least 8 characters"
         secure
+        autoComplete="new-password"
+        textContentType="newPassword"
+        returnKeyType="next"
+        onSubmitEditing={() => confirmRef.current?.focus()}
         error={fieldErrors.password ?? null}
       />
       <TextField
+        ref={confirmRef}
         label="Confirm Password"
         value={passwordConfirmation}
         onChangeText={setPasswordConfirmation}
         placeholder="Repeat your password"
         secure
+        autoComplete="new-password"
+        textContentType="newPassword"
+        returnKeyType="go"
+        onSubmitEditing={() => {
+          if (!submitting) void handleSubmit();
+        }}
         error={fieldErrors.password_confirmation ?? null}
       />
 

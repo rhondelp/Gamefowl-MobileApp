@@ -9,8 +9,8 @@
  *   backend's DELETE is just is_active:false. Linking to diseases lives on
  *   the Disease Detail screen by design.
  */
-import React, { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Screen } from "../../components/ui/Screen";
@@ -47,6 +47,7 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const contentRef = useRef<TextInput>(null);
 
   // No single-recommendation GET exists; resolve from the flat list.
   useEffect(() => {
@@ -163,6 +164,8 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
           }}
           placeholder="e.g. Isolate affected birds immediately"
           autoCapitalize="sentences"
+          returnKeyType="next"
+          onSubmitEditing={() => contentRef.current?.focus()}
           maxLength={255}
           error={fieldErrors.title ?? null}
         />
@@ -200,6 +203,7 @@ export function AdminRecommendationFormScreen({ route, navigation }: Props) {
         </View>
 
         <TextField
+          ref={contentRef}
           label="Content *"
           value={content}
           onChangeText={(t) => {

@@ -12,8 +12,15 @@
  *     credentials."), per-field messages render under their inputs.
  *   - 429 rate limiting surfaces friendly copy in the banner.
  */
-import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { Ionicons } from "@expo/vector-icons";
 import { tone } from "../../components/ui/status";
@@ -22,6 +29,7 @@ import { TextField } from "../../components/ui/TextField";
 import { Button } from "../../components/ui/Button";
 import { FormError } from "../../components/ui/FormError";
 import { useAuth } from "../../contexts/AuthContext";
+import { useKeyboardVisible } from "../../hooks/useKeyboardVisible";
 import { ApiError } from "../../services/api/client";
 import type { AuthStackScreenProps } from "../../navigation/types";
 
@@ -37,7 +45,12 @@ export function LoginScreen({ navigation }: Props) {
   // ~58% of screen width, but capped by height so the whole form still fits
   // above the fold on short phones.
   const { width: winW, height: winH } = useWindowDimensions();
-  const logoH = Math.min((winW * 0.58) / LOGO_RATIO, winH * 0.24, 230);
+  const fullLogoH = Math.min((winW * 0.58) / LOGO_RATIO, winH * 0.24, 230);
+  // Keyboard open: compact the logo so both fields and Log In stay in view
+  // on small phones.
+  const keyboardVisible = useKeyboardVisible();
+  const logoH = keyboardVisible ? Math.min(fullLogoH, 72) : fullLogoH;
+  const passwordRef = useRef<TextInput>(null);
 
   // Local form state — kept in the screen because only this screen cares.
   const [email, setEmail] = useState("");
@@ -88,7 +101,7 @@ export function LoginScreen({ navigation }: Props) {
     <Screen scroll>
       {/* The wordmark is part of the logo image, so it doubles as the title;
           the subtitle stays live text so it's readable and scales. */}
-      <View className="mb-8 items-center">
+      <View className={`items-center ${keyboardVisible ? "mb-4" : "mb-8"}`}>
         <Image
           source={require("../../assets/images/logo-full.png")}
           style={{ width: logoH * LOGO_RATIO, height: logoH, resizeMode: "contain" }}
@@ -96,7 +109,9 @@ export function LoginScreen({ navigation }: Props) {
           accessibilityRole="image"
           accessibilityLabel="Gamefowl"
         />
-        <Text className="mt-3 text-base text-ink-secondary">Early Bird Disease Monitoring</Text>
+        {keyboardVisible ? null : (
+          <Text className="mt-3 text-base text-ink-secondary">Early Bird Disease Monitoring</Text>
+        )}
       </View>
 
       {/* Forced sign-out explanation (token revoked/expired mid-session). */}
@@ -124,14 +139,26 @@ export function LoginScreen({ navigation }: Props) {
         onChangeText={setEmail}
         placeholder="you@example.com"
         keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+        textContentType="emailAddress"
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
         error={fieldErrors.email ?? null}
       />
       <TextField
+        ref={passwordRef}
         label="Password"
         value={password}
         onChangeText={setPassword}
         placeholder="Your password"
         secure
+        autoComplete="current-password"
+        textContentType="password"
+        returnKeyType="go"
+        onSubmitEditing={() => {
+          if (!submitting) void handleSubmit();
+        }}
         error={fieldErrors.password ?? null}
       />
 

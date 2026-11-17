@@ -12,7 +12,7 @@ import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Gamefowl } from "../../types/api";
-import { formatAge } from "../../utils/format";
+import { formatAge, formatSex } from "../../utils/format";
 import { elevation } from "../ui/elevation";
 
 interface GamefowlCardProps {
@@ -64,7 +64,7 @@ export function GamefowlCard({ gamefowl, onPress }: GamefowlCardProps) {
           </View>
           <Text className="mt-1 text-sm text-ink-tertiary" numberOfLines={1}>
             {gamefowl.breed?.trim() || "Breed not set"} · {formatAge(gamefowl.age)} ·{" "}
-            {gamefowl.sex}
+            {formatSex(gamefowl.sex)}
           </Text>
         </View>
 

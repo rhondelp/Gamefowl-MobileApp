@@ -20,6 +20,7 @@
  */
 import React from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -68,6 +69,12 @@ const DashboardStack = createNativeStackNavigator<DashboardStackParamList>();
 const AdminStack = createNativeStackNavigator<AdminStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const MainTabs = createBottomTabNavigator<MainTabParamList>();
+
+/** Icon + label row of the tab bar, excluding the system-navigation inset. */
+const TAB_BAR_CONTENT_HEIGHT = 60;
+
+/** logo-mark.png is 521×453; rendered 140dp wide like the native splash. */
+const SPLASH_MARK_H = 140 * (453 / 521);
 
 /**
  * Self-service account stack (Milestone 16): settings main + edit profile +
@@ -269,6 +276,13 @@ function AdminStackScreen() {
  * hidden button).
  */
 function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
+  // Edge-to-edge Android draws the app under the system navigation bar.
+  // A fixed height/paddingBottom here REPLACES React Navigation's own
+  // inset-aware sizing, which pushed labels under the 3-button bar and
+  // squeezed the icons out. Grow the bar by the inset instead, so the
+  // tappable row always sits above it (3-button: ~48dp, gesture: ~16-24dp).
+  const insets = useSafeAreaInsets();
+
   return (
     <MainTabs.Navigator
       screenOptions={{
@@ -278,9 +292,9 @@ function MainTabsScreen({ isAdmin }: { isAdmin: boolean }) {
         tabBarStyle: {
           backgroundColor: palette.surface.card,
           borderTopColor: palette.surface.line,
-          height: 62,
+          height: TAB_BAR_CONTENT_HEIGHT + insets.bottom,
           paddingTop: 6,
-          paddingBottom: 8,
+          paddingBottom: 6 + insets.bottom,
         },
         tabBarLabelStyle: {
           fontFamily: "Poppins_500Medium",
@@ -344,15 +358,25 @@ export function RootNavigator() {
   // Bootstrap in progress: show a branded splash and render nothing else,
   // so neither auth screens nor app content can flash before we know the
   // real auth state.
+  // Visually continues the native splash (same canvas color, same
+  // transparent mark — no white tile) so launch reads as one screen.
   if (status === "loading") {
     return (
-      <View className="flex-1 items-center justify-center bg-brand-600">
+      <View className="flex-1 items-center justify-center bg-surface-canvas">
+        {/* Exactly centered + same 140dp width as app.json's imageWidth, so
+            the mark doesn't jump when the native splash hands over. */}
         <Image
-          source={require("../assets/images/app_icon_white.png")}
-          style={{ width: 110, height: 110, resizeMode: "contain" }}
+          source={require("../assets/images/logo-mark.png")}
+          style={{ width: 140, height: SPLASH_MARK_H, resizeMode: "contain" }}
+          accessibilityLabel="Gamefowl"
         />
-        <ActivityIndicator color="#ffffff" style={{ marginTop: 16 }} />
-        <Text className="mt-3 text-sm text-brand-100">Checking session…</Text>
+        <View
+          className="absolute left-0 right-0 items-center"
+          style={{ top: "50%", marginTop: SPLASH_MARK_H / 2 + 24 }}
+        >
+          <ActivityIndicator color={palette.brand[500]} />
+          <Text className="mt-3 text-sm text-ink-secondary">Checking session…</Text>
+        </View>
       </View>
     );
   }

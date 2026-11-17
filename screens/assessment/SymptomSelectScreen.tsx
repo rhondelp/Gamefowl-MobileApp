@@ -22,7 +22,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -32,6 +31,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { tone } from "../../components/ui/status";
 
 import { Screen } from "../../components/ui/Screen";
+import { FormScrollView } from "../../components/ui/KeyboardAware";
 import { ErrorState } from "../../components/ui/ErrorState";
 import { ChipGroup } from "../../components/ui/ChipGroup";
 import { elevation } from "../../components/ui/elevation";
@@ -189,7 +189,9 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
   }
 
   return (
-    <Screen>
+    // avoidKeyboard: the sticky Run button and the notes field ride above
+    // the keyboard instead of being covered by it.
+    <Screen avoidKeyboard>
       {/* Processing overlay while scoring/persisting runs. */}
       <Modal transparent visible={submitting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50 px-8">
@@ -207,7 +209,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
         </View>
       </Modal>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
+      <FormScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Who is being assessed */}
         <View className="mt-1 mb-4">
           <Text className="text-lg font-bold text-ink-primary">
@@ -314,7 +316,7 @@ export function SymptomSelectScreen({ route, navigation }: Props) {
             autoCapitalize="sentences"
           />
         </View>
-      </ScrollView>
+      </FormScrollView>
 
       {/* Sticky action bar */}
       <View className="border-t border-gray-200 bg-surface-card px-1 pb-1 pt-3">

@@ -95,7 +95,7 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
           source={require("../../assets/images/logo-mark.png")}
           style={{ width: 72, height: 72, resizeMode: "contain" }}
         />
-        <Text className="mt-2 text-2xl font-bold text-ink-primary">Forgot your password?</Text>
+        <Text className="mt-2 text-xl font-bold text-ink-primary">Forgot your password?</Text>
         <Text className="mt-1 text-center text-sm text-ink-tertiary">
           Enter the email on your account and we'll send you a reset link.
         </Text>
@@ -146,6 +146,12 @@ export function ForgotPasswordScreen({ navigation, route }: Props) {
             placeholder="you@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            returnKeyType="send"
+            onSubmitEditing={() => {
+              if (!submitting) void handleSubmit();
+            }}
             error={fieldErrors.email ?? null}
           />
 
